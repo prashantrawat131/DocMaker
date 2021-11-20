@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_bg"
+    tools:context=".SingleImage">
+
+    <ProgressBar
+        android:id="@+id/progressBar4"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@color/my_button_color"
+        android:orientation="horizontal"
+        android:padding="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageButton
+            android:id="@+id/imageButton4"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:rotation="-90"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/CD8"
+            android:onClick="GoBack"
+            android:backgroundTint="@color/my_button_color"
+            android:src="@drawable/ic_baseline_arrow_upward_24" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/CD9"
+            android:onClick="shareImage"
+            android:backgroundTint="@color/my_button_color"
+            android:src="@drawable/ic_baseline_share_24" />
+
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/CD10"
+            android:onClick="deleteImage"
+            android:backgroundTint="@color/my_button_color"
+            android:src="@drawable/ic_baseline_delete_24" />
+        <!--<Button
+            android:id="@+id/edit_button"
+            android:typeface="monospace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/my_button_color"
+            android:text="Edit"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textAllCaps="false"
+            />-->
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/my_button_color">
+
+            <ImageButton
+                android:id="@+id/edit_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="top"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/CD11"
+                android:onClick="goForEditing"
+                android:backgroundTint="@color/my_button_color"
+                android:src="@drawable/ic_baseline_edit_24" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:text="@string/t11"
+                android:textAlignment="center"
+                android:textColor="@color/black" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/my_button_color">
+
+            <ImageButton
+                android:id="@+id/imageButton5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="top"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/CD12"
+                android:onClick="retakeImage"
+                android:backgroundTint="@color/my_button_color"
+                android:src="@drawable/ic_baseline_photo_camera_24" />
+
+            <TextView
+                android:id="@+id/retake_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:text="@string/t12"
+                android:textAlignment="center"
+                android:textColor="@color/black" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:transitionName="image"
+        android:contentDescription="@string/CD13"
+        app:layout_constraintBottom_toTopOf="@+id/crop_linear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:srcCompat="@drawable/app_icon_orange_foreground" />
+
+    <LinearLayout
+        android:id="@+id/crop_linear"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@color/medium"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <ImageButton
+            android:id="@+id/imageButton15"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:rotation="-90"
+            android:contentDescription="@string/CD15"
+            android:onClick="goToPreviousImage"
+            android:backgroundTint="@color/my_button_color"
+            android:src="@drawable/ic_baseline_arrow_upward_24"/>
+
+        <TextView
+            android:id="@+id/single_image_index_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="1"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:gravity="center|center_horizontal"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/imageButton14"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:rotation="90"
+            android:contentDescription="@string/CD16"
+            android:onClick="goToNextImage"
+            android:backgroundTint="@color/my_button_color"
+            android:background="@color/app_bg"
+            android:src="@drawable/ic_baseline_arrow_upward_24"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--dark zone-->
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="text_color">#000000</color>
+
+    <!--medium zone-->
+    <color name="colorPrimary">#CF7500</color>
+    <color name="my_button_color">#CF7500</color>
+    <color name="floating_action_button_background">#CF7500</color>
+    <color name="colorAccent">#CF7500</color>
+
+    <!--light zone-->
+    <color name="app_bg">#F4F4F4</color>
+
+    <!--    extra light zone-->
+
+    <!--    random colors-->
+    <color name="black">#000000</color>
+    <color name="app_contrast_color">#fff</color>
+    <color name="icons_color">#F4F4F4</color>
+
+    <!--The theme color are below-->
+    <color name="extra_light">#F4F4F4</color>
+    <color name="light">#F0A500</color>
+    <color name="medium">#CF7500</color>
+
+    <!--    Buttons-->
+    <color name="button_before_press_color">#F0A500</color>
+    <color name="button_after_press_color">#CF7500</color>
+    <color name="radio_button_color">#000000</color>
+    <color name="flash_color">#F0A500</color>
+
+    <!--    Error zone-->
+    <color name="red">#FF0000</color>
+    <color name="empty_image_color">#F69999</color>
+    <color name="warning">#FFE916</color>
+
+</resources>
