@@ -3,6 +3,11 @@ package com.oxodiceproductions.dockmaker;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -10,8 +15,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +43,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,10 +86,14 @@ public class AllDocs extends AppCompatActivity {
         IDProvider();
 
         toolbar.inflateMenu(R.menu.toolbar_menu);
+        toolbar.setTitleTextColor(Color.BLACK);
 
         clearAnimationImageView.setVisibility(View.GONE);
 
         swipeRefreshLayout.setOnRefreshListener(this::Initializer);
+
+        //Navigation Drawer setup
+
 
         //all the ads stuff starts here
         MobileAds.initialize(this, initializationStatus -> {
@@ -128,6 +143,11 @@ public class AllDocs extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void toolBarClick(View view){
+        DrawerLayout drawerLayout=findViewById(R.id.drawer_layout);
+        drawerLayout.openDrawer(drawerLayout);
     }
 
     public void deleteUnusedFiles() {
