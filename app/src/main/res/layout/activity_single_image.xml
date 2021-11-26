@@ -21,7 +21,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:background="@color/my_button_color"
         android:orientation="horizontal"
         android:padding="6dp"
@@ -147,7 +147,7 @@
     <LinearLayout
         android:id="@+id/crop_linear"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:background="@color/medium"
         android:padding="10dp"

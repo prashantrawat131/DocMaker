@@ -9,6 +9,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     boolean all_permissions_granted = false;
     boolean dialog_running = false;
     boolean first_time = true;
+    TextView textView;
 
     //TextView appNameTextView;
     @Override
@@ -30,7 +34,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //mycode
+        textView = findViewById(R.id.textView7);
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.splash_screen_text_anim);
+        textView.setAnimation(animation);
+        animation.start();
         CheckPermissions();
     }
 
@@ -111,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, AllDocs.class);
             startActivity(intent);
             finish();
-        }, 500);
+        }, 1500);
     }
 
 

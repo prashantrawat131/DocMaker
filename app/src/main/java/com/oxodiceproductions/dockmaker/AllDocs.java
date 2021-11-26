@@ -3,6 +3,7 @@ package com.oxodiceproductions.dockmaker;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -54,7 +55,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class AllDocs extends AppCompatActivity {
+public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /*This activity show all the documents present in the database*/
     ArrayList<document_model> arrayList = new ArrayList<>();
     RecyclerView recyclerView;
@@ -66,6 +67,8 @@ public class AllDocs extends AppCompatActivity {
     AllDocsRecyclerViewAdapter adapter;
     SwipeRefreshLayout swipeRefreshLayout;
     ImageView clearAnimationImageView;
+    NavigationView navigationView;
+    DrawerLayout drawerLayout;
     ImageButton deleteSelectedDocumentsButton;
 
     /* arrayList :- it is a list of all the documents present in the database. It has type of document_model which is a custom java class for documents
@@ -93,7 +96,7 @@ public class AllDocs extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(this::Initializer);
 
         //Navigation Drawer setup
-
+        navigationView.setNavigationItemSelectedListener(this);
 
         //all the ads stuff starts here
         MobileAds.initialize(this, initializationStatus -> {
@@ -127,27 +130,22 @@ public class AllDocs extends AppCompatActivity {
 
         Initializer();
 
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.action_settings) {
-                    GoToSettings();
-                }
-                if (item.getItemId() == R.id.action_share_app) {
-                    shareApp();
-                }
-                if (item.getItemId() == R.id.action_clear_cache) {
-                    clearCache();
-                }
-                return false;
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_settings) {
+                GoToSettings();
             }
+            if (item.getItemId() == R.id.action_share_app) {
+                shareApp();
+            }
+            if (item.getItemId() == R.id.action_clear_cache) {
+                clearCache();
+            }
+            return false;
         });
-
     }
 
-    public void toolBarClick(View view){
-        DrawerLayout drawerLayout=findViewById(R.id.drawer_layout);
-        drawerLayout.openDrawer(drawerLayout);
+    public void toolBarClick(View view) {
+        drawerLayout.openDrawer(GravityCompat.START);
     }
 
     public void deleteUnusedFiles() {
@@ -347,36 +345,14 @@ public class AllDocs extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.swipe_all_doc);
         addNewDocFloatingActionButton = findViewById(R.id.floatingActionButton2);
         empty_home_frame_layout.setVisibility(View.GONE);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
     }
 
     public void GoToSettings() {
         Intent in = new Intent(AllDocs.this, MySettings.class);
         startActivity(in);
     }
-/*
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        return super.onOptionsItemSelected(item);
-        Toast.makeText(getApplicationContext(), "" + item.getItemId() + "", Toast.LENGTH_SHORT).show();
-        if (item.getItemId() == R.id.action_settings) {
-            GoToSettings();
-        }
-        if (item.getItemId() == R.id.action_share_app) {
-            shareApp();
-        }
-        if (item.getItemId() == R.id.action_clear_cache) {
-            clearCache();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-*/
 
     private void clearCache() {
         progressBar.setVisibility(View.VISIBLE);
@@ -412,5 +388,21 @@ public class AllDocs extends AppCompatActivity {
         in.putExtra("DocId", DocId);
         in.putExtra("first_time", false);
         startActivity(in);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        drawerLayout.closeDrawer(GravityCompat.START);
+        if (id == R.id.all_photos) {
+            Toast.makeText(getApplicationContext(), "All photos", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_share_app) {
+            shareApp();
+        } else if (id == R.id.nav_about_app) {
+            Toast.makeText(getApplicationContext(), "About app", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_setting) {
+            GoToSettings();
+        }
+        return true;
     }
 }

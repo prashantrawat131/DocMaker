@@ -10,7 +10,7 @@
     <LinearLayout
         android:id="@+id/crop_top_view"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:background="@color/my_button_color"
         android:orientation="horizontal"
         android:padding="6dp"
@@ -47,7 +47,7 @@
     <LinearLayout
         android:id="@+id/crop_bottom_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:background="@color/my_button_color"
         android:orientation="horizontal"
         android:padding="5dp"

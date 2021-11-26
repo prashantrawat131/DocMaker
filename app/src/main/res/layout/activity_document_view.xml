@@ -50,7 +50,7 @@
     <LinearLayout
         android:id="@+id/doc_view_options"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:layout_weight="1"
         android:background="@color/my_button_color"
         android:orientation="horizontal"
