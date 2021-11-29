@@ -42,16 +42,13 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     Context context;
     Activity activity;
     RecyclerView recyclerView;
-    int selected = 0;
     FloatingActionButton createDocumentFAB;
-    ImageButton selected_delete_button;
 
-    public AllDocsRecyclerViewAdapter(FloatingActionButton createDocumentFAB, ImageButton selected_delete_button, ArrayList<document_model> arrayList, Context context, Activity activity, RecyclerView recyclerView) {
+    public AllDocsRecyclerViewAdapter(FloatingActionButton createDocumentFAB, ArrayList<document_model> arrayList, Context context, Activity activity, RecyclerView recyclerView) {
         this.arrayList = arrayList;
         this.context = context;
         this.activity = activity;
         this.recyclerView = recyclerView;
-        this.selected_delete_button = selected_delete_button;
         this.createDocumentFAB = createDocumentFAB;
     }
 
@@ -96,70 +93,23 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                     .into(holder.sample_image);
         }
 
-        holder.checkBox.setOnClickListener(view2 -> {
-            CheckBox checkBox = view2.findViewById(R.id.checkBox);
-            if (checkBox.isChecked()) {
-                //this means after user clicked the checkbox become checked
-                selectImage(position);
-            } else {
-                //this means after user clicked the checkbox become unchecked
-                deselectImage(position);
+        holder.toolbar.setOnMenuItemClickListener(item -> {
+            String DocId = arrayList.get(holder.getAdapterPosition()).getDocId();
+            String DocName = arrayList.get(holder.getAdapterPosition()).getDocName();
+            int position1 = holder.getAdapterPosition();
+            if (item.getItemId() == R.id.overflow_doc_delete) {
+                DeleteDocButtonListener(DocId, DocName, position1);
             }
-        });
-
-        holder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                String DocId = arrayList.get(holder.getAdapterPosition()).getDocId();
-                String DocName = arrayList.get(holder.getAdapterPosition()).getDocName();
-                int position = holder.getAdapterPosition();
-                if (item.getItemId() == R.id.overflow_doc_delete) {
-                    DeleteDocButtonListener(DocId, DocName, position);
-                }
-                if (item.getItemId() == R.id.overflow_doc_share) {
-                    SharePdfButtonListener(DocId);
-                }
-                return true;
+            if (item.getItemId() == R.id.overflow_doc_share) {
+                SharePdfButtonListener(DocId);
             }
+            return true;
         });
-
-        //checking if already checked or not, to show it as checked if it was checked
-        if (arrayList.get(position).isCheck()) {
-            holder.checkBox.setChecked(true);
-        }
     }
 
     @Override
     public int getItemCount() {
         return arrayList.size();
-    }
-
-
-    void selectImage(int i) {
-        selected++;
-        arrayList.get(i).setCheck(true);
-        lookUp();
-    }
-
-    void deselectImage(int i) {
-        selected--;
-        arrayList.get(i).setCheck(false);
-        lookUp();
-    }
-
-    void lookUp() {
-        /*this function looks up whether any image is selected
-		or not then it will perform the respective tasks
-		*/
-        if (selected == 0) {
-            selected_delete_button.setVisibility(View.GONE);
-            createDocumentFAB.setVisibility(View.VISIBLE);
-        } else {
-            selected_delete_button.setVisibility(View.VISIBLE);
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.rotation_left_right_repeat);
-            selected_delete_button.startAnimation(animation);
-            createDocumentFAB.setVisibility(View.GONE);
-        }
     }
 
     void GotoDocumentView(int i) {
@@ -220,7 +170,9 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                         }
                         myDatabase.DeleteTable(DocId);
                         arrayList.remove(position);
-                        notifyAll();
+//                        ((AllDocs)context).Initializer();
+//                        notifyAll();
+                        notifyItemRemoved(position);
                         dialog.dismiss();
                     };
                     Thread thread = new Thread(runnable);
@@ -232,7 +184,6 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView date_created_tv, time_created_tv, size_tv, number_of_pics_tv;
         ImageView sample_image;
-        CheckBox checkBox;
         TextView indexNumberTextView;
         Toolbar toolbar;
 
@@ -243,7 +194,6 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             size_tv = itemView.findViewById(R.id.textView);
             sample_image = itemView.findViewById(R.id.doc_imageview);
             number_of_pics_tv = itemView.findViewById(R.id.textView5);
-            checkBox = itemView.findViewById(R.id.checkBox);
             indexNumberTextView = itemView.findViewById(R.id.index_number_text_view);
             toolbar = itemView.findViewById(R.id.doc_toolbar);
             toolbar.inflateMenu(R.menu.doc_overflow_menu);
@@ -254,21 +204,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
         public void onClick(View v) {
             TextView indexTv = v.findViewById(R.id.index_number_text_view);
             int i = Integer.parseInt(indexTv.getText().toString()) - 1;
-            if (selected == 0) {
-                //this means no document is selected and the user wants to preview the document
-                GotoDocumentView(i);
-            } else {
-                CheckBox checkBox = v.findViewById(R.id.checkBox);
-                if (checkBox.isChecked()) {
-                    //this means the user wants to remove the selection
-                    checkBox.setChecked(false);
-                    deselectImage(i);
-                } else {
-                    //this means the user wants to select the image
-                    checkBox.setChecked(true);
-                    selectImage(i);
-                }
-            }
+            GotoDocumentView(i);
         }
     }
 }

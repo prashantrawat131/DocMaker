@@ -38,9 +38,12 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -55,7 +58,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     /*This activity show all the documents present in the database*/
     ArrayList<document_model> arrayList = new ArrayList<>();
     RecyclerView recyclerView;
@@ -69,7 +72,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     ImageView clearAnimationImageView;
     NavigationView navigationView;
     DrawerLayout drawerLayout;
-    ImageButton deleteSelectedDocumentsButton;
+    private AdView mAdView;
 
     /* arrayList :- it is a list of all the documents present in the database. It has type of document_model which is a custom java class for documents
      * listView:-It is the listView for all the documents
@@ -101,8 +104,8 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         //all the ads stuff starts here
         MobileAds.initialize(this, initializationStatus -> {
         });
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(this, getResources().getString(R.string.go_to_single_image_ad_unit_id), adRequest, new InterstitialAdLoadCallback() {
+        AdRequest interstitialRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(this, getResources().getString(R.string.go_to_single_image_ad_unit_id), interstitialRequest, new InterstitialAdLoadCallback() {
             @Override
             public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
 //                super.onAdLoaded(interstitialAd);
@@ -126,8 +129,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
         //ads stuff ends here
 
-        deleteSelectedDocumentsButton.setOnClickListener(view -> AskToDelete());
-
         Initializer();
 
         toolbar.setOnMenuItemClickListener(item -> {
@@ -142,6 +143,17 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             }
             return false;
         });
+
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest bannerRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(bannerRequest);
     }
 
     public void toolBarClick(View view) {
@@ -272,14 +284,12 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         myDatabase.DeleteTable(DocId);
     }
 
-
-    void Initializer() {
+    public void Initializer() {
         /* This function fill the arrayList which documents to show in the listView.
          * Here the database is used to fetch all the documents.
          * ListView adapter is used to insert documents in the listView*/
         progressBar.setVisibility(View.VISIBLE);
         addNewDocFloatingActionButton.setVisibility(View.VISIBLE);
-        deleteSelectedDocumentsButton.setVisibility(View.GONE);
         arrayList.clear();
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         Cursor cc = myDatabase.LoadDocuments();
@@ -304,7 +314,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             Collections.sort(arrayList);
 
             //adapter setup
-            adapter = new AllDocsRecyclerViewAdapter(addNewDocFloatingActionButton, deleteSelectedDocumentsButton, arrayList, getApplicationContext(), this, recyclerView);
+            adapter = new AllDocsRecyclerViewAdapter(addNewDocFloatingActionButton, arrayList, getApplicationContext(), this, recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             recyclerView.setAdapter(adapter);
 
@@ -320,15 +330,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
     @Override
     public void onBackPressed() {
-        /*If back button is pressed then it will check whether any document is selected or not.
-         * If selected then then user may want to clear the selection and do not want to exit
-         * else it is the last activity and the user wants to exit the app.
-         * finish Affinity is used to exit the app*/
-        if (deleteSelectedDocumentsButton.isShown()) {
-            Initializer();
-        } else {
             finishAffinity();
-        }
     }
 
     void IDProvider() {
@@ -338,9 +340,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         clearAnimationImageView = findViewById(R.id.imageView4);
         progressBar = findViewById(R.id.progressBar2);
         toolbar = findViewById(R.id.toolBarAllDocs);
-        deleteSelectedDocumentsButton = findViewById(R.id.selected_delete_button);
         empty_home_frame_layout = findViewById(R.id.empty_home_id);
-        deleteSelectedDocumentsButton.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         swipeRefreshLayout = findViewById(R.id.swipe_all_doc);
         addNewDocFloatingActionButton = findViewById(R.id.floatingActionButton2);

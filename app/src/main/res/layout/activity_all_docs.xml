@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -27,22 +26,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/selected_delete_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/circular_button"
-            android:contentDescription="@string/deleteSelectedDocumentsCD"
-            android:src="@drawable/ic_baseline_delete_24"
-            android:translationZ="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <ProgressBar
             android:id="@+id/progressBar2"
             android:layout_width="wrap_content"
@@ -50,7 +33,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:translationZ="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/adView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolBarAllDocs" />
@@ -58,10 +41,9 @@
         <FrameLayout
             android:id="@+id/empty_home_id"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/toolBarAllDocs"
+            android:layout_height="0dp"
             android:background="@color/app_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/adView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolBarAllDocs">
@@ -88,10 +70,10 @@
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_all_doc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_below="@id/toolBarAllDocs"
             android:background="@color/app_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/adView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolBarAllDocs">
@@ -119,6 +101,8 @@
             android:onClick="addNewDocument"
             android:scaleType="center"
             android:src="@drawable/ic_baseline_picture_as_pdf_24"
+            app:layout_constraintBottom_toTopOf="@+id/adView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:maxImageSize="56dp" />
 
         <ImageView
@@ -130,8 +114,22 @@
             android:layout_marginBottom="48dp"
             android:contentDescription="@string/cacheClearedCD"
             android:src="@drawable/rocket"
-            android:visibility="gone" />
-    </RelativeLayout>
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/adView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/swipe_all_doc"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            app:adSize="SMART_BANNER"
+            app:adUnitId="@string/all_doc_ad"
+            app:layout_constraintBottom_toBottomOf="parent"></com.google.android.gms.ads.AdView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <com.google.android.material.navigation.NavigationView

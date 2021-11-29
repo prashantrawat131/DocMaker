@@ -4,6 +4,7 @@
     <group android:menuCategory="alternative">
         <item
             android:id="@+id/all_photos"
+            android:visible="false"
             android:icon="@drawable/ic_baseline_photo_camera_24"
             android:title="All photos" />
     </group>
@@ -15,6 +16,7 @@
             android:title="Share app" />
         <item
             android:id="@+id/nav_about_app"
+            android:visible="false"
             android:icon="@drawable/ic_baseline_description_24"
             android:title="About app" />
         <item

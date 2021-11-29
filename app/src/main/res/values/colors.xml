@@ -20,7 +20,7 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="grey">#BEBCBC</color>
-    <color name="image_view_bg">#ffffff</color>
+    <color name="image_view_bg">#BEBCBC</color>
     <color name="app_contrast_color">#fff</color>
     <color name="icons_color">#F4F4F4</color>
 

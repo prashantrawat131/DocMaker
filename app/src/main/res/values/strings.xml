@@ -5,7 +5,7 @@
 
     <!--  main ad unit start here-->
 
-<!--            <string name="go_to_single_image_ad_unit_id">ca-app-pub-7028190213096953/4986937567</string>-->
+<!--            <string name="go_to_single_image_ad_unit_id">ca-app-pub-7028190213096953/2435066460</string>-->
 
     <!-- main ad unit ends here-->
 
@@ -16,6 +16,22 @@
 
     <!-- test ad unit ends here-->
 
+
+<!--    Banner ad unit -->
+
+
+    <!--  main ad unit start here-->
+
+    <!--            <string name="all_doc_ad">ca-app-pub-7028190213096953/1313556482</string>-->
+
+    <!-- main ad unit ends here-->
+
+
+    <!--test ad unit start here-->
+
+    <string name="all_doc_ad">ca-app-pub-3940256099942544/6300978111</string>
+
+    <!-- test ad unit ends here-->
 
 <!--    Other texts starts here-->
     <string name="backButtonCD">Back button</string>
