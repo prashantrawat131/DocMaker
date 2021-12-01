@@ -4,29 +4,21 @@ import static androidx.core.content.FileProvider.getUriForFile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -98,7 +90,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             String DocName = arrayList.get(holder.getAdapterPosition()).getDocName();
             int position1 = holder.getAdapterPosition();
             if (item.getItemId() == R.id.overflow_doc_delete) {
-                DeleteDocButtonListener(DocId, DocName, position1);
+                DeleteDoc(DocId, DocName, position1);
             }
             if (item.getItemId() == R.id.overflow_doc_share) {
                 SharePdfButtonListener(DocId);
@@ -125,10 +117,12 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                 ArrayList<String> ImagePaths = new ArrayList<>();
                 MyDatabase myDatabase = new MyDatabase(context);
                 Cursor cc = myDatabase.LoadImagePaths(DocId);
-                cc.moveToFirst();
-                do {
-                    ImagePaths.add(cc.getString(0));
-                } while (cc.moveToNext());
+               try{
+                    cc.moveToFirst();
+                    do {
+                        ImagePaths.add(cc.getString(0));
+                    } while (cc.moveToNext());
+                }catch (Exception e){ }
                 if (!ImagePaths.isEmpty()) {
                     PDFMaker pdfMaker = new PDFMaker(context);
                     String filepath = pdfMaker.MakeTempPDF(null, ImagePaths);
@@ -141,11 +135,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                         shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
                         activity.startActivity(Intent.createChooser(shareIntent, "Share with"));
-                    } else {
-                        Toast.makeText(context, "File path not available", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(context, "Empty document", Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
                 Log.d("tagJi", "SharePdfButtonListener: " + e.getMessage());
@@ -153,30 +143,31 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
         }).start();
     }
 
-    public void DeleteDocButtonListener(String DocId, String DocName, int position) {
+    public void DeleteDoc(String DocId, String DocName, int position) {
+        //do not put notifyItemRemoved in a thread because it will not work there properly.
         new AlertDialog.Builder(activity).setTitle("Do you want to delete this document")
                 .setMessage(DocName)
                 .setCancelable(true)
                 .setPositiveButton("delete", (dialog, which) -> {
-                    Runnable runnable = () -> {
-                        MyDatabase myDatabase = new MyDatabase(context);
-                        Cursor cc = myDatabase.LoadImagePaths(DocId);
+                    MyDatabase myDatabase = new MyDatabase(context);
+                    Cursor cc = myDatabase.LoadImagePaths(DocId);
+                    try {
                         cc.moveToFirst();
+                        do {
+                            CommonOperations.deleteFile(cc.getString(0));
+                        } while (cc.moveToNext());
+                    } catch (Exception e) {
+                    }
+
+                    new Thread(() -> {
                         try {
-                            do {
-                                CommonOperations.deleteFile(cc.getString(0));
-                            } while (cc.moveToNext());
-                        } catch (Exception e) {
-                        }
-                        myDatabase.DeleteTable(DocId);
-                        arrayList.remove(position);
-//                        ((AllDocs)context).Initializer();
-//                        notifyAll();
-                        notifyItemRemoved(position);
-                        dialog.dismiss();
-                    };
-                    Thread thread = new Thread(runnable);
-                    thread.start();
+                            myDatabase.DeleteTable(DocId);
+                        } catch (Exception e) { }
+                    }).start();
+
+                    arrayList.remove(position);
+                    notifyItemRemoved(position);
+                    dialog.dismiss();
                 }).setNegativeButton("cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }

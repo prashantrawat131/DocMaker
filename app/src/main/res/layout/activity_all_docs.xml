@@ -126,7 +126,7 @@
             android:layout_below="@id/swipe_all_doc"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            app:adSize="SMART_BANNER"
+            app:adSize="BANNER"
             app:adUnitId="@string/all_doc_ad"
             app:layout_constraintBottom_toBottomOf="parent"></com.google.android.gms.ads.AdView>
     </androidx.constraintlayout.widget.ConstraintLayout>

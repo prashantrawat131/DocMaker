@@ -36,7 +36,6 @@ public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecy
     String DocId;
     ImageButton selectImagesButton;
     RecyclerView recyclerView;
-    //    boolean firstTime;
     LinearLayout docViewOptionsLinearLayout;
     FloatingActionButton selectPhotosButton, clickPhotosButton;
     int numberOfCheckedImages = 0;
@@ -53,7 +52,6 @@ public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecy
         this.context = context;
         this.activity = activity;
         this.progressBar = progressBar;
-//        this.firstTime = firstTime;
         this.docViewOptionsLinearLayout = docViewOptionsLinearLayout;
         this.selectImagesButton = selectPhotosButton;
     }
@@ -225,6 +223,4 @@ public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecy
         Thread thread = new Thread(runnable);
         thread.start();
     }
-
-
 }

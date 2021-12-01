@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -158,8 +159,16 @@ public class MyDatabase extends SQLiteOpenHelper {
     public void DeleteTable(String DocId) {
         /*To completely delete the document*/
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        sqLiteDatabase.execSQL("delete from '" + DocId + "'");
-        sqLiteDatabase.execSQL("drop table '" + DocId + "'");
-        sqLiteDatabase.execSQL("delete from documents where DocId='" + DocId + "'");
+        try{
+            sqLiteDatabase.execSQL("delete from '" + DocId + "'");
+        }catch (Exception e){
+            Log.d("tagJi","Zero images while deleting in database");
+        }
+        try{
+            sqLiteDatabase.execSQL("drop table '" + DocId + "'");
+            sqLiteDatabase.execSQL("delete from documents where DocId='" + DocId + "'");
+        }catch (Exception e){
+            Log.d("tagJi", "No table found when deleting doc");
+        }
     }
 }
