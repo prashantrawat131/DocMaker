@@ -1,28 +1,10 @@
 package com.oxodiceproductions.dockmaker;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +12,20 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -58,7 +48,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /*This activity show all the documents present in the database*/
     ArrayList<document_model> arrayList = new ArrayList<>();
     RecyclerView recyclerView;
@@ -171,9 +161,10 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 runOnUiThread(() -> clearAnimationImageView.setVisibility(View.GONE));
             }
         }, 3000);
+        MyDatabase myDatabase = null;
         try {
             ArrayList<String> usefulImages = new ArrayList<>();
-            MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+            myDatabase = new MyDatabase(getApplicationContext());
             Cursor cc = myDatabase.LoadDocuments();
             cc.moveToFirst();
             do {
@@ -181,10 +172,9 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 ccc.moveToFirst();
                 do {
                     usefulImages.add(ccc.getString(0));
-                    Log.d("tagJi", "" + ccc.getString(0));
+//                    Log.d("tagJi", "" + ccc.getString(0));
                 } while (ccc.moveToNext());
             } while (cc.moveToNext());
-
             File file = new File(getFilesDir().getPath());
             File[] allFiles = file.listFiles();
 
@@ -200,6 +190,9 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         } catch (Exception e) {
             progressBar.setVisibility(View.GONE);
             //Toast.makeText(AllDocs.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        finally {
+            myDatabase.close();
         }
     }
 
@@ -270,8 +263,8 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
          * It deletes the images from the database and also from the storage*/
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         Cursor cc = myDatabase.LoadImagePaths(DocId);
-        cc.moveToFirst();
         try {
+            cc.moveToFirst();
             do {
                 File file = new File(cc.getString(0));
                 boolean result = file.delete();
@@ -282,6 +275,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         } catch (Exception ignored) {
         }
         myDatabase.DeleteTable(DocId);
+        myDatabase.close();
     }
 
     public void Initializer() {
@@ -325,12 +319,15 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             recyclerView.setVisibility(View.GONE);
             swipeRefreshLayout.setVisibility(View.GONE);
         }
+        finally {
+            myDatabase.close();
+        }
         progressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void onBackPressed() {
-            finishAffinity();
+        finishAffinity();
     }
 
     void IDProvider() {
@@ -384,6 +381,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         String time_s = c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND);
         myDatabase.InsertDocument(DocId, DocId, date_s, time_s, DocId);
         myDatabase.CreateTable(DocId);
+        myDatabase.close();
         Intent in = new Intent(getApplicationContext(), document_view.class);
         in.putExtra("DocId", DocId);
         in.putExtra("first_time", false);

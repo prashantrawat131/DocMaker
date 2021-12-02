@@ -15,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@color/medium"
-            android:collapseIcon="@drawable/flash_off"
             android:contentDescription="@string/toolBarCD"
             android:navigationIcon="@drawable/ic_baseline_dehaze_24"
             android:onClick="toolBarClick"
@@ -126,7 +125,7 @@
             android:layout_below="@id/swipe_all_doc"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            app:adSize="BANNER"
+            app:adSize="SMART_BANNER"
             app:adUnitId="@string/all_doc_ad"
             app:layout_constraintBottom_toBottomOf="parent"></com.google.android.gms.ads.AdView>
     </androidx.constraintlayout.widget.ConstraintLayout>

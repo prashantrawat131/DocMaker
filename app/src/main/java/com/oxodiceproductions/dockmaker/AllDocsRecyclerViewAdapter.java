@@ -14,11 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -67,8 +65,9 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
         holder.indexNumberTextView.setText("" + (position + 1));
 
         //thumbnail extraction
+        MyDatabase myDatabase=null;
         try {
-            MyDatabase myDatabase = new MyDatabase(context);
+            myDatabase = new MyDatabase(context);
             Cursor cc = myDatabase.LoadImagePaths(arrayList.get(position).getDocId());
             cc.moveToFirst();
             File file = new File(cc.getString(0));
@@ -83,6 +82,9 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             Glide.with(context).applyDefaultRequestOptions(options)
                     .load(R.drawable.ic_baseline_broken_image_24)
                     .into(holder.sample_image);
+        }
+        finally {
+            myDatabase.close();
         }
 
         holder.toolbar.setOnMenuItemClickListener(item -> {
@@ -113,16 +115,18 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
 
     private void SharePdfButtonListener(String DocId) {
         new Thread(() -> {
+            MyDatabase myDatabase = null;
             try {
                 ArrayList<String> ImagePaths = new ArrayList<>();
-                MyDatabase myDatabase = new MyDatabase(context);
+                myDatabase = new MyDatabase(context);
                 Cursor cc = myDatabase.LoadImagePaths(DocId);
-               try{
+                try {
                     cc.moveToFirst();
                     do {
                         ImagePaths.add(cc.getString(0));
                     } while (cc.moveToNext());
-                }catch (Exception e){ }
+                } catch (Exception e) {
+                }
                 if (!ImagePaths.isEmpty()) {
                     PDFMaker pdfMaker = new PDFMaker(context);
                     String filepath = pdfMaker.MakeTempPDF(null, ImagePaths);
@@ -139,6 +143,8 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                 }
             } catch (Exception e) {
                 Log.d("tagJi", "SharePdfButtonListener: " + e.getMessage());
+            } finally {
+                    myDatabase.close();
             }
         }).start();
     }
@@ -159,11 +165,12 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                     } catch (Exception e) {
                     }
 
-                    new Thread(() -> {
-                        try {
-                            myDatabase.DeleteTable(DocId);
-                        } catch (Exception e) { }
-                    }).start();
+                    try{
+                        myDatabase.DeleteTable(DocId);
+                    }catch (Exception e){ }
+                    finally {
+                        myDatabase.close();
+                    }
 
                     arrayList.remove(position);
                     notifyItemRemoved(position);

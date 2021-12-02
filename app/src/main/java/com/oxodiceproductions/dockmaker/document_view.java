@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -105,11 +104,9 @@ public class document_view extends AppCompatActivity {
 
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         DocName = myDatabase.GetDocumentName(DocId);
+        myDatabase.close();
         doc_name_tv.setText(DocName);
 
-//        if (!first_time) {
-//            Initializer();
-//        }
         swipeRefreshLayout.setOnRefreshListener(this::Initializer);
     }
 
@@ -122,6 +119,7 @@ public class document_view extends AppCompatActivity {
     void delete(String ImagePath) {
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         myDatabase.DeleteImage(ImagePath, DocId);
+        myDatabase.close();
         CommonOperations.deleteFile(ImagePath);
     }
 
@@ -233,7 +231,7 @@ public class document_view extends AppCompatActivity {
     public void DeleteDocButtonListener(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
 
-        final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, recyclerView, false)};
+        final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
         alertDialogBuilder.setView(customView[0]);
 
         TextView textView = customView[0].findViewById(R.id.textView9);
@@ -249,14 +247,15 @@ public class document_view extends AppCompatActivity {
             Runnable runnable = () -> {
                 MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                 Cursor cc = myDatabase.LoadImagePaths(DocId);
-                cc.moveToFirst();
                 try {
+                    cc.moveToFirst();
                     do {
                         CommonOperations.deleteFile(cc.getString(0));
                     } while (cc.moveToNext());
                 } catch (Exception e) {
                 }
                 myDatabase.DeleteTable(DocId);
+                myDatabase.close();
                 Intent in = new Intent(document_view.this, AllDocs.class);
                 startActivity(in);
                 finish();
@@ -369,6 +368,8 @@ public class document_view extends AppCompatActivity {
             emptyListFrameLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
             swipeRefreshLayout.setVisibility(View.GONE);
+        } finally {
+            myDatabase.close();
         }
 //        first_time = false;
         progressBar.setVisibility(View.GONE);
@@ -476,12 +477,11 @@ public class document_view extends AppCompatActivity {
     }
 
     void ChangeName() {
-        Runnable runnable = () -> {
+        new Thread(() -> {
             MyDatabase myDatabase = new MyDatabase(getApplicationContext());
             myDatabase.SetDocumentName(DocId, DocName);
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
+            myDatabase.close();
+        }).start();
     }
 
     void InitialWork() {

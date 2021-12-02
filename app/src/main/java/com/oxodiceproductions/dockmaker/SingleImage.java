@@ -99,6 +99,7 @@ public class SingleImage extends AppCompatActivity {
                 //deleting from database
                 MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                 myDatabase.DeleteImage(ImagePath, DocId);
+                myDatabase.close();
 
                 //deleting from storage
                 CommonOperations.deleteFile(ImagePath);
@@ -162,10 +163,17 @@ public class SingleImage extends AppCompatActivity {
     void populateImageList() {
         MyDatabase database = new MyDatabase(getApplicationContext());
         Cursor cc = database.LoadImagePaths(DocId);
-        cc.moveToFirst();
-        do {
-            imagesList.add(cc.getString(0));
-        } while (cc.moveToNext());
+        try {
+            cc.moveToFirst();
+            do {
+                imagesList.add(cc.getString(0));
+            } while (cc.moveToNext());
+        }catch (Exception e){
+
+        }
+        finally {
+            database.close();
+        }
         String index="" + (imagesList.indexOf(ImagePath) + 1);
         imageIndexTextView.setText(index);
     }

@@ -150,6 +150,7 @@ public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecy
             //database operations must be performed in separate thread
             MyDatabase myDatabase = new MyDatabase(context);
             myDatabase.updateDoc(ImagePaths.get(p1), ImagePaths.get(p2), DocId);
+            myDatabase.close();
         };
         Thread thread = new Thread(runnable);
         thread.start();

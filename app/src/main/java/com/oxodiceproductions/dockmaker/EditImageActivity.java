@@ -71,10 +71,12 @@ public class EditImageActivity extends AppCompatActivity {
 
         //saving to database
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-        if (retakeImagePath.equals("-1"))
+        if (retakeImagePath.equals("-1")) {
             myDatabase.InsertImage(DocId, finalFile.getPath());
-        else
+        } else {
             myDatabase.retake(DocId, retakeImagePath, finalFile.getPath());
+        }
+        myDatabase.close();
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(finalFile);

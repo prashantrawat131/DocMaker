@@ -3,11 +3,11 @@
 
     <!-- TODO: Remove or change this placeholder text -->
 
-    <!-- all docs interstitial ad unit start here-->
+    <!-- all docs interstitial main ad unit start here-->
 
 <!--            <string name="go_to_single_image_ad_unit_id">ca-app-pub-7028190213096953/2435066460</string>-->
 
-    <!-- all docs interstitial ad unit ends here-->
+    <!-- all docs interstitial main ad unit ends here-->
 
 
     <!--test  all docs interstitial ad unit start here-->
@@ -20,11 +20,11 @@
 <!--    Banner ad unit -->
 
 
-    <!--  all doc banner ad unit start here-->
+    <!--  all doc banner main ad unit start here-->
 
-    <!--            <string name="all_doc_ad">ca-app-pub-7028190213096953/1313556482</string>-->
+<!--                <string name="all_doc_ad">ca-app-pub-7028190213096953/1313556482</string>-->
 
-    <!-- all doc banner ad unit ends here-->
+    <!-- all doc banner main ad unit ends here-->
 
 
     <!--test all doc banner ad unit start here-->
