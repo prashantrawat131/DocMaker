@@ -7,6 +7,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,15 +55,9 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     @Override
     public void onBindViewHolder(@NonNull MyDocViewHolder holder, int position) {
         holder.toolbar.setTitle(arrayList.get(position).getDocName());
-        holder.date_created_tv.setText("Date: " + arrayList.get(position).getDateCreated());
-        holder.time_created_tv.setText("Time: " + arrayList.get(position).getTimeCreated());
-
-        //size calculations
-        float size = Float.parseFloat(arrayList.get(position).getSize());
-        size = size / (1048576f);//1024 * 1024 = 1048576
-        holder.size_tv.setText("Size: " + String.format("%.2f MB", size));
-
-        holder.number_of_pics_tv.setText("Pics: " + arrayList.get(position).getNumberOfPics());
+        holder.date_created_tv.setText(context.getString(R.string.date,arrayList.get(position).getDateCreated()));
+        holder.time_created_tv.setText(context.getString(R.string.time,arrayList.get(position).getTimeCreated()));
+        holder.number_of_pics_tv.setText(context.getString(R.string.pics,arrayList.get(position).getNumberOfPics()));
         holder.indexNumberTextView.setText("" + (position + 1));
 
         //thumbnail extraction
@@ -94,11 +90,23 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             if (item.getItemId() == R.id.overflow_doc_delete) {
                 DeleteDoc(DocId, DocName, position1);
             }
-            if (item.getItemId() == R.id.overflow_doc_share) {
+            else if (item.getItemId() == R.id.overflow_doc_share) {
                 SharePdfButtonListener(DocId);
+            }
+            else if(item.getItemId()==R.id.overflow_doc_details){
+                ShowDocDetails(arrayList.get(position));
             }
             return true;
         });
+    }
+
+    private void ShowDocDetails(document_model doc){
+        MyAlertCreator myAlertCreator=new MyAlertCreator();
+        //size calculations
+        float size = Float.parseFloat(doc.getSize());
+        size = size / (1048576f);//1024 * 1024 = 1048576
+        String text="Size: " + String.format("%.2f MB", size);
+        myAlertCreator.showDialog(activity,text);
     }
 
     @Override
@@ -162,8 +170,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                         do {
                             CommonOperations.deleteFile(cc.getString(0));
                         } while (cc.moveToNext());
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) { }
 
                     try{
                         myDatabase.DeleteTable(DocId);
@@ -180,7 +187,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     }
 
     class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView date_created_tv, time_created_tv, size_tv, number_of_pics_tv;
+        TextView date_created_tv,size_tv, time_created_tv, number_of_pics_tv;
         ImageView sample_image;
         TextView indexNumberTextView;
         Toolbar toolbar;
@@ -189,9 +196,9 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             super(itemView);
             date_created_tv = itemView.findViewById(R.id.textView3);
             time_created_tv = itemView.findViewById(R.id.textView2);
-            size_tv = itemView.findViewById(R.id.textView);
             sample_image = itemView.findViewById(R.id.doc_imageview);
             number_of_pics_tv = itemView.findViewById(R.id.textView5);
+            size_tv.
             indexNumberTextView = itemView.findViewById(R.id.index_number_text_view);
             toolbar = itemView.findViewById(R.id.doc_toolbar);
             toolbar.inflateMenu(R.menu.doc_overflow_menu);

@@ -14,12 +14,14 @@
         android:roundIcon="@mipmap/app_icon_orange_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditImageActivity"></activity>
+        <activity android:name=".EditImageActivity" />
         <activity android:name=".MySettings" />
         <activity android:name=".AllDocs" />
-      <!--  <activity
+        <!--
+  <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />-->
+            android:theme="@style/Base.Theme.AppCompat" />
+        -->
         <activity android:name=".SingleImage" />
         <activity android:name=".document_view" />
         <activity android:name=".MyCamera" />

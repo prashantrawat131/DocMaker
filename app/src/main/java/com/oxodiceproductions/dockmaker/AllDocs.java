@@ -7,19 +7,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -29,13 +25,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -55,7 +45,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     Toolbar toolbar;
     FloatingActionButton addNewDocFloatingActionButton;
     FrameLayout empty_home_frame_layout;
-    private InterstitialAd mInterstitialAd;
     ProgressBar progressBar;
     AllDocsRecyclerViewAdapter adapter;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -68,7 +57,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
      * listView:-It is the listView for all the documents
      * addNewDocFloatingActionButton:-It is used to create a new document and change the activity to that particular document
      * empty_home_frame_layout:-When no documents are present the it will show a empty document sign board
-     * mInterstitialAd:-It it the object for ads
      * progressBar:-This is a simple progress bar
      * swipeRefreshLayout:-It is the object of the swipe refresh layout functionality for refreshing the listView
      * deleteSelectedDocumentsButton:-After the user selects all the documents in the listView the it must be able to collectively delete all the items selected.It is visible when any item is selected
@@ -94,36 +82,17 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         //all the ads stuff starts here
         MobileAds.initialize(this, initializationStatus -> {
         });
-        AdRequest interstitialRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(this, getResources().getString(R.string.go_to_single_image_ad_unit_id), interstitialRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-//                super.onAdLoaded(interstitialAd);
-                mInterstitialAd = interstitialAd;
-                mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                    @Override
-                    public void onAdShowedFullScreenContent() {
-//                super.onAdShowedFullScreenContent();
-                        mInterstitialAd = null;
-//                mInterstitialAd is set to be null so that the same ad do not come again because it is already viewed
-                    }
-                });
-            }
 
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-//                super.onAdFailedToLoad(loadAdError);
-                mInterstitialAd = null;
-            }
-        });
-
+        mAdView = findViewById(R.id.adView);
+        AdRequest bannerRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(bannerRequest);
         //ads stuff ends here
 
         Initializer();
 
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_settings) {
-                GoToSettings();
+                startActivity(new Intent(AllDocs.this, MySettings.class));
             }
             if (item.getItemId() == R.id.action_share_app) {
                 shareApp();
@@ -133,17 +102,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             }
             return false;
         });
-
-
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
-
-        mAdView = findViewById(R.id.adView);
-        AdRequest bannerRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(bannerRequest);
     }
 
     public void toolBarClick(View view) {
@@ -190,8 +148,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         } catch (Exception e) {
             progressBar.setVisibility(View.GONE);
             //Toast.makeText(AllDocs.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-        finally {
+        } finally {
             myDatabase.close();
         }
     }
@@ -224,58 +181,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         } else {
             return false;
         }
-    }
-
-    void AskToDelete() {
-    	/*When user tries to delete a document then it will ask for confirmation.
-		It has a custom view for alert message.
-		textView:-It shows a the alert message.
-		Here the ads functionality is used. When the user clicks the delete button
-		then it will show the ads and the documents are getting deleted in background
-		 */
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AllDocs.this);
-        ViewGroup viewGroup = findViewById(R.id.alert_main_layout);
-        final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, viewGroup, true)};
-        alertDialogBuilder.setView(customView[0]);
-        TextView textView = customView[0].findViewById(R.id.textView9);
-        Button cancel_button = customView[0].findViewById(R.id.button);
-        Button ok_button = customView[0].findViewById(R.id.button2);
-        textView.setText(getText(R.string.allDocsAlertText));
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        ok_button.setOnClickListener(view -> {
-            for (document_model doc : arrayList) {
-                if (doc.isCheck()) {
-                    delete(doc.getDocId());
-                }
-            }
-            if (mInterstitialAd != null) {
-                mInterstitialAd.show(AllDocs.this);
-            }
-            Initializer();
-            alertDialog.dismiss();
-        });
-        cancel_button.setOnClickListener(view -> alertDialog.dismiss());
-    }
-
-    void delete(String DocId) {
-        /* It is used to delete all the images of a particular document with DocId
-         * It deletes the images from the database and also from the storage*/
-        MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-        Cursor cc = myDatabase.LoadImagePaths(DocId);
-        try {
-            cc.moveToFirst();
-            do {
-                File file = new File(cc.getString(0));
-                boolean result = file.delete();
-                if (!result) {
-                    file.deleteOnExit();
-                }
-            } while (cc.moveToNext());
-        } catch (Exception ignored) {
-        }
-        myDatabase.DeleteTable(DocId);
-        myDatabase.close();
     }
 
     public void Initializer() {
@@ -318,8 +223,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             empty_home_frame_layout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
             swipeRefreshLayout.setVisibility(View.GONE);
-        }
-        finally {
+        } finally {
             myDatabase.close();
         }
         progressBar.setVisibility(View.GONE);
@@ -344,11 +248,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         empty_home_frame_layout.setVisibility(View.GONE);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-    }
-
-    public void GoToSettings() {
-        Intent in = new Intent(AllDocs.this, MySettings.class);
-        startActivity(in);
     }
 
     private void clearCache() {
@@ -392,15 +291,14 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         drawerLayout.closeDrawer(GravityCompat.START);
-        if (id == R.id.all_photos) {
-            Toast.makeText(getApplicationContext(), "All photos", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_share_app) {
+        if (id == R.id.nav_share_app) {
             shareApp();
         } else if (id == R.id.nav_about_app) {
-            Toast.makeText(getApplicationContext(), "About app", Toast.LENGTH_SHORT).show();
+//            GoToAboutApp();
         } else if (id == R.id.nav_setting) {
-            GoToSettings();
+            startActivity(new Intent(AllDocs.this, MySettings.class));
         }
         return true;
     }
+
 }
