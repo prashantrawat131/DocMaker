@@ -1,24 +1,6 @@
 <resources>
     <string name="app_name">DocMaker</string>
 
-    <!--    Banner ad unit -->
-
-    <!--  all doc banner main ad unit start here-->
-
-<!--                    <string name="all_doc_ad">ca-app-pub-7028190213096953/1313556482</string>-->
-
-    <!-- all doc banner main ad unit ends here-->
-
-
-    <!--test all doc banner ad unit start here-->
-
-    <string name="all_doc_ad">ca-app-pub-3940256099942544/6300978111</string>
-
-    <!-- test all doc banner ad unit ends here-->
-
-
-
-
     <!--    Other texts starts here-->
     <string name="backButtonCD">Back button</string>
     <string name="rotateButtonCD">Rotate button</string>
@@ -73,11 +55,13 @@
     <string name="t15">We need some permissions to perform necessary tasks. Please permit the permission(s) through Settings.\n\nSelect Permissions -> Enable permission</string>
     <string name="t16">Do you want to delete this image?</string>
 
-<!--    all docs recycler view-->
+    <!--    all docs recycler view-->
     <string name="date">Date: %1$s</string>
     <string name="time">Time: %1$s</string>
     <string name="pics">Pics: %1$s</string>
 
+    <!--    All docs -->
+    <string name="docDetails"><b>DocName:</b> %1$s\n\n<b>Date of Creation:</b> %2$s\n\n<b>Time of Creation:</b> %3$s\n\n<b>Pics:</b> %4$s\n\n<b>Size:</b> %5$s</string>
 
     <string name="about_app">
         <b>DocMaker</b>\n

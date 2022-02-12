@@ -44,7 +44,7 @@
                     android:background="@color/image_view_bg"
                     android:src="@drawable/ic_baseline_broken_image_24" />
 
-<!--                This textview just used to gte the index of the clicked element-->
+<!--                This textview just used to get the index of the clicked element-->
                 <TextView
                     android:id="@+id/index_number_text_view"
                     android:layout_width="wrap_content"

@@ -22,10 +22,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -51,7 +47,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     ImageView clearAnimationImageView;
     NavigationView navigationView;
     DrawerLayout drawerLayout;
-    private AdView mAdView;
 
     /* arrayList :- it is a list of all the documents present in the database. It has type of document_model which is a custom java class for documents
      * listView:-It is the listView for all the documents
@@ -78,15 +73,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
         //Navigation Drawer setup
         navigationView.setNavigationItemSelectedListener(this);
-
-        //all the ads stuff starts here
-        MobileAds.initialize(this, initializationStatus -> {
-        });
-
-        mAdView = findViewById(R.id.adView);
-        AdRequest bannerRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(bannerRequest);
-        //ads stuff ends here
 
         Initializer();
 

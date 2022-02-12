@@ -206,7 +206,7 @@ public class document_view extends AppCompatActivity {
         try {
 //            String filepath = MakeTempPDF();
             PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-            String filepath = pdfMaker.MakeTempPDF(progressBar, ImagePaths);
+            String filepath = pdfMaker.MakeTempPDF(progressBar, ImagePaths,DocName);
             if (!filepath.equals("")) {
                 File fileToShare = new File(filepath);
                 Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", fileToShare);
@@ -274,7 +274,7 @@ public class document_view extends AppCompatActivity {
             myAlertCreator.createAlertForZeroSizeImages(document_view.this);
         } else {
             PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-            String path = pdfMaker.MakeTempPDF(progressBar, ImagePaths);
+            String path = pdfMaker.MakeTempPDF(progressBar, ImagePaths,DocName);
             if (!path.equals("")) {
                 Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
                 Intent in = new Intent(Intent.ACTION_VIEW);

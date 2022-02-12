@@ -66,6 +66,16 @@ public class MyDatabase extends SQLiteOpenHelper {
         cc.moveToFirst();
         return cc;
     }
+    public String getDocName(String DocId) {
+        /* It gives a particular document by its DocId
+         * It gives it in the form of a cursor object, I may change it in future*/
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cc = sqLiteDatabase.rawQuery("select * from documents where DocId = '" + DocId + "'", null);
+        cc.moveToFirst();
+        return cc.getString(4);
+    }
+
+
 
     public String GetDocumentName(String DocId) {
         /* It simply returns the name of the document by it DocId.

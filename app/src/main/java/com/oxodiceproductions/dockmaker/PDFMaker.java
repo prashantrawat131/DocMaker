@@ -37,7 +37,7 @@ public class PDFMaker {
 
 
     //native android method starts here
-    public String MakeTempPDF(ProgressBar progressBar, ArrayList<String> ImagePaths) {
+    public String MakeTempPDF(ProgressBar progressBar, ArrayList<String> ImagePaths,String DocName) {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
@@ -46,8 +46,13 @@ public class PDFMaker {
 
         try {
             //file creation
-            File file = CommonOperations.createTempFile(context, "pdf");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            File folder = new File(context.getCacheDir().getPath());
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+            String child = DocName+".pdf";
+            File file = new File(folder, child);
+            FileOutputStream fileOutputStream = new FileOutputStream(file,false);
             pdfCreation(ImagePaths, fileOutputStream);
             filepath = file.getPath();
         } catch (Exception ignored) {

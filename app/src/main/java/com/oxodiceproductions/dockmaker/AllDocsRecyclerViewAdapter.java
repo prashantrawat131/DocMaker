@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecyclerViewAdapter.MyDocViewHolder> {
 
+    private final String TAG = "tagJi";
     ArrayList<document_model> arrayList;
     Context context;
     Activity activity;
@@ -55,13 +56,13 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     @Override
     public void onBindViewHolder(@NonNull MyDocViewHolder holder, int position) {
         holder.toolbar.setTitle(arrayList.get(position).getDocName());
-        holder.date_created_tv.setText(context.getString(R.string.date,arrayList.get(position).getDateCreated()));
-        holder.time_created_tv.setText(context.getString(R.string.time,arrayList.get(position).getTimeCreated()));
-        holder.number_of_pics_tv.setText(context.getString(R.string.pics,arrayList.get(position).getNumberOfPics()));
+        holder.date_created_tv.setText(context.getString(R.string.date, arrayList.get(position).getDateCreated()));
+        holder.time_created_tv.setText(context.getString(R.string.time, arrayList.get(position).getTimeCreated()));
+        holder.number_of_pics_tv.setText(context.getString(R.string.pics, arrayList.get(position).getNumberOfPics()));
         holder.indexNumberTextView.setText("" + (position + 1));
 
         //thumbnail extraction
-        MyDatabase myDatabase=null;
+        MyDatabase myDatabase = null;
         try {
             myDatabase = new MyDatabase(context);
             Cursor cc = myDatabase.LoadImagePaths(arrayList.get(position).getDocId());
@@ -78,8 +79,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             Glide.with(context).applyDefaultRequestOptions(options)
                     .load(R.drawable.ic_baseline_broken_image_24)
                     .into(holder.sample_image);
-        }
-        finally {
+        } finally {
             myDatabase.close();
         }
 
@@ -89,24 +89,23 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             int position1 = holder.getAdapterPosition();
             if (item.getItemId() == R.id.overflow_doc_delete) {
                 DeleteDoc(DocId, DocName, position1);
-            }
-            else if (item.getItemId() == R.id.overflow_doc_share) {
+            } else if (item.getItemId() == R.id.overflow_doc_share) {
                 SharePdfButtonListener(DocId);
-            }
-            else if(item.getItemId()==R.id.overflow_doc_details){
+            } else if (item.getItemId() == R.id.overflow_doc_details) {
                 ShowDocDetails(arrayList.get(position));
             }
             return true;
         });
     }
 
-    private void ShowDocDetails(document_model doc){
-        MyAlertCreator myAlertCreator=new MyAlertCreator();
+    private void ShowDocDetails(document_model doc) {
+        MyAlertCreator myAlertCreator = new MyAlertCreator();
         //size calculations
         float size = Float.parseFloat(doc.getSize());
         size = size / (1048576f);//1024 * 1024 = 1048576
-        String text="Size: " + String.format("%.2f MB", size);
-        myAlertCreator.showDialog(activity,text);
+//        Log.d(TAG, "ShowDocDetails: " + Float.parseFloat(doc.getSize()));
+        String text = context.getString(R.string.docDetails, doc.getDocName(), doc.getDateCreated(), doc.getTimeCreated(), doc.getNumberOfPics(), String.format("%.2f MB", size));
+        myAlertCreator.showDialog(activity, text);
     }
 
     @Override
@@ -137,7 +136,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                 }
                 if (!ImagePaths.isEmpty()) {
                     PDFMaker pdfMaker = new PDFMaker(context);
-                    String filepath = pdfMaker.MakeTempPDF(null, ImagePaths);
+                    String filepath = pdfMaker.MakeTempPDF(null, ImagePaths,myDatabase.getDocName(DocId));
                     if (!filepath.equals("")) {
                         File fileToShare = new File(filepath);
                         Uri contentUri = getUriForFile(context, "com.oxodiceproductions.dockmaker", fileToShare);
@@ -152,7 +151,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             } catch (Exception e) {
                 Log.d("tagJi", "SharePdfButtonListener: " + e.getMessage());
             } finally {
-                    myDatabase.close();
+                myDatabase.close();
             }
         }).start();
     }
@@ -170,12 +169,13 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                         do {
                             CommonOperations.deleteFile(cc.getString(0));
                         } while (cc.moveToNext());
-                    } catch (Exception e) { }
+                    } catch (Exception e) {
+                    }
 
-                    try{
+                    try {
                         myDatabase.DeleteTable(DocId);
-                    }catch (Exception e){ }
-                    finally {
+                    } catch (Exception e) {
+                    } finally {
                         myDatabase.close();
                     }
 
@@ -187,7 +187,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     }
 
     class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView date_created_tv,size_tv, time_created_tv, number_of_pics_tv;
+        TextView date_created_tv, time_created_tv, number_of_pics_tv;
         ImageView sample_image;
         TextView indexNumberTextView;
         Toolbar toolbar;
@@ -198,7 +198,6 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
             time_created_tv = itemView.findViewById(R.id.textView2);
             sample_image = itemView.findViewById(R.id.doc_imageview);
             number_of_pics_tv = itemView.findViewById(R.id.textView5);
-            size_tv.
             indexNumberTextView = itemView.findViewById(R.id.index_number_text_view);
             toolbar = itemView.findViewById(R.id.doc_toolbar);
             toolbar.inflateMenu(R.menu.doc_overflow_menu);
