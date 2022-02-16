@@ -32,18 +32,19 @@
     </LinearLayout>
 
 
-    <com.edmodo.cropper.CropImageView
+    <com.edmodo.cropper.CropImageView xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/crop_imageView"
         android:layout_width="match_parent"
-        android:contentDescription="@string/CD4"
         android:layout_height="0dp"
+        android:layout_margin="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_margin="10dp"
-        app:layout_constraintBottom_toTopOf="@id/crop_bottom_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/crop_top_view"/>
+        android:contentDescription="@string/CD4"
+
+        custom:layout_constraintBottom_toTopOf="@id/crop_bottom_view"
+        custom:layout_constraintEnd_toEndOf="parent"
+        custom:layout_constraintStart_toStartOf="parent"
+        custom:layout_constraintTop_toBottomOf="@+id/crop_top_view" />
 
     <LinearLayout
         android:id="@+id/crop_bottom_view"
@@ -52,9 +53,9 @@
         android:background="@color/my_button_color"
         android:orientation="horizontal"
         android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
             android:id="@+id/imageButton12"
@@ -71,10 +72,10 @@
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:visibility="gone"
-            android:contentDescription="@string/FlipCD"
             android:background="@color/my_button_color"
-            android:src="@drawable/ic_baseline_flip_24"/>
+            android:contentDescription="@string/FlipCD"
+            android:src="@drawable/ic_baseline_flip_24"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/bnwButton"
@@ -82,12 +83,12 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:backgroundTint="@color/my_button_color"
-            android:text="@string/bnwText"
             android:minHeight="48dp"
-            android:visibility="gone"
+            android:text="@string/bnwText"
             android:textAllCaps="false"
             android:textColor="@color/extra_light"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/button7"
@@ -101,24 +102,24 @@
             android:textColor="@color/extra_light"
             android:textSize="20sp" />
     </LinearLayout>
-<!--
+    <!--
 
-    <Button
-        android:id="@+id/continue_clicking"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_weight="1"
-        android:background="@drawable/button_state_listener"
-        android:padding="15dp"
-        android:text="@string/saveText"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
--->
+        <Button
+            android:id="@+id/continue_clicking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:background="@drawable/button_state_listener"
+            android:padding="15dp"
+            android:text="@string/saveText"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    -->
 
     <ProgressBar
         android:id="@+id/progressBar5"

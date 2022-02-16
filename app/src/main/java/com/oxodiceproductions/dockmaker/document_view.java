@@ -2,10 +2,13 @@ package com.oxodiceproductions.dockmaker;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
+import android.app.DownloadManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -23,14 +26,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.edmodo.cropper.CropImageView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class document_view extends AppCompatActivity {
     ArrayList<String> ImagePaths = new ArrayList<>();
@@ -48,6 +57,7 @@ public class document_view extends AppCompatActivity {
     FloatingActionButton clickPhotosButton, selectPhotosButton;
     ProgressBar progressBar;
     int SelectPhotosRequestCode = 10;
+    int notificationId=0;
     ImageButton checkedPhotosDeleteButton, backButton, sharePdfButton, saveDocButton, deleteDocButton, pdfPreviewButton;
     ImageButton selectiveDeleteButton;
 
@@ -137,7 +147,37 @@ public class document_view extends AppCompatActivity {
         });
 
         saveDocButton.setOnClickListener(view -> {
-            createFile();
+//            createFile();
+
+            // Create an explicit intent for an Activity in your app
+            Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.DocMakerNotificationChannelId))
+                    .setSmallIcon(R.drawable.app_icon_orange_foreground)
+                    .setContentTitle(DocName)
+                    .setContentText("Go to downloads")
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+
+            // notificationId is a unique int for each notification that you must define
+            notificationManager.notify(notificationId++, builder.build());
+
+
+            try {
+                File downloadsFolder=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                FileOutputStream fileOutputStream=new FileOutputStream(downloadsFolder+"/"+DocName+".pdf");
+                PDFMaker pdfMaker=new PDFMaker(getApplicationContext());
+                pdfMaker.downloadPdf(ImagePaths,fileOutputStream);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
         });
 
         deleteDocButton.setOnClickListener(view -> {
@@ -496,7 +536,6 @@ public class document_view extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        first_time = true;
         Initializer();
     }
 
@@ -538,6 +577,5 @@ public class document_view extends AppCompatActivity {
         saveDocButton = findViewById(R.id.save_doc_imageButton);
         deleteDocButton=findViewById(R.id.imageButton7);
         selectiveDeleteButton = findViewById(R.id.deleteSelectedDocumentsButton);
-
     }
 }

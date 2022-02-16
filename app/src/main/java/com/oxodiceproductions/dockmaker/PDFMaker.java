@@ -9,6 +9,7 @@ import android.graphics.pdf.PdfDocument;
 import android.os.ParcelFileDescriptor;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -95,5 +96,14 @@ public class PDFMaker {
         //finally writing document and closing it
         pdfDocument.writeTo(fileOutputStream);
         pdfDocument.close();
+    }
+
+    public void downloadPdf(ArrayList<String> ImagePaths,FileOutputStream fileOutputStream){
+        try {
+            pdfCreation(ImagePaths,fileOutputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Toast.makeText(context, "Download complete", Toast.LENGTH_SHORT).show();
     }
 }

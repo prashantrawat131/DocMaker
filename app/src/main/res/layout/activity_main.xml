@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_picture_as_pdf_24" />
+        app:srcCompat="@drawable/app_icon_for_buttons" />
 
     <TextView
         android:id="@+id/textView7"

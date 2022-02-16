@@ -28,7 +28,7 @@ public class EditImageActivity extends AppCompatActivity {
     File finalFile;
     Bitmap bitmap;
     ProgressBar progressBar;
-    boolean isBnw = false;
+//    boolean isBnw = false;
     boolean fromGallery = false, fromCamera = false;
     ArrayList<String> selectedImages;
 
@@ -37,22 +37,11 @@ public class EditImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_image);
 
-        ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
-        DocId = getIntent().getExtras().getString("DocId", "-1");
-        retakeImagePath = getIntent().getExtras().getString("retakeImagePath", "-1");
-        fromGallery = getIntent().getExtras().getBoolean("fromGallery", false);
-        fromCamera = getIntent().getExtras().getBoolean("fromCamera", false);
-        selectedImages = getIntent().getExtras().getStringArrayList("galleryImagesPaths");
 
-        flipButton = findViewById(R.id.imageButton13);
-        backButton = findViewById(R.id.edit_back_button);
-        cropImageView = findViewById(R.id.crop_imageView);
-        progressBar = findViewById(R.id.progressBar5);
-        bnwButton = findViewById(R.id.bnwButton);
-        bitmap = BitmapFactory.decodeFile(ImagePath);
-        cropImageView.setImageBitmap(bitmap);
-        rotateImageButton=findViewById(R.id.imageButton12);
-        cropButton=findViewById(R.id.button7);
+        IdProvider();
+
+
+        InitialWork();
 
         progressBar.setVisibility(View.GONE);
 
@@ -112,7 +101,7 @@ public class EditImageActivity extends AppCompatActivity {
                         */
                         crop(selectedImages.get(0));
                     }
-                    isBnw = false;
+//                    isBnw = false;
                 } else {
                     //not from gallery
                     new File(retakeImagePath).delete();
@@ -124,6 +113,29 @@ public class EditImageActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
         });
 
+    }
+
+    private void InitialWork(){
+        ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
+        DocId = getIntent().getExtras().getString("DocId", "-1");
+        retakeImagePath = getIntent().getExtras().getString("retakeImagePath", "-1");
+        fromGallery = getIntent().getExtras().getBoolean("fromGallery", false);
+        fromCamera = getIntent().getExtras().getBoolean("fromCamera", false);
+        selectedImages = getIntent().getExtras().getStringArrayList("galleryImagesPaths");
+
+        bitmap = BitmapFactory.decodeFile(ImagePath);
+
+        cropImageView.setImageBitmap(bitmap);
+    }
+
+    private void IdProvider(){
+        flipButton = findViewById(R.id.imageButton13);
+        backButton = findViewById(R.id.edit_back_button);
+        cropImageView = (CropImageView) findViewById(R.id.crop_imageView);
+        progressBar = findViewById(R.id.progressBar5);
+        bnwButton = findViewById(R.id.bnwButton);
+        rotateImageButton=findViewById(R.id.imageButton12);
+        cropButton=findViewById(R.id.button7);
     }
 
 
@@ -155,7 +167,6 @@ public class EditImageActivity extends AppCompatActivity {
         } catch (Exception ignored) {
         }
     }*/
-
 
     private void Exit() {
         progressBar.setVisibility(View.VISIBLE);

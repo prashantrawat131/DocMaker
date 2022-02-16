@@ -79,30 +79,16 @@
             android:contentDescription="@string/shareCD"
             android:src="@drawable/ic_baseline_share_24" />
 
-        <FrameLayout
+        <ImageButton
+            android:id="@+id/save_doc_imageButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/save_doc_imageButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/my_button_color"
-                android:contentDescription="@string/saveDocButtonCD"
-                android:foregroundGravity="top"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_baseline_save_24" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|bottom"
-                android:text="@string/t2"
-                android:textAlignment="center"
-                android:textColor="@color/black" />
-        </FrameLayout>
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/saveDocButtonCD"
+            android:src="@drawable/ic_baseline_get_app_24" />
 
         <ImageButton
             android:id="@+id/imageButton7"
@@ -114,29 +100,16 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_delete_24" />
 
-        <FrameLayout
+        <ImageButton
+            android:id="@+id/imageButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_gravity="center"
+            android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/previewDocCD"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_baseline_picture_as_pdf_24" />
 
-            <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/my_button_color"
-                android:contentDescription="@string/previewDocCD"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_baseline_preview_24" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|bottom"
-                android:text="@string/t3"
-                android:textAlignment="center"
-                android:textColor="@color/black" />
-        </FrameLayout>
     </LinearLayout>
 
     <ImageButton

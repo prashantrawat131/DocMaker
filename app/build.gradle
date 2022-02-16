@@ -57,6 +57,9 @@ dependencies {
     //image cropper library
     implementation 'com.edmodo:cropper:1.0.1'
 
+    //notification lib
+    implementation "androidx.core:core:1.6.0"
+
     //some other android basic implementations
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

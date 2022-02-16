@@ -97,8 +97,7 @@
             android:clickable="true"
             android:contentDescription="@string/addNewDocCD"
             android:focusable="true"
-            android:scaleType="center"
-            android:src="@drawable/ic_baseline_picture_as_pdf_24"
+            android:src="@drawable/app_icon_for_buttons"
             app:layout_constraintBottom_toBottomOf="@+id/all_docs_mainLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:maxImageSize="56dp" />
