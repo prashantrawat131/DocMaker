@@ -23,11 +23,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:contentDescription="@string/backButtonCD"
             android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/backButtonCD"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
             android:rotation="-90"
-            android:onClick="GoBack"
-            android:src="@drawable/ic_baseline_arrow_upward_24"/>
+            android:src="@drawable/ic_baseline_arrow_upward_24" />
     </LinearLayout>
 
 
@@ -60,15 +61,15 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:onClick="rotateImage"
-            android:contentDescription="@string/rotateButtonCD"
             android:background="@color/my_button_color"
-            android:src="@drawable/ic_baseline_rotate_right_24"/>
+            android:contentDescription="@string/rotateButtonCD"
+            android:src="@drawable/ic_baseline_rotate_right_24"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <ImageButton
             android:id="@+id/imageButton13"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:visibility="gone"
             android:contentDescription="@string/FlipCD"
@@ -78,10 +79,11 @@
         <Button
             android:id="@+id/bnwButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:backgroundTint="@color/my_button_color"
             android:text="@string/bnwText"
+            android:minHeight="48dp"
             android:visibility="gone"
             android:textAllCaps="false"
             android:textColor="@color/extra_light"
@@ -90,11 +92,11 @@
         <Button
             android:id="@+id/button7"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:backgroundTint="@color/my_button_color"
+            android:minHeight="48dp"
             android:text="@string/cropText"
-            android:onClick="Crop"
             android:textAllCaps="false"
             android:textColor="@color/extra_light"
             android:textSize="20sp" />

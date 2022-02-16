@@ -21,8 +21,8 @@ import java.util.ArrayList;
 public class EditImageActivity extends AppCompatActivity {
     String ImagePath = "-1";
     CropImageView cropImageView;
-    Button bnwButton;
-    ImageButton backButton, flipButton;
+    Button bnwButton,cropButton;
+    ImageButton backButton, flipButton,rotateImageButton;
     String retakeImagePath = "-1";
     String DocId = "-1";
     File finalFile;
@@ -51,48 +51,57 @@ public class EditImageActivity extends AppCompatActivity {
         bnwButton = findViewById(R.id.bnwButton);
         bitmap = BitmapFactory.decodeFile(ImagePath);
         cropImageView.setImageBitmap(bitmap);
+        rotateImageButton=findViewById(R.id.imageButton12);
+        cropButton=findViewById(R.id.button7);
 
         progressBar.setVisibility(View.GONE);
-    }
 
-    public void Crop(View view) {
-        progressBar.setVisibility(View.VISIBLE);
-        //old file getting deleted
-        CommonOperations.deleteFile(ImagePath);
+        backButton.setOnClickListener(view->{
+            onBackPressed();
+        });
 
-        //creating new file name and saving it
-        String uniqueName = CommonOperations.getUniqueName("jpg", 0);//date + time + ".jpg";
-        File appDir = new File(getFilesDir().getPath());
-        if (!appDir.exists()) {
-            appDir.mkdirs();
-        }
-        finalFile = new File(appDir, uniqueName);
-        ImagePath = finalFile.getPath();
+        rotateImageButton.setOnClickListener(view->{
+            cropImageView.rotateImage(90);
+        });
 
-        //saving to database
-        MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-        if (retakeImagePath.equals("-1")) {
-            myDatabase.InsertImage(DocId, finalFile.getPath());
-        } else {
-            myDatabase.retake(DocId, retakeImagePath, finalFile.getPath());
-        }
-        myDatabase.close();
+        cropButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            //old file getting deleted
+            CommonOperations.deleteFile(ImagePath);
 
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(finalFile);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            cropImageView.getCroppedImage().compress(Bitmap.CompressFormat.JPEG, 100, bos);
-            fileOutputStream.write(bos.toByteArray());
-            fileOutputStream.close();
+            //creating new file name and saving it
+            String uniqueName = CommonOperations.getUniqueName("jpg", 0);//date + time + ".jpg";
+            File appDir = new File(getFilesDir().getPath());
+            if (!appDir.exists()) {
+                appDir.mkdirs();
+            }
+            finalFile = new File(appDir, uniqueName);
+            ImagePath = finalFile.getPath();
 
-            if (fromGallery) {
-                //this section is for user which came from gallery
-                selectedImages.remove(0);
-                //check whether the list is empty or nor
-                if (selectedImages.isEmpty()) {
+            //saving to database
+            MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+            if (retakeImagePath.equals("-1")) {
+                myDatabase.InsertImage(DocId, finalFile.getPath());
+            } else {
+                myDatabase.retake(DocId, retakeImagePath, finalFile.getPath());
+            }
+            myDatabase.close();
+
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(finalFile);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                cropImageView.getCroppedImage().compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                fileOutputStream.write(bos.toByteArray());
+                fileOutputStream.close();
+
+                if (fromGallery) {
+                    //this section is for user which came from gallery
+                    selectedImages.remove(0);
+                    //check whether the list is empty or nor
+                    if (selectedImages.isEmpty()) {
 //                        Log.d("tagJi","Exit");
-                    Exit();
-                } else {
+                        Exit();
+                    } else {
                         /*this block is not as simple as it appears
                         this block is executed when the user clicks
                         save and there are still some images in the text view
@@ -101,27 +110,22 @@ public class EditImageActivity extends AppCompatActivity {
                         list to the crop function which is actually not getting cropped but
                         it being placed in the crop image view.
                         */
-                    crop(selectedImages.get(0));
+                        crop(selectedImages.get(0));
+                    }
+                    isBnw = false;
+                } else {
+                    //not from gallery
+                    new File(retakeImagePath).delete();
+                    Exit();
                 }
-                isBnw = false;
-            } else {
-                //not from gallery
-                new File(retakeImagePath).delete();
-                Exit();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        progressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+        });
+
     }
 
-    public void rotateImage(View view) {
-        cropImageView.rotateImage(90);
-    }
-
-    public void GoBack(View view) {
-        onBackPressed();
-    }
 
 /*
     private void bnw() {

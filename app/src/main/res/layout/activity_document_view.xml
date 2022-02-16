@@ -66,7 +66,6 @@
             android:layout_weight="1"
             android:background="@color/my_button_color"
             android:contentDescription="@string/backButtonCD"
-            android:onClick="BackButtonListener"
             android:rotation="-90"
             android:src="@drawable/ic_baseline_arrow_upward_24" />
 
@@ -78,7 +77,6 @@
             android:layout_weight="1"
             android:backgroundTint="@color/my_button_color"
             android:contentDescription="@string/shareCD"
-            android:onClick="SharePdfButtonListener"
             android:src="@drawable/ic_baseline_share_24" />
 
         <FrameLayout
@@ -94,7 +92,6 @@
                 android:backgroundTint="@color/my_button_color"
                 android:contentDescription="@string/saveDocButtonCD"
                 android:foregroundGravity="top"
-                android:onClick="SaveDocButtonListener"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_baseline_save_24" />
 
@@ -114,7 +111,6 @@
             android:layout_weight="1"
             android:backgroundTint="@color/my_button_color"
             android:contentDescription="@string/deleteDocButtonCD"
-            android:onClick="DeleteDocButtonListener"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_delete_24" />
 
@@ -130,7 +126,6 @@
                 android:layout_gravity="center"
                 android:backgroundTint="@color/my_button_color"
                 android:contentDescription="@string/previewDocCD"
-                android:onClick="pdfPreviewButtonListener"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_baseline_preview_24" />
 
@@ -152,7 +147,6 @@
         android:layout_weight="1"
         android:background="@drawable/circular_button"
         android:contentDescription="@string/CD1"
-        android:onClick="selectiveDeleteButtonListener"
         android:padding="6dp"
         android:src="@drawable/ic_baseline_delete_24"
         android:translationZ="8dp"
@@ -178,21 +172,20 @@
             android:elevation="10dp"
             android:maxEms="10"
             android:minHeight="48dp"
-            android:onClick="DocNameClickListener"
             android:padding="7dp"
             android:text="@string/t4"
             android:textColor="@color/black"
             android:textSize="20sp" />
-<!--
-        <TextView
-            android:id="@+id/warning_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/warning"
-            android:padding="10dp"
-            android:text="@string/t13"
-            android:textColor="@color/text_color"
-            android:textSize="20sp" />-->
+        <!--
+                <TextView
+                    android:id="@+id/warning_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/warning"
+                    android:padding="10dp"
+                    android:text="@string/t13"
+                    android:textColor="@color/text_color"
+                    android:textSize="20sp" />-->
     </LinearLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -203,14 +196,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/doc_name_ll">
-       <!-- <ListView
-            android:id="@+id/doc_view_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/app_bg"
-            android:horizontalSpacing="10dp"
-            android:padding="10dp"
-            android:verticalSpacing="10dp" />-->
+        <!-- <ListView
+             android:id="@+id/doc_view_list_view"
+             android:layout_width="match_parent"
+             android:layout_height="0dp"
+             android:background="@color/app_bg"
+             android:horizontalSpacing="10dp"
+             android:padding="10dp"
+             android:verticalSpacing="10dp" />-->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/docRecyclerView"
             android:layout_width="match_parent"
@@ -229,7 +222,6 @@
         android:clickable="true"
         android:contentDescription="@string/CD2"
         android:focusable="true"
-        android:onClick="GallerySelectButtonListener"
         android:src="@drawable/ic_baseline_photo_library_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -244,7 +236,6 @@
         android:clickable="true"
         android:contentDescription="@string/CD3"
         android:focusable="true"
-        android:onClick="ClickNewPhotoButtonListener"
         android:src="@drawable/ic_baseline_photo_camera_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

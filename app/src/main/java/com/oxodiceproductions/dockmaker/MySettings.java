@@ -46,6 +46,13 @@ public class MySettings extends AppCompatActivity {
             }
             save_button.setVisibility(View.VISIBLE);
         });
+
+        save_button.setOnClickListener(view->{
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("pdf_image_quality", pdf_image_quality);
+            editor.apply();
+            GoToAllDocs();
+        });
     }
 
     private void Initializer() {
@@ -73,12 +80,5 @@ public class MySettings extends AppCompatActivity {
         Intent in = new Intent(MySettings.this, AllDocs.class);
         startActivity(in);
         finish();
-    }
-
-    public void saveSettings(View view) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("pdf_image_quality", pdf_image_quality);
-        editor.apply();
-        GoToAllDocs();
     }
 }

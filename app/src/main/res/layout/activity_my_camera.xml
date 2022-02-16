@@ -17,8 +17,7 @@
         <androidx.camera.view.PreviewView
             android:id="@+id/previewView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="previewViewClickListener">
+            android:layout_height="match_parent">
 
         </androidx.camera.view.PreviewView>
 
@@ -39,7 +38,6 @@
                 android:clickable="true"
                 android:contentDescription="@string/CD6"
                 android:focusable="true"
-                android:onClick="captureImage"
                 android:src="@drawable/ic_baseline_photo_camera_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +50,6 @@
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:contentDescription="@string/CD7"
-                android:onClick="flashButtonClickListener"
                 android:src="@drawable/flash_off"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

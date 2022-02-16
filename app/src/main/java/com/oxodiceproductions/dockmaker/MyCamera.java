@@ -24,6 +24,7 @@ import androidx.camera.view.PreviewView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -49,6 +50,7 @@ public class MyCamera extends AppCompatActivity {
     ImageButton flash_button;
     File capturedImage;
     ProgressBar progressBar;
+    FloatingActionButton captureImageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,7 @@ public class MyCamera extends AppCompatActivity {
         camera_menu = findViewById(R.id.camera_menu);
         flash_button = findViewById(R.id.imageButton8);
         progressBar = findViewById(R.id.progressBar);
+        captureImageButton = findViewById(R.id.floatingActionButton);
 
         settingsSharedPreferences = getSharedPreferences("DocMakerSettings", MODE_PRIVATE);
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
@@ -83,6 +86,54 @@ public class MyCamera extends AppCompatActivity {
 //		};
 
         progressBar.setVisibility(View.GONE);
+
+        previewView.setOnClickListener(view -> {
+            MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory(0, 0);
+            MeteringPoint point = factory.createPoint(0, 0);
+            FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
+                    .addPoint(point, FocusMeteringAction.FLAG_AE) // could have many
+                    // auto calling cancelFocusAndMetering in 5 seconds
+                    .setAutoCancelDuration(5, TimeUnit.SECONDS)
+                    .build();
+            cameraControl.startFocusAndMetering(action);
+        });
+
+        captureImageButton.setOnClickListener(view -> {
+            camera_menu.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            try {
+                FileOutputStream out = new FileOutputStream(capturedImage); //Use the stream as usual to w
+                ImageCapture.OutputFileOptions outputFileOptions =
+                        new ImageCapture.OutputFileOptions.Builder(out).build();
+                imageCapture.takePicture(outputFileOptions, executor, new ImageCapture.OnImageSavedCallback() {
+                    @Override
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                    }
+                });
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+
+        flash_button.setOnClickListener(view -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            //if flash was on then it needs to be off on click and vice-verse
+            boolean flashStateAfterClick = !sharedPreferences.getBoolean("flash", false);
+            editor.putBoolean("flash", flashStateAfterClick);
+            editor.apply();
+
+            if (flashStateAfterClick) {
+                imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
+                flash_button.setImageDrawable(getDrawable(R.drawable.flash_on));
+            } else {
+                imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
+                flash_button.setImageDrawable(getDrawable(R.drawable.flash_off));
+            }
+        });
     }
 
     void Setup() {
@@ -104,27 +155,6 @@ public class MyCamera extends AppCompatActivity {
             } catch (ExecutionException | InterruptedException ignored) {
             }
         }, ContextCompat.getMainExecutor(this));
-    }
-
-    public void captureImage(View view) {
-        camera_menu.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-        try {
-            FileOutputStream out = new FileOutputStream(capturedImage); //Use the stream as usual to w
-            ImageCapture.OutputFileOptions outputFileOptions =
-                    new ImageCapture.OutputFileOptions.Builder(out).build();
-            imageCapture.takePicture(outputFileOptions, executor, new ImageCapture.OnImageSavedCallback() {
-                @Override
-                public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                }
-
-                @Override
-                public void onError(@NonNull ImageCaptureException exception) {
-                }
-            });
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -200,30 +230,4 @@ public class MyCamera extends AppCompatActivity {
         finish();
     }
 
-    public void flashButtonClickListener(View view) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        //if flash was on then it needs to be off on click and vice-verse
-        boolean flashStateAfterClick = !sharedPreferences.getBoolean("flash", false);
-        editor.putBoolean("flash", flashStateAfterClick);
-        editor.apply();
-
-        if (flashStateAfterClick) {
-            imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
-            flash_button.setImageDrawable(getDrawable(R.drawable.flash_on));
-        } else {
-            imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
-            flash_button.setImageDrawable(getDrawable(R.drawable.flash_off));
-        }
-    }
-
-    public void previewViewClickListener(View view) {
-        MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory(0, 0);
-        MeteringPoint point = factory.createPoint(0, 0);
-        FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
-                .addPoint(point, FocusMeteringAction.FLAG_AE) // could have many
-                // auto calling cancelFocusAndMetering in 5 seconds
-                .setAutoCancelDuration(5, TimeUnit.SECONDS)
-                .build();
-        cameraControl.startFocusAndMetering(action);
-    }
 }

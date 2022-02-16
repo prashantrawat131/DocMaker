@@ -35,11 +35,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/CD8"
             android:rotation="-90"
             android:scaleType="fitCenter"
-            android:contentDescription="@string/CD8"
-            android:onClick="GoBack"
-            android:backgroundTint="@color/my_button_color"
             android:src="@drawable/ic_baseline_arrow_upward_24" />
 
         <ImageButton
@@ -47,10 +46,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/CD9"
-            android:onClick="shareImage"
             android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/CD9"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_share_24" />
 
         <ImageButton
@@ -58,10 +56,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/CD10"
-            android:onClick="deleteImage"
             android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/CD10"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_delete_24" />
         <!--<Button
             android:id="@+id/edit_button"
@@ -87,10 +84,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="top"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/CD11"
-                android:onClick="goForEditing"
                 android:backgroundTint="@color/my_button_color"
+                android:contentDescription="@string/CD11"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_baseline_edit_24" />
 
             <TextView
@@ -113,10 +109,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="top"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/CD12"
-                android:onClick="retakeImage"
                 android:backgroundTint="@color/my_button_color"
+                android:contentDescription="@string/CD12"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_baseline_photo_camera_24" />
 
             <TextView
@@ -136,8 +131,8 @@
         android:layout_height="0dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:transitionName="image"
         android:contentDescription="@string/CD13"
+        android:transitionName="image"
         app:layout_constraintBottom_toTopOf="@+id/crop_linear"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -148,8 +143,8 @@
         android:id="@+id/crop_linear"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:orientation="horizontal"
         android:background="@color/medium"
+        android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -161,33 +156,31 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:rotation="-90"
-            android:contentDescription="@string/CD15"
-            android:onClick="goToPreviousImage"
             android:backgroundTint="@color/my_button_color"
-            android:src="@drawable/ic_baseline_arrow_upward_24"/>
+            android:contentDescription="@string/CD15"
+            android:rotation="-90"
+            android:src="@drawable/ic_baseline_arrow_upward_24" />
 
         <TextView
             android:id="@+id/single_image_index_tv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="1"
-            android:textStyle="bold"
-            android:textSize="20sp"
+            android:layout_weight="1"
             android:gravity="center|center_horizontal"
-            android:layout_weight="1" />
+            android:text="1"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/imageButton14"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:rotation="90"
-            android:contentDescription="@string/CD16"
-            android:onClick="goToNextImage"
-            android:backgroundTint="@color/my_button_color"
             android:background="@color/app_bg"
-            android:src="@drawable/ic_baseline_arrow_upward_24"/>
+            android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/CD16"
+            android:rotation="90"
+            android:src="@drawable/ic_baseline_arrow_upward_24" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

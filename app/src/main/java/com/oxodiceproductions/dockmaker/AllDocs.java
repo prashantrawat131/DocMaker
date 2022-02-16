@@ -22,6 +22,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -88,11 +89,33 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             }
             return false;
         });
+
+        toolbar.setOnClickListener((view) -> {
+            drawerLayout.openDrawer(GravityCompat.START);
+        });
+
+        addNewDocFloatingActionButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+
+            /* Here the document is created.
+             * Each document has a unique name given by the calender function.
+             * After creating the name for the document then it is stored in the database
+             * and an intent is fired which change the activity to that document*/
+            MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+            Calendar c = Calendar.getInstance();
+            String DocId = "DocMaker" + "_" + c.get(Calendar.DATE) + "_" + c.get(Calendar.MONTH) + "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + "_" + c.get(Calendar.SECOND);//date.getSeconds()+"_"+date.getDate()+"_"+(date.getMonth()+1)+"_"+date.getHours()+"_"+date.getMinutes();
+            String date_s = c.get(Calendar.DATE) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
+            String time_s = c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND);
+            myDatabase.InsertDocument(DocId, DocId, date_s, time_s, DocId);
+            myDatabase.CreateTable(DocId);
+            myDatabase.close();
+            Intent in = new Intent(getApplicationContext(), document_view.class);
+            in.putExtra("DocId", DocId);
+            in.putExtra("first_time", false);
+            startActivity(in);
+        });
     }
 
-    public void toolBarClick(View view) {
-        drawerLayout.openDrawer(GravityCompat.START);
-    }
 
     public void deleteUnusedFiles() {
         Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.memory_free_anim);
@@ -250,27 +273,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         String message = "DocMaker\n\nA light weight app to turn\nimages into pdf files.\n\nLink:-\nhttps://play.google.com/store/apps/details?id=com.oxodiceproductions.docmaker";
         in.putExtra(Intent.EXTRA_TEXT, message);
         startActivity(Intent.createChooser(in, "Share this app with friends and family."));
-    }
-
-    public void addNewDocument(View view) {
-        progressBar.setVisibility(View.VISIBLE);
-
-        /* Here the document is created.
-         * Each document has a unique name given by the calender function.
-         * After creating the name for the document then it is stored in the database
-         * and an intent is fired which change the activity to that document*/
-        MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-        Calendar c = Calendar.getInstance();
-        String DocId = "DocMaker" + "_" + c.get(Calendar.DATE) + "_" + c.get(Calendar.MONTH) + "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + "_" + c.get(Calendar.SECOND);//date.getSeconds()+"_"+date.getDate()+"_"+(date.getMonth()+1)+"_"+date.getHours()+"_"+date.getMinutes();
-        String date_s = c.get(Calendar.DATE) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
-        String time_s = c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND);
-        myDatabase.InsertDocument(DocId, DocId, date_s, time_s, DocId);
-        myDatabase.CreateTable(DocId);
-        myDatabase.close();
-        Intent in = new Intent(getApplicationContext(), document_view.class);
-        in.putExtra("DocId", DocId);
-        in.putExtra("first_time", false);
-        startActivity(in);
     }
 
     @Override

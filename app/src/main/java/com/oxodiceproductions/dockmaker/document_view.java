@@ -48,7 +48,8 @@ public class document_view extends AppCompatActivity {
     FloatingActionButton clickPhotosButton, selectPhotosButton;
     ProgressBar progressBar;
     int SelectPhotosRequestCode = 10;
-    ImageButton checkedPhotosDeleteButton;
+    ImageButton checkedPhotosDeleteButton, backButton, sharePdfButton, saveDocButton, deleteDocButton, pdfPreviewButton;
+    ImageButton selectiveDeleteButton;
 
     // Request code for creating a PDF document.
     private static final int CREATE_FILE = 1;
@@ -108,6 +109,164 @@ public class document_view extends AppCompatActivity {
         doc_name_tv.setText(DocName);
 
         swipeRefreshLayout.setOnRefreshListener(this::Initializer);
+
+        backButton.setOnClickListener(view -> {
+            onBackPressed();
+        });
+
+        sharePdfButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            try {
+//            String filepath = MakeTempPDF();
+                PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
+                String filepath = pdfMaker.MakeTempPDF(progressBar, ImagePaths, DocName);
+                if (!filepath.equals("")) {
+                    File fileToShare = new File(filepath);
+                    Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", fileToShare);
+                    grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("application/pdf");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    startActivity(Intent.createChooser(shareIntent, "Share with"));
+                } else {
+                    Toast.makeText(getApplicationContext(), "File path not available", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+            }
+            progressBar.setVisibility(View.GONE);
+        });
+
+        saveDocButton.setOnClickListener(view -> {
+            createFile();
+        });
+
+        deleteDocButton.setOnClickListener(view -> {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
+
+            final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
+            alertDialogBuilder.setView(customView[0]);
+
+            TextView textView = customView[0].findViewById(R.id.textView9);
+            Button cancel_button = customView[0].findViewById(R.id.button);
+            Button ok_button = customView[0].findViewById(R.id.button2);
+            textView.setText(getResources().getText(R.string.t14));
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+            ok_button.setOnClickListener(view1 -> {
+                progressBar.setVisibility(View.VISIBLE);
+                Runnable runnable = () -> {
+                    MyDatabase myDatabase2 = new MyDatabase(getApplicationContext());
+                    Cursor cc = myDatabase2.LoadImagePaths(DocId);
+                    try {
+                        cc.moveToFirst();
+                        do {
+                            CommonOperations.deleteFile(cc.getString(0));
+                        } while (cc.moveToNext());
+                    } catch (Exception e) {
+                    }
+                    myDatabase2.DeleteTable(DocId);
+                    myDatabase2.close();
+                    Intent in = new Intent(document_view.this, AllDocs.class);
+                    startActivity(in);
+                    finish();
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
+            });
+            cancel_button.setOnClickListener(view12 -> alertDialog.dismiss());
+            progressBar.setVisibility(View.GONE);
+        });
+
+        pdfPreviewButton.setOnClickListener(view -> {
+            //isse emptyAvailable karna hai baad mein
+            if (false) {
+                MyAlertCreator myAlertCreator = new MyAlertCreator();
+                myAlertCreator.createAlertForZeroSizeImages(document_view.this);
+            } else {
+                PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
+                String path = pdfMaker.MakeTempPDF(progressBar, ImagePaths, DocName);
+                if (!path.equals("")) {
+                    Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
+                    Intent in = new Intent(Intent.ACTION_VIEW);
+                    in.setDataAndType(uri, "application/pdf");
+                    in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(in);
+                }
+            }
+        });
+
+        selectiveDeleteButton.setOnClickListener(view -> {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
+
+            final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, findViewById(R.id.alert_main_layout), false)};
+            alertDialogBuilder.setView(customView[0]);
+
+            TextView textView = customView[0].findViewById(R.id.textView9);
+            Button cancel_button = customView[0].findViewById(R.id.button);
+            Button ok_button = customView[0].findViewById(R.id.button2);
+            textView.setText(getText(R.string.docViewAlertText));
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            ok_button.setOnClickListener(view2 -> {
+                for (int k = 0; k < ImagePaths.size(); k++) {
+                    if (ImagePathsChecker.get(k)) {
+                        delete(ImagePaths.get(k));
+                    }
+                }
+                Initializer();
+                alertDialog.dismiss();
+            });
+
+            cancel_button.setOnClickListener(view2 -> alertDialog.dismiss());
+        });
+
+        selectPhotosButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            Intent fileManager = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            fileManager.setType("image/*");
+            fileManager.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(fileManager, SelectPhotosRequestCode);
+        });
+
+        clickPhotosButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            Intent in = new Intent(document_view.this, MyCamera.class);
+            in.putExtra("DocId", DocId);
+            startActivity(in);
+            finish();
+        });
+
+        doc_name_tv.setOnClickListener(view -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.name_changer_dialog_box, null, false);
+            EditText input = dialogView.findViewById(R.id.editTextTextPersonName2);
+            Button okButton = dialogView.findViewById(R.id.button4);
+            Button cancelButton = dialogView.findViewById(R.id.button3);
+            input.setText(DocName);
+            alert.setView(dialogView);
+
+            AlertDialog alertDialog = alert.create();
+            alertDialog.show();
+            input.requestFocus();
+            input.selectAll();
+            okButton.setOnClickListener(view2 -> {
+                if (!input.getText().toString().isEmpty()) {
+                    DocName = input.getText().toString();
+                    doc_name_tv.setText(DocName);
+                    ChangeName();
+                    progressBar.setVisibility(View.GONE);
+                    alertDialog.dismiss();
+                } else {
+                    Toast.makeText(document_view.this, "Please fill something", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            cancelButton.setOnClickListener(view2 -> alertDialog.dismiss());
+        });
     }
 
     private void GoToAllDocs() {
@@ -194,131 +353,6 @@ public class document_view extends AppCompatActivity {
 
         Thread t = new Thread(runnable);
         t.start();
-    }
-
-
-    public void BackButtonListener(View view) {
-        onBackPressed();
-    }
-
-    public void SharePdfButtonListener(View view) {
-        progressBar.setVisibility(View.VISIBLE);
-        try {
-//            String filepath = MakeTempPDF();
-            PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-            String filepath = pdfMaker.MakeTempPDF(progressBar, ImagePaths,DocName);
-            if (!filepath.equals("")) {
-                File fileToShare = new File(filepath);
-                Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", fileToShare);
-                grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("application/pdf");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                startActivity(Intent.createChooser(shareIntent, "Share with"));
-            } else {
-                Toast.makeText(getApplicationContext(), "File path not available", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-        }
-        progressBar.setVisibility(View.GONE);
-    }
-
-    public void SaveDocButtonListener(View view) {
-//        Uri uri = Uri.fromFile(new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "DocMaker"));
-        createFile();
-    }
-
-    public void DeleteDocButtonListener(View view) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
-
-        final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
-        alertDialogBuilder.setView(customView[0]);
-
-        TextView textView = customView[0].findViewById(R.id.textView9);
-        Button cancel_button = customView[0].findViewById(R.id.button);
-        Button ok_button = customView[0].findViewById(R.id.button2);
-        textView.setText(getResources().getText(R.string.t14));
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-
-        ok_button.setOnClickListener(view1 -> {
-            progressBar.setVisibility(View.VISIBLE);
-            Runnable runnable = () -> {
-                MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-                Cursor cc = myDatabase.LoadImagePaths(DocId);
-                try {
-                    cc.moveToFirst();
-                    do {
-                        CommonOperations.deleteFile(cc.getString(0));
-                    } while (cc.moveToNext());
-                } catch (Exception e) {
-                }
-                myDatabase.DeleteTable(DocId);
-                myDatabase.close();
-                Intent in = new Intent(document_view.this, AllDocs.class);
-                startActivity(in);
-                finish();
-            };
-            Thread thread = new Thread(runnable);
-            thread.start();
-        });
-        cancel_button.setOnClickListener(view12 -> alertDialog.dismiss());
-        progressBar.setVisibility(View.GONE);
-    }
-
-    public void pdfPreviewButtonListener(View view) {
-        //isse emptyAvailable karna hai baad mein
-        if (false) {
-            MyAlertCreator myAlertCreator = new MyAlertCreator();
-            myAlertCreator.createAlertForZeroSizeImages(document_view.this);
-        } else {
-            PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-            String path = pdfMaker.MakeTempPDF(progressBar, ImagePaths,DocName);
-            if (!path.equals("")) {
-                Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
-                Intent in = new Intent(Intent.ACTION_VIEW);
-                in.setDataAndType(uri, "application/pdf");
-                in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(in);
-            }
-        }
-    }
-
-    public void selectiveDeleteButtonListener(View view) {
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
-
-        final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, findViewById(R.id.alert_main_layout), false)};
-        alertDialogBuilder.setView(customView[0]);
-
-        TextView textView = customView[0].findViewById(R.id.textView9);
-        Button cancel_button = customView[0].findViewById(R.id.button);
-        Button ok_button = customView[0].findViewById(R.id.button2);
-        textView.setText(getText(R.string.docViewAlertText));
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        ok_button.setOnClickListener(view2 -> {
-            for (int k = 0; k < ImagePaths.size(); k++) {
-                if (ImagePathsChecker.get(k)) {
-                    delete(ImagePaths.get(k));
-                }
-            }
-            Initializer();
-            alertDialog.dismiss();
-        });
-
-        cancel_button.setOnClickListener(view2 -> alertDialog.dismiss());
-    }
-
-    public void GallerySelectButtonListener(View view) {
-//        first_time = true;
-        progressBar.setVisibility(View.VISIBLE);
-        Intent fileManager = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        fileManager.setType("image/*");
-        fileManager.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(fileManager, SelectPhotosRequestCode);
     }
 
     private void createFile() {//Uri pickerInitialUri) {
@@ -497,42 +531,13 @@ public class document_view extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         docViewOptionsLinearLayout = findViewById(R.id.doc_view_options);
         mainLayout = findViewById(R.id.document_view_id);
-    }
 
-    public void ClickNewPhotoButtonListener(View view) {
-        progressBar.setVisibility(View.VISIBLE);
-        Intent in = new Intent(document_view.this, MyCamera.class);
-        in.putExtra("DocId", DocId);
-        startActivity(in);
-        finish();
-    }
+        backButton = findViewById(R.id.imageButton9);
+        sharePdfButton = findViewById(R.id.imageButton6);
+        pdfPreviewButton = findViewById(R.id.imageButton);
+        saveDocButton = findViewById(R.id.save_doc_imageButton);
+        deleteDocButton=findViewById(R.id.imageButton7);
+        selectiveDeleteButton = findViewById(R.id.deleteSelectedDocumentsButton);
 
-    public void DocNameClickListener(View view) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-        View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.name_changer_dialog_box, null, false);
-        EditText input = dialogView.findViewById(R.id.editTextTextPersonName2);
-        Button okButton = dialogView.findViewById(R.id.button4);
-        Button cancelButton = dialogView.findViewById(R.id.button3);
-        input.setText(DocName);
-        alert.setView(dialogView);
-
-        AlertDialog alertDialog = alert.create();
-        alertDialog.show();
-        input.requestFocus();
-        input.selectAll();
-        okButton.setOnClickListener(view2 -> {
-            if (!input.getText().toString().isEmpty()) {
-                DocName = input.getText().toString();
-                doc_name_tv.setText(DocName);
-                ChangeName();
-                progressBar.setVisibility(View.GONE);
-                alertDialog.dismiss();
-            } else {
-                Toast.makeText(document_view.this, "Please fill something", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        cancelButton.setOnClickListener(view2 -> alertDialog.dismiss());
     }
 }
