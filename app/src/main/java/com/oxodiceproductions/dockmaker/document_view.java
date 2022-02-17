@@ -2,8 +2,6 @@ package com.oxodiceproductions.dockmaker;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
-import android.app.DownloadManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -26,20 +24,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.edmodo.cropper.CropImageView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class document_view extends AppCompatActivity {
     ArrayList<String> ImagePaths = new ArrayList<>();
@@ -57,9 +51,7 @@ public class document_view extends AppCompatActivity {
     FloatingActionButton clickPhotosButton, selectPhotosButton;
     ProgressBar progressBar;
     int SelectPhotosRequestCode = 10;
-    int notificationId=0;
     ImageButton checkedPhotosDeleteButton, backButton, sharePdfButton, saveDocButton, deleteDocButton, pdfPreviewButton;
-    ImageButton selectiveDeleteButton;
 
     // Request code for creating a PDF document.
     private static final int CREATE_FILE = 1;
@@ -121,59 +113,43 @@ public class document_view extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(this::Initializer);
 
         backButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
             onBackPressed();
         });
 
         sharePdfButton.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
-            try {
-//            String filepath = MakeTempPDF();
-                PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-                String filepath = pdfMaker.MakeTempPDF(progressBar, ImagePaths, DocName);
-                if (!filepath.equals("")) {
-                    File fileToShare = new File(filepath);
-                    Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", fileToShare);
-                    grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("application/pdf");
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                    startActivity(Intent.createChooser(shareIntent, "Share with"));
-                } else {
-                    Toast.makeText(getApplicationContext(), "File path not available", Toast.LENGTH_SHORT).show();
+            new Thread(() -> {
+                try {
+                    PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
+                    String filepath = pdfMaker.MakeTempPDF(ImagePaths, DocName);
+                    if (!filepath.equals("")) {
+                        File fileToShare = new File(filepath);
+                        Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", fileToShare);
+                        grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("application/pdf");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                        startActivity(Intent.createChooser(shareIntent, "Share with"));
+                    } else {
+                        Toast.makeText(getApplicationContext(), "File path not available", Toast.LENGTH_SHORT).show();
+                    }
+                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                } catch (Exception e) {
+                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
                 }
-            } catch (Exception e) {
-            }
-            progressBar.setVisibility(View.GONE);
+            }).start();
         });
 
         saveDocButton.setOnClickListener(view -> {
 //            createFile();
-
-            // Create an explicit intent for an Activity in your app
-            Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.DocMakerNotificationChannelId))
-                    .setSmallIcon(R.drawable.app_icon_orange_foreground)
-                    .setContentTitle(DocName)
-                    .setContentText("Go to downloads")
-                    .setContentIntent(pendingIntent)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setAutoCancel(true);
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-
-            // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(notificationId++, builder.build());
-
-
+            NotificationModule notificationModule = new NotificationModule();
+            notificationModule.generateNotification(getApplicationContext(), DocName, "Go to downloads.");
             try {
-                File downloadsFolder=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                FileOutputStream fileOutputStream=new FileOutputStream(downloadsFolder+"/"+DocName+".pdf");
-                PDFMaker pdfMaker=new PDFMaker(getApplicationContext());
-                pdfMaker.downloadPdf(ImagePaths,fileOutputStream);
+                File downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                FileOutputStream fileOutputStream = new FileOutputStream(downloadsFolder + "/" + DocName + ".pdf");
+                PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
+                pdfMaker.downloadPdf(ImagePaths, fileOutputStream);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -204,7 +180,7 @@ public class document_view extends AppCompatActivity {
                         do {
                             CommonOperations.deleteFile(cc.getString(0));
                         } while (cc.moveToNext());
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
                     myDatabase2.DeleteTable(DocId);
                     myDatabase2.close();
@@ -220,24 +196,40 @@ public class document_view extends AppCompatActivity {
         });
 
         pdfPreviewButton.setOnClickListener(view -> {
-            //isse emptyAvailable karna hai baad mein
-            if (false) {
-                MyAlertCreator myAlertCreator = new MyAlertCreator();
-                myAlertCreator.createAlertForZeroSizeImages(document_view.this);
-            } else {
-                PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-                String path = pdfMaker.MakeTempPDF(progressBar, ImagePaths, DocName);
-                if (!path.equals("")) {
-                    Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
-                    Intent in = new Intent(Intent.ACTION_VIEW);
-                    in.setDataAndType(uri, "application/pdf");
-                    in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(in);
+            progressBar.setVisibility(View.VISIBLE);
+            Thread pdfCreationThread = new Thread(() -> {
+                boolean emptyAvailable = false;
+                try {
+                    for (String imagePath : ImagePaths) {
+                        File file = new File(imagePath);
+                        if (!file.exists()) {
+                            emptyAvailable = true;
+                            break;
+                        }
+                    }
+                } catch (Exception ignored) {
                 }
-            }
+                if (emptyAvailable) {
+                    MyAlertCreator myAlertCreator = new MyAlertCreator();
+                    myAlertCreator.createAlertForZeroSizeImages(document_view.this);
+                } else {
+                    PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
+                    String path = pdfMaker.MakeTempPDF(ImagePaths, DocName);
+                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                    if (!path.equals("")) {
+                        Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
+                        Intent in = new Intent(Intent.ACTION_VIEW);
+                        in.setDataAndType(uri, "application/pdf");
+                        in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(in);
+                    }
+                }
+            });
+
+            pdfCreationThread.start();
         });
 
-        selectiveDeleteButton.setOnClickListener(view -> {
+        checkedPhotosDeleteButton.setOnClickListener(view -> {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
 
             final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, findViewById(R.id.alert_main_layout), false)};
@@ -395,15 +387,15 @@ public class document_view extends AppCompatActivity {
         t.start();
     }
 
-    private void createFile() {//Uri pickerInitialUri) {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/pdf");
-        String name = DocName + ".pdf";
-        intent.putExtra(Intent.EXTRA_TITLE, name);
-//            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-        startActivityForResult(intent, CREATE_FILE);
-    }
+//    private void createFile() {//Uri pickerInitialUri) {
+//        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+//        intent.addCategory(Intent.CATEGORY_OPENABLE);
+//        intent.setType("application/pdf");
+//        String name = DocName + ".pdf";
+//        intent.putExtra(Intent.EXTRA_TITLE, name);
+////            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+//        startActivityForResult(intent, CREATE_FILE);
+//    }
 
     void Initializer() {
         progressBar.setVisibility(View.VISIBLE);
@@ -414,8 +406,7 @@ public class document_view extends AppCompatActivity {
         ImagePathsChecker.clear();
         ImagePaths.clear();
 
-        MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-        try {
+        try (MyDatabase myDatabase = new MyDatabase(getApplicationContext())) {
             Cursor cc = myDatabase.LoadImagePaths(DocId);
             cc.moveToFirst();
             do {
@@ -442,96 +433,10 @@ public class document_view extends AppCompatActivity {
             emptyListFrameLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
             swipeRefreshLayout.setVisibility(View.GONE);
-        } finally {
-            myDatabase.close();
         }
 //        first_time = false;
         progressBar.setVisibility(View.GONE);
     }
-
-   /* public class MyTouches extends ItemTouchHelper.SimpleCallback {
-
-
-
-//        The real problem is with database
-//                kyunki databse bahut slow kar deta hai
-//        swipe aur move ke process ko isliye swipe and drag ko abhi nahi kar raha
-
-
-
-
-
-
-
-        DocViewRecyclerViewAdapter adapter;
-
-        public MyTouches(DocViewRecyclerViewAdapter adapter) {
-            super(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT | ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
-            this.adapter = adapter;
-        }
-
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            int p1 = viewHolder.getAdapterPosition();
-            int p2 = target.getAdapterPosition();
-
-
-            Collections.swap(ImagePaths, p1, p2);
-            Collections.swap(ImagePathsChecker, p1, p2);
-
-            adapter.notifyItemMoved(p1, p2);
-
-            return true;
-        }
-
-        @Override
-        public void onMoved(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
-            super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
-            MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-            myDatabase.updateDoc(ImagePaths.get(fromPos), ImagePaths.get(toPos), DocId);
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            int position = viewHolder.getAdapterPosition();
-
-            lastSwipedImagePath = ImagePaths.get(position);
-            lastSwipedImagePosition = position;
-
-
-            ImagePaths.remove(lastSwipedImagePosition);
-            ImagePathsChecker.remove(lastSwipedImagePosition);
-            adapter.notifyItemRemoved(lastSwipedImagePosition);
-
-            //alert starts here
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
-            final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null)};
-            alertDialogBuilder.setView(customView[0]);
-            TextView textView = customView[0].findViewById(R.id.textView9);
-            Button cancel_button = customView[0].findViewById(R.id.button);
-            Button ok_button = customView[0].findViewById(R.id.button2);
-            textView.setText("Do you want to delete this image?");
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-            ok_button.setOnClickListener(view -> {
-                MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-                myDatabase.DeleteImage(lastSwipedImagePath, DocId);
-                File file = new File(lastSwipedImagePath);
-                file.delete();
-                alertDialog.dismiss();
-            });
-
-            cancel_button.setOnClickListener(view -> {
-                progressBar.setVisibility(View.GONE);
-                ImagePaths.add(lastSwipedImagePosition, lastSwipedImagePath);
-                ImagePathsChecker.add(lastSwipedImagePosition, false);
-                adapter.notifyItemInserted(lastSwipedImagePosition);
-                alertDialog.dismiss();
-            });
-        }
-    }
-*/
 
     @Override
     protected void onResume() {
@@ -575,7 +480,6 @@ public class document_view extends AppCompatActivity {
         sharePdfButton = findViewById(R.id.imageButton6);
         pdfPreviewButton = findViewById(R.id.imageButton);
         saveDocButton = findViewById(R.id.save_doc_imageButton);
-        deleteDocButton=findViewById(R.id.imageButton7);
-        selectiveDeleteButton = findViewById(R.id.deleteSelectedDocumentsButton);
+        deleteDocButton = findViewById(R.id.imageButton7);
     }
 }

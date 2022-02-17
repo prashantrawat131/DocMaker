@@ -85,9 +85,9 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:scaleType="fitCenter"
             android:backgroundTint="@color/my_button_color"
             android:contentDescription="@string/saveDocButtonCD"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_get_app_24" />
 
         <ImageButton
@@ -149,16 +149,6 @@
             android:text="@string/t4"
             android:textColor="@color/black"
             android:textSize="20sp" />
-        <!--
-                <TextView
-                    android:id="@+id/warning_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/warning"
-                    android:padding="10dp"
-                    android:text="@string/t13"
-                    android:textColor="@color/text_color"
-                    android:textSize="20sp" />-->
     </LinearLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -169,14 +159,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/doc_name_ll">
-        <!-- <ListView
-             android:id="@+id/doc_view_list_view"
-             android:layout_width="match_parent"
-             android:layout_height="0dp"
-             android:background="@color/app_bg"
-             android:horizontalSpacing="10dp"
-             android:padding="10dp"
-             android:verticalSpacing="10dp" />-->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/docRecyclerView"
             android:layout_width="match_parent"

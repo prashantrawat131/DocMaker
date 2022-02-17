@@ -8,22 +8,23 @@
     android:background="@color/extra_light">
 
     <LinearLayout
+
+        android:background="@color/extra_light"
         android:id="@+id/linearLayoutSimpleImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:background="@color/extra_light"
         android:orientation="horizontal"
         android:padding="10dp">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/image_rep_card_view"
             android:layout_width="70dp"
+            android:background="@color/extra_light"
             android:layout_height="140dp"
             android:layout_weight="1"
-            android:background="@color/extra_light"
             app:cardCornerRadius="10dp">
 
             <ImageView

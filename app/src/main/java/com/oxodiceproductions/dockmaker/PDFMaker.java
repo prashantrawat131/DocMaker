@@ -38,10 +38,10 @@ public class PDFMaker {
 
 
     //native android method starts here
-    public String MakeTempPDF(ProgressBar progressBar, ArrayList<String> ImagePaths,String DocName) {
-        if (progressBar != null) {
-            progressBar.setVisibility(View.VISIBLE);
-        }
+    public String MakeTempPDF(ArrayList<String> ImagePaths,String DocName) {
+//        if (progressBar != null) {
+//            progressBar.setVisibility(View.VISIBLE);
+//        }
 
         String filepath = "";
 
@@ -58,9 +58,9 @@ public class PDFMaker {
             filepath = file.getPath();
         } catch (Exception ignored) {
         }
-        if (progressBar != null) {
-            progressBar.setVisibility(View.GONE);
-        }
+//        if (progressBar != null) {
+//            progressBar.setVisibility(View.GONE);
+//        }
 
         return filepath;
     }

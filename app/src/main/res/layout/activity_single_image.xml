@@ -60,6 +60,17 @@
             android:contentDescription="@string/CD10"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_delete_24" />
+
+        <ImageButton
+            android:id="@+id/download_image"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/my_button_color"
+            android:contentDescription="@string/di"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_baseline_get_app_24" />
+
         <!--<Button
             android:id="@+id/edit_button"
             android:typeface="monospace"

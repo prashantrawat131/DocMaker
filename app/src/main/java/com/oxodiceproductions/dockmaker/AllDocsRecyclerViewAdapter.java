@@ -136,7 +136,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
                 }
                 if (!ImagePaths.isEmpty()) {
                     PDFMaker pdfMaker = new PDFMaker(context);
-                    String filepath = pdfMaker.MakeTempPDF(null, ImagePaths,myDatabase.getDocName(DocId));
+                    String filepath = pdfMaker.MakeTempPDF(ImagePaths,myDatabase.getDocName(DocId));
                     if (!filepath.equals("")) {
                         File fileToShare = new File(filepath);
                         Uri contentUri = getUriForFile(context, "com.oxodiceproductions.dockmaker", fileToShare);

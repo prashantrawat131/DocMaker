@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +25,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class SingleImage extends AppCompatActivity {
@@ -36,6 +41,7 @@ public class SingleImage extends AppCompatActivity {
     private GestureDetectorCompat gestureDetectorCompat;
     ImageButton backButton, shareImageButton, deleteImageButton, editImageButton;
     ImageButton retakeImageButton, previousImageButton, nextImageButton;
+    ImageButton downloadImageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,7 @@ public class SingleImage extends AppCompatActivity {
         setContentView(R.layout.activity_single_image);
         imageView = findViewById(R.id.imageView2);
         progressBar = findViewById(R.id.progressBar4);
+        downloadImageButton=findViewById(R.id.download_image);
         imageIndexTextView = findViewById(R.id.single_image_index_tv);
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
         ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
@@ -146,7 +153,13 @@ public class SingleImage extends AppCompatActivity {
         previousImageButton.setOnClickListener(view -> move(-1));
 
         nextImageButton.setOnClickListener(view -> move(1));
+
+        downloadImageButton.setOnClickListener(view->{
+            CommonOperations.downloadImage(getApplicationContext(),ImagePath);
+        });
     }
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
