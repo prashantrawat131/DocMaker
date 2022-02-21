@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class MyCamera extends AppCompatActivity {
+    private static final String TAG = "tagJi";
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     PreviewView previewView;
     ImageCapture imageCapture;
@@ -50,6 +52,7 @@ public class MyCamera extends AppCompatActivity {
     ImageButton flash_button;
     File capturedImage;
     ProgressBar progressBar;
+    public static final int cameraImageEditingId = 1928;
     FloatingActionButton captureImageButton;
 
     @Override
@@ -81,9 +84,6 @@ public class MyCamera extends AppCompatActivity {
         }
 
         Setup();
-
-//		Executor executor2 = runnable -> {
-//		};
 
         progressBar.setVisibility(View.GONE);
 
@@ -205,13 +205,30 @@ public class MyCamera extends AppCompatActivity {
     }
 
     private void GoToCrop() {
-        Intent in = new Intent(MyCamera.this, EditImageActivity.class);
+        Intent in = new Intent(MyCamera.this, EditingImageActivity.class);
+//        Log.d(TAG, "GoToCrop: "+new File(ImagePath).length());
         in.putExtra("ImagePath", ImagePath);
-        in.putExtra("DocId", DocId);
-        in.putExtra("fromCamera", true);
-        in.putExtra("retakeImagePath", retakeImagePath);
-        startActivity(in);
-        finish();
+//        in.putExtra("DocId", DocId);
+//        in.putExtra("fromCamera", true);
+//        in.putExtra("retakeImagePath", retakeImagePath);
+        startActivityForResult(in, cameraImageEditingId);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==cameraImageEditingId&&resultCode==RESULT_OK){
+            String newImagePath=data.getExtras().getString("ImagePath");
+            MyDatabase myDatabase=new MyDatabase(getApplicationContext());
+            if(retakeImagePath.equals("-1")){
+                myDatabase.InsertImage(DocId,newImagePath);
+            }
+            else{
+                myDatabase.retake(DocId,retakeImagePath,newImagePath);
+            }
+            myDatabase.close();
+            GoToDocumentView();
+        }
     }
 
     private void GoToDocumentView() {

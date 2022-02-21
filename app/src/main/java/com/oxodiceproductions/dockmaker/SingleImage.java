@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.FileUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,13 +17,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class SingleImage extends AppCompatActivity {
@@ -34,7 +30,6 @@ public class SingleImage extends AppCompatActivity {
     ProgressBar progressBar;
     String ImagePath = "-1";
     String DocId = "-1";
-    boolean first_time = false;
     SharedPreferences sharedPreferences;
     TextView imageIndexTextView;
     ArrayList<String> imagesList = new ArrayList<>();
@@ -42,6 +37,7 @@ public class SingleImage extends AppCompatActivity {
     ImageButton backButton, shareImageButton, deleteImageButton, editImageButton;
     ImageButton retakeImageButton, previousImageButton, nextImageButton;
     ImageButton downloadImageButton;
+    public static final int editingSingleImageId = 1908;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +45,11 @@ public class SingleImage extends AppCompatActivity {
         setContentView(R.layout.activity_single_image);
         imageView = findViewById(R.id.imageView2);
         progressBar = findViewById(R.id.progressBar4);
-        downloadImageButton=findViewById(R.id.download_image);
+        downloadImageButton = findViewById(R.id.download_image);
         imageIndexTextView = findViewById(R.id.single_image_index_tv);
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
         ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
         DocId = getIntent().getExtras().getString("DocId", "-1");
-        first_time = getIntent().getExtras().getBoolean("first_time", false);
         imageView.setImageURI(Uri.fromFile(new File(ImagePath)));
         progressBar.setVisibility(View.GONE);
 
@@ -133,12 +128,11 @@ public class SingleImage extends AppCompatActivity {
 
         editImageButton.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
-            Intent in = new Intent(SingleImage.this, EditImageActivity.class);
+            Intent in = new Intent(SingleImage.this, EditingImageActivity.class);
             in.putExtra("ImagePath", ImagePath);
-            in.putExtra("DocId", DocId);
-            in.putExtra("retakeImagePath", ImagePath);
-            startActivity(in);
-            finish();
+//            in.putExtra("DocId", DocId);
+//            in.putExtra("retakeImagePath", ImagePath);
+            startActivityForResult(in, editingSingleImageId);
         });
 
         retakeImageButton.setOnClickListener(view -> {
@@ -154,12 +148,28 @@ public class SingleImage extends AppCompatActivity {
 
         nextImageButton.setOnClickListener(view -> move(1));
 
-        downloadImageButton.setOnClickListener(view->{
-            CommonOperations.downloadImage(getApplicationContext(),ImagePath);
+        downloadImageButton.setOnClickListener(view -> {
+            CommonOperations.downloadImage(getApplicationContext(), ImagePath);
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == editingSingleImageId) {
+            if (resultCode == RESULT_OK) {
+                String newImagePath = data.getExtras().getString("ImagePath");
+                MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+                myDatabase.retake(DocId, ImagePath, newImagePath);
+                myDatabase.close();
 
+                //setting the new image
+                ImagePath = newImagePath;
+                imageView.setImageURI(Uri.fromFile(new File(ImagePath)));
+                progressBar.setVisibility(View.GONE);
+            }
+        }
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -215,7 +225,6 @@ public class SingleImage extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         Intent in = new Intent(SingleImage.this, document_view.class);
         in.putExtra("DocId", DocId);
-//        in.putExtra("first_time", false);
         startActivity(in);
     }
 }

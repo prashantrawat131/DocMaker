@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,10 +50,12 @@ public class document_view extends AppCompatActivity {
     FloatingActionButton clickPhotosButton, selectPhotosButton;
     ProgressBar progressBar;
     int SelectPhotosRequestCode = 10;
-    ImageButton checkedPhotosDeleteButton, backButton, sharePdfButton, saveDocButton, deleteDocButton, pdfPreviewButton;
+    ImageButton checkedPhotosDeleteButton, backButton, sharePdfButton, downloadDocButton, deleteDocButton, pdfPreviewButton;
 
     // Request code for creating a PDF document.
-    private static final int CREATE_FILE = 1;
+//    private static final int CREATE_FILE = 1;
+
+    private static final int galleryImagesId = 1800;
 
     public static boolean emptyAvailable = false;
 
@@ -141,7 +142,7 @@ public class document_view extends AppCompatActivity {
             }).start();
         });
 
-        saveDocButton.setOnClickListener(view -> {
+        downloadDocButton.setOnClickListener(view -> {
 //            createFile();
             NotificationModule notificationModule = new NotificationModule();
             notificationModule.generateNotification(getApplicationContext(), DocName, "Go to downloads.");
@@ -317,64 +318,83 @@ public class document_view extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CREATE_FILE) {
-            if (resultCode == RESULT_OK) {
-                assert data != null;
-                Uri resultUri = data.getData();
-                try {
-                    ParcelFileDescriptor p = getContentResolver().openFileDescriptor(resultUri, "w");
-//                    Save(p);
-                    PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-                    pdfMaker.Save(p, ImagePaths, progressBar);
-                    p.close();
-//                    first_time = false;
-                } catch (Exception ignored) {
-                }
-                progressBar.setVisibility(View.GONE);
-            }
-        }
+//        if (requestCode == CREATE_FILE) {
+//            if (resultCode == RESULT_OK) {
+//                assert data != null;
+//                Uri resultUri = data.getData();
+//                try {
+//                    ParcelFileDescriptor p = getContentResolver().openFileDescriptor(resultUri, "w");
+////                    Save(p);
+//                    PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
+//                    pdfMaker.Save(p, ImagePaths, progressBar);
+//                    p.close();
+////                    first_time = false;
+//                } catch (Exception ignored) {
+//                }
+//                progressBar.setVisibility(View.GONE);
+//            }
+//        }
         if (requestCode == SelectPhotosRequestCode) {
             if (resultCode == RESULT_OK) {
-                progressBar.setVisibility(View.VISIBLE);
-//                first_time = true;
                 assert data != null;
                 progressBar.setVisibility(View.VISIBLE);
                 if (data.getClipData() == null) {
+//                    this means only single image
                     Uri uri = data.getData();
                     galleryImagesUris.add(uri);
                 } else {
-//                    Log.d("tagJi", "Initial Uri paths starts here");
+//                    this is for multiple paragraphs
                     for (int i = 0; i < data.getClipData().getItemCount(); i++) {
-//                        Log.d("tagJi", data.getClipData().getItemAt(i).getUri().getPath());
                         galleryImagesUris.add(data.getClipData().getItemAt(i).getUri());
                     }
-//                    Log.d("tagJi", "Initial Uri paths ends here");
                 }
                 saveSelectedImage();
+            }
+        }
+
+        if (requestCode == galleryImagesId) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                String ImagePath = data.getExtras().getString("ImagePath");
+                MyDatabase myDatabase=new MyDatabase(getApplicationContext());
+                myDatabase.InsertImage(DocId,ImagePath);
+                myDatabase.close();
+
+                goForEditing();
             }
         }
     }
 
     void goForEditing() {
+//        if (galleryImagesPaths.size() > 0) {
+//            Intent in = new Intent(document_view.this, EditImageActivity.class);
+//            in.putExtra("ImagePath", galleryImagesPaths.get(0));
+//            in.putExtra("DocId", DocId);
+//            in.putExtra("fromGallery", true);
+//            in.putExtra("galleryImagesPaths", galleryImagesPaths);
+//            startActivity(in);
+//        }
+
+
+        //checking if there are images left to crop
         if (galleryImagesPaths.size() > 0) {
-            Intent in = new Intent(document_view.this, EditImageActivity.class);
-            in.putExtra("ImagePath", galleryImagesPaths.get(0));
-            in.putExtra("DocId", DocId);
-            in.putExtra("fromGallery", true);
-            in.putExtra("galleryImagesPaths", galleryImagesPaths);
-            startActivity(in);
+            String imagePathForEditing = galleryImagesPaths.get(0);
+            galleryImagesPaths.remove(0);
+
+            Intent in = new Intent(document_view.this, EditingImageActivity.class);
+            in.putExtra("ImagePath", imagePathForEditing);
+            startActivityForResult(in, galleryImagesId);
         }
     }
 
     private void saveSelectedImage() {
+        progressBar.setVisibility(View.VISIBLE);
         Runnable runnable = () -> {
             for (int i = 0; i < galleryImagesUris.size(); i++) {
-                runOnUiThread(() -> progressBar.setVisibility(View.VISIBLE));
+//                runOnUiThread(() -> );
 
-                //My methods starts here
                 MyImageCompressor myImageCompressor = new MyImageCompressor(getApplicationContext());
                 String filePath = myImageCompressor.compress(galleryImagesUris.get(i));
-                //My method ends here
 
                 if (!filePath.equals("-1")) {
                     galleryImagesPaths.add(filePath);
@@ -479,7 +499,7 @@ public class document_view extends AppCompatActivity {
         backButton = findViewById(R.id.imageButton9);
         sharePdfButton = findViewById(R.id.imageButton6);
         pdfPreviewButton = findViewById(R.id.imageButton);
-        saveDocButton = findViewById(R.id.save_doc_imageButton);
+        downloadDocButton = findViewById(R.id.save_doc_imageButton);
         deleteDocButton = findViewById(R.id.imageButton7);
     }
 }

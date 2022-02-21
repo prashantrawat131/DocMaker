@@ -4,7 +4,6 @@ import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -19,8 +18,6 @@ public class NotificationModule {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-
-        Toast.makeText(context, ""+notificationId, Toast.LENGTH_SHORT).show();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(R.string.DocMakerNotificationChannelId))
                 .setSmallIcon(R.drawable.app_icon_orange_foreground)
                 .setContentTitle(title)
