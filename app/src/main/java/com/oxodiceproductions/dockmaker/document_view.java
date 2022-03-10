@@ -218,11 +218,14 @@ public class document_view extends AppCompatActivity {
                     String path = pdfMaker.MakeTempPDF(ImagePaths, DocName);
                     runOnUiThread(() -> progressBar.setVisibility(View.GONE));
                     if (!path.equals("")) {
-                        Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
-                        Intent in = new Intent(Intent.ACTION_VIEW);
-                        in.setDataAndType(uri, "application/pdf");
-                        in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        startActivity(in);
+//                        Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
+//                        Intent in = new Intent(Intent.ACTION_VIEW);
+//                        in.setDataAndType(uri, "application/pdf");
+//                        in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                        startActivity(in);
+                        Intent intent=new Intent(document_view.this,PdfPReview.class);
+                        intent.putExtra("path",path);
+                        startActivity(intent);
                     }
                 }
             });

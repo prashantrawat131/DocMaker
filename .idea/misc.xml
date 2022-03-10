@@ -66,10 +66,12 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3140625" />
         <entry key="app/src/main/res/layout/activity_my_camera.xml" value="0.3140625" />
         <entry key="app/src/main/res/layout/activity_my_settings.xml" value="0.3145833333333333" />
+        <entry key="app/src/main/res/layout/activity_pdf_preview.xml" value="0.3145833333333333" />
         <entry key="app/src/main/res/layout/activity_single_image.xml" value="0.3145833333333333" />
         <entry key="app/src/main/res/layout/alert_box.xml" value="0.3145833333333333" />
         <entry key="app/src/main/res/layout/doc_rep.xml" value="0.3145833333333333" />
         <entry key="app/src/main/res/layout/name_changer_dialog_box.xml" value="0.3145833333333333" />
+        <entry key="app/src/main/res/layout/pdf_preview_single_image.xml" value="0.3145833333333333" />
         <entry key="app/src/main/res/layout/simple_image_layout.xml" value="0.3145833333333333" />
       </map>
     </option>
