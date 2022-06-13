@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.oxodiceproductions.dockmaker">
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -15,18 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".PdfPReview"
-            android:exported="false" />
-        <activity
             android:name=".EditingImageActivity"
             android:exported="false" />
         <activity android:name=".MySettings" />
         <activity android:name=".AllDocs" />
-        <!--
-  <activity
-            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
-        -->
         <activity android:name=".SingleImage" />
         <activity android:name=".document_view" />
         <activity android:name=".MyCamera" />
