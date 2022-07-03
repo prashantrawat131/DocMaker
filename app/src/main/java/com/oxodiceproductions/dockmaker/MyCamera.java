@@ -232,7 +232,7 @@ public class MyCamera extends AppCompatActivity {
     }
 
     private void GoToDocumentView() {
-        Intent in = new Intent(MyCamera.this, document_view.class);
+        Intent in = new Intent(MyCamera.this, DocumentViewActivity.class);
         in.putExtra("DocId", DocId);
         startActivity(in);
         finish();
@@ -241,7 +241,7 @@ public class MyCamera extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent in = new Intent(MyCamera.this, document_view.class);
+        Intent in = new Intent(MyCamera.this, DocumentViewActivity.class);
         in.putExtra("DocId", DocId);
         startActivity(in);
         finish();

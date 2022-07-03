@@ -21,9 +21,10 @@
         <activity android:name=".MySettings" />
         <activity android:name=".AllDocs" />
         <activity android:name=".SingleImage" />
-        <activity android:name=".document_view" />
+        <activity android:name=".DocumentViewActivity" />
         <activity android:name=".MyCamera" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

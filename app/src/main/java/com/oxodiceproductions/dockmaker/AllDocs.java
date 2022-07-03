@@ -37,7 +37,7 @@ import java.util.TimerTask;
 
 public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /*This activity show all the documents present in the database*/
-    ArrayList<document_model> arrayList = new ArrayList<>();
+    ArrayList<DocumentDataModel> arrayList = new ArrayList<>();
     RecyclerView recyclerView;
     Toolbar toolbar;
     FloatingActionButton addNewDocFloatingActionButton;
@@ -48,6 +48,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     ImageView clearAnimationImageView;
     NavigationView navigationView;
     DrawerLayout drawerLayout;
+
 
     /* arrayList :- it is a list of all the documents present in the database. It has type of document_model which is a custom java class for documents
      * listView:-It is the listView for all the documents
@@ -109,7 +110,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             myDatabase.InsertDocument(DocId, DocId, date_s, time_s, DocId);
             myDatabase.CreateTable(DocId);
             myDatabase.close();
-            Intent in = new Intent(getApplicationContext(), document_view.class);
+            Intent in = new Intent(getApplicationContext(), DocumentViewActivity.class);
             in.putExtra("DocId", DocId);
             in.putExtra("first_time", false);
             startActivity(in);
@@ -216,7 +217,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                     NumberOfPics = myDatabase.getNumberOfPics(DocId);
                 } catch (Exception ignored) {
                 }
-                arrayList.add(new document_model(false, DocId, SampleImageId, DateCreated, TimeCreated, DocName, Size, NumberOfPics));
+                arrayList.add(new DocumentDataModel(false, DocId, SampleImageId, DateCreated, TimeCreated, DocName, Size, NumberOfPics));
             } while (cc.moveToNext());
 
             Collections.sort(arrayList);

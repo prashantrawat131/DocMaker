@@ -34,7 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
-public class document_view extends AppCompatActivity {
+public class DocumentViewActivity extends AppCompatActivity {
     ArrayList<String> ImagePaths = new ArrayList<>();
     ArrayList<Boolean> ImagePathsChecker = new ArrayList<>();
     String DocId, DocName;
@@ -158,7 +158,7 @@ public class document_view extends AppCompatActivity {
         });
 
         deleteDocButton.setOnClickListener(view -> {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DocumentViewActivity.this);
 
             final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
             alertDialogBuilder.setView(customView[0]);
@@ -185,7 +185,7 @@ public class document_view extends AppCompatActivity {
                     }
                     myDatabase2.DeleteTable(DocId);
                     myDatabase2.close();
-                    Intent in = new Intent(document_view.this, AllDocs.class);
+                    Intent in = new Intent(DocumentViewActivity.this, AllDocs.class);
                     startActivity(in);
                     finish();
                 };
@@ -212,7 +212,7 @@ public class document_view extends AppCompatActivity {
                 }
                 if (emptyAvailable) {
                     MyAlertCreator myAlertCreator = new MyAlertCreator();
-                    myAlertCreator.createAlertForZeroSizeImages(document_view.this);
+                    myAlertCreator.createAlertForZeroSizeImages(DocumentViewActivity.this);
                 } else {
                     PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
                     String path = pdfMaker.MakeTempPDF(ImagePaths, DocName);
@@ -234,7 +234,7 @@ public class document_view extends AppCompatActivity {
         });
 
         checkedPhotosDeleteButton.setOnClickListener(view -> {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(document_view.this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DocumentViewActivity.this);
 
             final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, findViewById(R.id.alert_main_layout), false)};
             alertDialogBuilder.setView(customView[0]);
@@ -269,7 +269,7 @@ public class document_view extends AppCompatActivity {
 
         clickPhotosButton.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
-            Intent in = new Intent(document_view.this, MyCamera.class);
+            Intent in = new Intent(DocumentViewActivity.this, MyCamera.class);
             in.putExtra("DocId", DocId);
             startActivity(in);
             finish();
@@ -297,7 +297,7 @@ public class document_view extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     alertDialog.dismiss();
                 } else {
-                    Toast.makeText(document_view.this, "Please fill something", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DocumentViewActivity.this, "Please fill something", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -306,7 +306,7 @@ public class document_view extends AppCompatActivity {
     }
 
     private void GoToAllDocs() {
-        Intent in = new Intent(document_view.this, AllDocs.class);
+        Intent in = new Intent(DocumentViewActivity.this, AllDocs.class);
         startActivity(in);
         finish();
     }
@@ -384,7 +384,7 @@ public class document_view extends AppCompatActivity {
             String imagePathForEditing = galleryImagesPaths.get(0);
             galleryImagesPaths.remove(0);
 
-            Intent in = new Intent(document_view.this, EditingImageActivity.class);
+            Intent in = new Intent(DocumentViewActivity.this, EditingImageActivity.class);
             in.putExtra("ImagePath", imagePathForEditing);
             startActivityForResult(in, galleryImagesId);
         }
@@ -438,7 +438,7 @@ public class document_view extends AppCompatActivity {
             } while (cc.moveToNext());
 
             //recycler view setup
-            DocViewRecyclerViewAdapter adapter = new DocViewRecyclerViewAdapter(docViewOptionsLinearLayout, progressBar, selectPhotosButton, clickPhotosButton, ImagePathsChecker, checkedPhotosDeleteButton, recyclerView, DocId, ImagePaths, getApplicationContext(), document_view.this);
+            DocViewRecyclerViewAdapter adapter = new DocViewRecyclerViewAdapter(docViewOptionsLinearLayout, progressBar, selectPhotosButton, clickPhotosButton, ImagePathsChecker, checkedPhotosDeleteButton, recyclerView, DocId, ImagePaths, getApplicationContext(), DocumentViewActivity.this);
             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             recyclerView.setAdapter(adapter);
 
@@ -472,7 +472,7 @@ public class document_view extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         ChangeName();
-        Intent in = new Intent(document_view.this, AllDocs.class);
+        Intent in = new Intent(DocumentViewActivity.this, AllDocs.class);
         startActivity(in);
         finish();
     }

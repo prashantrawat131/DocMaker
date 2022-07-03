@@ -67,4 +67,8 @@ public class CommonOperations {
 
         }
     }
+
+    public static void deleteDocument(String docId){
+
+    }
 }

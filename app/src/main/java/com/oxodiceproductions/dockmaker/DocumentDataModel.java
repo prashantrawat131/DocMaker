@@ -1,6 +1,6 @@
 package com.oxodiceproductions.dockmaker;
 
-public class document_model implements Comparable<document_model> {
+public class DocumentDataModel implements Comparable<DocumentDataModel> {
     String DocId;
     String SampleImageId;
     String DateCreated;
@@ -28,7 +28,7 @@ public class document_model implements Comparable<document_model> {
         this.check = check;
     }
 
-    public document_model(boolean check, String docId, String sampleImageId, String dateCreated, String timeCreated, String docName, String size, String NumberOfPics) {
+    public DocumentDataModel(boolean check, String docId, String sampleImageId, String dateCreated, String timeCreated, String docName, String size, String NumberOfPics) {
         DocId = docId;
         SampleImageId = sampleImageId;
         DateCreated = dateCreated;
@@ -69,7 +69,7 @@ public class document_model implements Comparable<document_model> {
     }
 
     @Override
-    public int compareTo(document_model o) {
+    public int compareTo(DocumentDataModel o) {
 
         //this comparator only compares date not time
         String[] d1Arr = this.getDateCreated().split("-");

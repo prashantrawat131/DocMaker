@@ -7,8 +7,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,13 +29,13 @@ import java.util.ArrayList;
 public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecyclerViewAdapter.MyDocViewHolder> {
 
     private final String TAG = "tagJi";
-    ArrayList<document_model> arrayList;
+    ArrayList<DocumentDataModel> arrayList;
     Context context;
     Activity activity;
     RecyclerView recyclerView;
     FloatingActionButton createDocumentFAB;
 
-    public AllDocsRecyclerViewAdapter(FloatingActionButton createDocumentFAB, ArrayList<document_model> arrayList, Context context, Activity activity, RecyclerView recyclerView) {
+    public AllDocsRecyclerViewAdapter(FloatingActionButton createDocumentFAB, ArrayList<DocumentDataModel> arrayList, Context context, Activity activity, RecyclerView recyclerView) {
         this.arrayList = arrayList;
         this.context = context;
         this.activity = activity;
@@ -98,7 +96,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
         });
     }
 
-    private void ShowDocDetails(document_model doc) {
+    private void ShowDocDetails(DocumentDataModel doc) {
         MyAlertCreator myAlertCreator = new MyAlertCreator();
         //size calculations
         float size = Float.parseFloat(doc.getSize());
@@ -114,7 +112,7 @@ public class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecy
     }
 
     void GotoDocumentView(int i) {
-        Intent in = new Intent(context, document_view.class);
+        Intent in = new Intent(context, DocumentViewActivity.class);
         in.putExtra("DocId", arrayList.get(i).getDocId());
         in.putExtra("first_time", false);
         activity.startActivity(in);

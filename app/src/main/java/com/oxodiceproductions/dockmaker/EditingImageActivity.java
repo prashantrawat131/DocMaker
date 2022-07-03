@@ -34,7 +34,6 @@ public class EditingImageActivity extends AppCompatActivity {
 
         IdProvider();
 
-
         InitialWork();
 
         progressBar.setVisibility(View.GONE);
@@ -98,36 +97,6 @@ public class EditingImageActivity extends AppCompatActivity {
         rotateImageButton=findViewById(R.id.imageButton12);
         cropButton=findViewById(R.id.button7);
     }
-
-
-/*
-    private void bnw() {
-        try {
-            progressBar.setVisibility(View.VISIBLE);
-            int width, height, i = 0, bnwMargin = 122;
-            Bitmap.Config config;
-//            Rect rect = cropImageView.getCropRect();
-            RectF rect = cropImageView.getActualCropRect();
-            width = bitmap.getWidth();
-            height = bitmap.getHeight();
-            config = bitmap.getConfig();
-            int[] pixels = new int[width * height];
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-            bitmap.recycle();
-            bitmap = Bitmap.createBitmap(width, height, config);
-            for (int pixel : pixels) {
-                if (!(Color.red(pixel) < bnwMargin && Color.green(pixel) < bnwMargin))
-                    pixels[i] = Color.argb(225, 225, 225, 225);
-                i++;
-            }
-            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-            cropImageView.setImageBitmap(bitmap);
-//            cropImageView.setCropRect(rect);
-            isBnw = true;
-            progressBar.setVisibility(View.GONE);
-        } catch (Exception ignored) {
-        }
-    }*/
 
     private void Exit() {
         progressBar.setVisibility(View.VISIBLE);

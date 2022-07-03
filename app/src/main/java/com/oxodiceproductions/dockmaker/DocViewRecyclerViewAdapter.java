@@ -70,7 +70,7 @@ public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecy
         holder.positionTextView.setText(activity.getString(R.string.docViewImagePosition, position + 1));
         float size = (float) imageFile.length() / (1024 * 1024);
 
-        document_view.emptyAvailable = (size == 0.0f);
+        DocumentViewActivity.emptyAvailable = (size == 0.0f);
 
         String sizeString = "Size:\n" + String.format(Locale.getDefault(), "%.2f MB", size);
         holder.sizeTextView.setText(sizeString);

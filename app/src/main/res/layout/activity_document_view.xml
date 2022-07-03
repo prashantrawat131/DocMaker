@@ -5,7 +5,7 @@
     android:id="@+id/document_view_id"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".document_view">
+    tools:context=".DocumentViewActivity">
 
     <ProgressBar
         android:id="@+id/progressBar3"

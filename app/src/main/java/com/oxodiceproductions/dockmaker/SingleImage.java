@@ -110,7 +110,7 @@ public class SingleImage extends AppCompatActivity {
                     CommonOperations.deleteFile(ImagePath);
 
                     //going to document view
-                    Intent in = new Intent(SingleImage.this, document_view.class);
+                    Intent in = new Intent(SingleImage.this, DocumentViewActivity.class);
                     in.putExtra("DocId", DocId);
 //                in.putExtra("first_time", false);
                     startActivity(in);
@@ -223,7 +223,7 @@ public class SingleImage extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         progressBar.setVisibility(View.VISIBLE);
-        Intent in = new Intent(SingleImage.this, document_view.class);
+        Intent in = new Intent(SingleImage.this, DocumentViewActivity.class);
         in.putExtra("DocId", DocId);
         startActivity(in);
     }
