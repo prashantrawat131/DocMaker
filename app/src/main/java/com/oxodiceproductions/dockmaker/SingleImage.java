@@ -22,53 +22,39 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 
+import com.oxodiceproductions.dockmaker.databinding.ActivitySingleImageBinding;
+
 import java.io.File;
 import java.util.ArrayList;
 
 public class SingleImage extends AppCompatActivity {
-    ImageView imageView;
-    ProgressBar progressBar;
     String ImagePath = "-1";
     String DocId = "-1";
     SharedPreferences sharedPreferences;
-    TextView imageIndexTextView;
     ArrayList<String> imagesList = new ArrayList<>();
     private GestureDetectorCompat gestureDetectorCompat;
-    ImageButton backButton, shareImageButton, deleteImageButton, editImageButton;
-    ImageButton retakeImageButton, previousImageButton, nextImageButton;
-    ImageButton downloadImageButton;
+    ActivitySingleImageBinding binding;
     public static final int editingSingleImageId = 1908;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_image);
-        imageView = findViewById(R.id.imageView2);
-        progressBar = findViewById(R.id.progressBar4);
-        downloadImageButton = findViewById(R.id.download_image);
-        imageIndexTextView = findViewById(R.id.single_image_index_tv);
+        binding=ActivitySingleImageBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
         ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
         DocId = getIntent().getExtras().getString("DocId", "-1");
-        imageView.setImageURI(Uri.fromFile(new File(ImagePath)));
-        progressBar.setVisibility(View.GONE);
-
-        backButton = findViewById(R.id.imageButton4);
-        shareImageButton = findViewById(R.id.imageButton3);
-        deleteImageButton = findViewById(R.id.imageButton2);
-        editImageButton = findViewById(R.id.edit_button);
-        retakeImageButton = findViewById(R.id.imageButton5);
-        previousImageButton = findViewById(R.id.imageButton15);
-        nextImageButton = findViewById(R.id.imageButton14);
+        binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
+        binding.progressBarSingleImage.setVisibility(View.GONE);
 
         gestureDetectorCompat = new GestureDetectorCompat(this, new MyGestureDetector());
 
         populateImageList();
 
-        backButton.setOnClickListener(view -> onBackPressed());
+        binding.backButtonSingleImage.setOnClickListener(view -> onBackPressed());
 
-        shareImageButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.shareSingleImage.setOnClickListener(view -> {
+            binding.progressBarSingleImage.setVisibility(View.VISIBLE);
             try {
                 File newFile = new File(ImagePath);
                 Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", newFile);
@@ -80,11 +66,11 @@ public class SingleImage extends AppCompatActivity {
                 startActivity(Intent.createChooser(shareIntent, "hello"));
             } catch (Exception ignored) {
             }
-            progressBar.setVisibility(View.GONE);
+            binding.progressBarSingleImage.setVisibility(View.GONE);
         });
 
-        deleteImageButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.deleteSingleImage.setOnClickListener(view -> {
+            binding.progressBarSingleImage.setVisibility(View.VISIBLE);
 
             ViewGroup viewGroup = view.findViewById(R.id.alert_main_layout);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SingleImage.this);
@@ -121,13 +107,13 @@ public class SingleImage extends AppCompatActivity {
                 thread.start();
             });
             cancel_button.setOnClickListener(view1 -> {
-                progressBar.setVisibility(View.GONE);
+                binding.progressBarSingleImage.setVisibility(View.GONE);
                 alertDialog.dismiss();
             });
         });
 
-        editImageButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.editSingleImage.setOnClickListener(view -> {
+            binding.progressBarSingleImage.setVisibility(View.VISIBLE);
             Intent in = new Intent(SingleImage.this, EditingImageActivity.class);
             in.putExtra("ImagePath", ImagePath);
 //            in.putExtra("DocId", DocId);
@@ -135,8 +121,8 @@ public class SingleImage extends AppCompatActivity {
             startActivityForResult(in, editingSingleImageId);
         });
 
-        retakeImageButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.retakeSingleImage.setOnClickListener(view -> {
+            binding.progressBarSingleImage.setVisibility(View.VISIBLE);
             Intent in = new Intent(SingleImage.this, MyCamera.class);
             in.putExtra("DocId", DocId);
             in.putExtra("ImagePath", ImagePath);
@@ -144,11 +130,11 @@ public class SingleImage extends AppCompatActivity {
             finish();
         });
 
-        previousImageButton.setOnClickListener(view -> move(-1));
+        binding.previousSingleImage.setOnClickListener(view -> move(-1));
 
-        nextImageButton.setOnClickListener(view -> move(1));
+        binding.nextSingleImage.setOnClickListener(view -> move(1));
 
-        downloadImageButton.setOnClickListener(view -> {
+        binding.downloadSingleImage.setOnClickListener(view -> {
             CommonOperations.downloadImage(getApplicationContext(), ImagePath);
         });
     }
@@ -165,8 +151,8 @@ public class SingleImage extends AppCompatActivity {
 
                 //setting the new image
                 ImagePath = newImagePath;
-                imageView.setImageURI(Uri.fromFile(new File(ImagePath)));
-                progressBar.setVisibility(View.GONE);
+                binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
+                binding.progressBarSingleImage.setVisibility(View.GONE);
             }
         }
     }
@@ -203,7 +189,7 @@ public class SingleImage extends AppCompatActivity {
             database.close();
         }
         String index = "" + (imagesList.indexOf(ImagePath) + 1);
-        imageIndexTextView.setText(index);
+        binding.singleImageIndexTv.setText(index);
     }
 
     void move(int x) {
@@ -215,14 +201,14 @@ public class SingleImage extends AppCompatActivity {
             next = imagesList.size() - 1;
         }
         String stringIndex = "" + (next + 1);
-        imageIndexTextView.setText(stringIndex);
+        binding.singleImageIndexTv.setText(stringIndex);
         ImagePath = imagesList.get(next);
-        imageView.setImageURI(Uri.fromFile(new File(ImagePath)));
+        binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
     }
 
     @Override
     public void onBackPressed() {
-        progressBar.setVisibility(View.VISIBLE);
+        binding.progressBarSingleImage.setVisibility(View.VISIBLE);
         Intent in = new Intent(SingleImage.this, DocumentViewActivity.class);
         in.putExtra("DocId", DocId);
         startActivity(in);

@@ -2,14 +2,14 @@
 <resources>
 
     <!--dark zone-->
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="text_color">#000000</color>
+    <color name="colorPrimaryDark">#984800</color>
+    <color name="colorOnPrimary">#ffa43e</color>
 
     <!--medium zone-->
     <color name="colorPrimary">#CF7500</color>
     <color name="my_button_color">#CF7500</color>
     <color name="floating_action_button_background">#CF7500</color>
-    <color name="colorAccent">#CF7500</color>
+    <color name="colorAccent">#ff9800</color>
 
     <!--light zone-->
     <color name="app_bg">#ffffff</color>
@@ -20,9 +20,10 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="grey">#BEBCBC</color>
+    <color name="transparent">#00000000</color>
     <color name="image_view_bg">#BEBCBC</color>
     <color name="app_contrast_color">#fff</color>
-    <color name="icons_color">#F4F4F4</color>
+    <color name="icons_color">?attr/colorOnPrimary</color>
 
     <!--The theme color are below-->
     <color name="extra_light">#ffffff</color>

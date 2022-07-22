@@ -1,9 +1,18 @@
 package com.oxodiceproductions.dockmaker;
 
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Environment;
 import android.os.FileUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,7 +77,30 @@ public class CommonOperations {
         }
     }
 
-    public static void deleteDocument(String docId){
+    public static void deleteDocument(Context context,String docId){
+        new Thread(()->{
+            MyDatabase myDatabase2 = new MyDatabase(context);
+            Cursor cc = myDatabase2.LoadImagePaths(docId);
+            try {
+                cc.moveToFirst();
+                do {
+                    CommonOperations.deleteFile(cc.getString(0));
+                } while (cc.moveToNext());
+            } catch (Exception ignored) { }
+            myDatabase2.DeleteTable(docId);
+            myDatabase2.close();
+        }).start();
+    }
 
+    public static void log(String msg){
+        Log.d(Constants.TAG, msg+"");
+    }
+
+    public static void logError(String msg){
+        Log.e(Constants.TAG, msg+"");
+    }
+
+    public static void toast(String msg,Context context){
+        Toast.makeText(context, ""+msg, Toast.LENGTH_SHORT).show();
     }
 }

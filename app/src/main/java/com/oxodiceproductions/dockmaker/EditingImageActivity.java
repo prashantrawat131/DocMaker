@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.edmodo.cropper.CropImageView;
+import com.oxodiceproductions.dockmaker.databinding.ActivityEditingImageBinding;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,34 +21,32 @@ import java.io.FileOutputStream;
 public class EditingImageActivity extends AppCompatActivity {
 
     String ImagePath = "-1";
-    CropImageView cropImageView;
-    Button bnwButton,cropButton;
-    ImageButton backButton, flipButton,rotateImageButton;
     File finalFile;
     Bitmap bitmap;
-    ProgressBar progressBar;
+    ActivityEditingImageBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editing_image);
+        binding=ActivityEditingImageBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        IdProvider();
+//        IdProvider();
 
         InitialWork();
 
-        progressBar.setVisibility(View.GONE);
+        binding.progressBarEditImage.setVisibility(View.GONE);
 
-        backButton.setOnClickListener(view->{
+        binding.backButtonEditImage.setOnClickListener(view->{
             onBackPressed();
         });
 
-        rotateImageButton.setOnClickListener(view->{
-            cropImageView.rotateImage(90);
+        binding.rotateButtonEditImage.setOnClickListener(view->{
+            binding.cropImageView.rotateImage(90);
         });
 
-        cropButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.cropButtonEditImage.setOnClickListener(view -> {
+            binding.progressBarEditImage.setVisibility(View.VISIBLE);
             //old file getting deleted
             CommonOperations.deleteFile(ImagePath);
 
@@ -63,7 +62,7 @@ public class EditingImageActivity extends AppCompatActivity {
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(finalFile);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                cropImageView.getCroppedImage().compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                binding.cropImageView.getCroppedImage().compress(Bitmap.CompressFormat.JPEG, 100, bos);
                 fileOutputStream.write(bos.toByteArray());
                 fileOutputStream.close();
 
@@ -75,7 +74,7 @@ public class EditingImageActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            progressBar.setVisibility(View.GONE);
+            binding.progressBarEditImage.setVisibility(View.GONE);
         });
     }
 
@@ -85,21 +84,21 @@ public class EditingImageActivity extends AppCompatActivity {
 
         bitmap = BitmapFactory.decodeFile(ImagePath);
 
-        cropImageView.setImageBitmap(bitmap);
+        binding.cropImageView.setImageBitmap(bitmap);
     }
 
-    private void IdProvider(){
-        flipButton = findViewById(R.id.imageButton13);
-        backButton = findViewById(R.id.edit_back_button);
+   /* private void IdProvider(){
+        flipButton = findViewById(R.id.flip_button_edit_image);
+        backButton = findViewById(R.id.back_button_edit_image);
         cropImageView = findViewById(R.id.crop_imageView);
-        progressBar = findViewById(R.id.progressBar5);
+        progressBar = findViewById(R.id.progress_bar_edit_image);
         bnwButton = findViewById(R.id.bnwButton);
-        rotateImageButton=findViewById(R.id.imageButton12);
-        cropButton=findViewById(R.id.button7);
-    }
+        rotateImageButton=findViewById(R.id.rotate_button_edit_image);
+        cropButton=findViewById(R.id.crop_button_edit_image);
+    }*/
 
     private void Exit() {
-        progressBar.setVisibility(View.VISIBLE);
+        binding.progressBarEditImage.setVisibility(View.VISIBLE);
     }
 
     @Override

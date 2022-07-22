@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.oxodiceproductions.dockmaker.databinding.ActivityMyCameraBinding;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,33 +39,29 @@ import java.util.concurrent.TimeUnit;
 
 
 public class MyCamera extends AppCompatActivity {
-    private static final String TAG = "tagJi";
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    PreviewView previewView;
     ImageCapture imageCapture;
     Executor executor;
     String DocId = "-2";
     Camera camera;
-    ConstraintLayout camera_menu;
     SharedPreferences settingsSharedPreferences, sharedPreferences;
     String ImagePath = "-1", retakeImagePath = "-1";
     CameraControl cameraControl;
-    ImageButton flash_button;
     File capturedImage;
-    ProgressBar progressBar;
     public static final int cameraImageEditingId = 1928;
-    FloatingActionButton captureImageButton;
+    ActivityMyCameraBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_camera);
+        binding=ActivityMyCameraBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        previewView = findViewById(R.id.previewView);
-        camera_menu = findViewById(R.id.camera_menu);
-        flash_button = findViewById(R.id.imageButton8);
-        progressBar = findViewById(R.id.progressBar);
-        captureImageButton = findViewById(R.id.floatingActionButton);
+//        previewView = findViewById(R.id.previewView);
+//        camera_menu = findViewById(R.id.camera_menu);
+//        flash_button = findViewById(R.id.flash_button);
+//        progressBar = findViewById(R.id.progress_bar_camera);
+//        captureImageButton = findViewById(R.id.camera_button);
 
         settingsSharedPreferences = getSharedPreferences("DocMakerSettings", MODE_PRIVATE);
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
@@ -80,14 +77,14 @@ public class MyCamera extends AppCompatActivity {
 
 
         if (sharedPreferences.getBoolean("flash", false)) {
-            flash_button.setImageDrawable(getDrawable(R.drawable.flash_on));
+            binding.flashButton.setImageDrawable(getDrawable(R.drawable.flash_on));
         }
 
         Setup();
 
-        progressBar.setVisibility(View.GONE);
+        binding.progressBarCamera.setVisibility(View.GONE);
 
-        previewView.setOnClickListener(view -> {
+        binding.previewView.setOnClickListener(view -> {
             MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory(0, 0);
             MeteringPoint point = factory.createPoint(0, 0);
             FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
@@ -98,9 +95,9 @@ public class MyCamera extends AppCompatActivity {
             cameraControl.startFocusAndMetering(action);
         });
 
-        captureImageButton.setOnClickListener(view -> {
-            camera_menu.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
+        binding.cameraButton.setOnClickListener(view -> {
+            binding.cameraMenu.setVisibility(View.GONE);
+            binding.progressBarCamera.setVisibility(View.VISIBLE);
             try {
                 FileOutputStream out = new FileOutputStream(capturedImage); //Use the stream as usual to w
                 ImageCapture.OutputFileOptions outputFileOptions =
@@ -119,7 +116,7 @@ public class MyCamera extends AppCompatActivity {
             }
         });
 
-        flash_button.setOnClickListener(view -> {
+        binding.flashButton.setOnClickListener(view -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             //if flash was on then it needs to be off on click and vice-verse
             boolean flashStateAfterClick = !sharedPreferences.getBoolean("flash", false);
@@ -128,10 +125,10 @@ public class MyCamera extends AppCompatActivity {
 
             if (flashStateAfterClick) {
                 imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
-                flash_button.setImageDrawable(getDrawable(R.drawable.flash_on));
+                binding.flashButton.setImageDrawable(getDrawable(R.drawable.flash_on));
             } else {
                 imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
-                flash_button.setImageDrawable(getDrawable(R.drawable.flash_off));
+                binding.flashButton.setImageDrawable(getDrawable(R.drawable.flash_off));
             }
         });
     }
@@ -168,7 +165,7 @@ public class MyCamera extends AppCompatActivity {
                 .build();
 
         //attaching surface provider
-        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+        preview.setSurfaceProvider(binding.previewView.getSurfaceProvider());
 
         //after image capture, executor is called
         executor = runnable -> GoToCompress();
@@ -177,13 +174,13 @@ public class MyCamera extends AppCompatActivity {
             imageCapture = new ImageCapture.Builder()
                     .setFlashMode(ImageCapture.FLASH_MODE_ON)
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                    .setTargetRotation(previewView.getDisplay().getRotation())
+                    .setTargetRotation(binding.previewView.getDisplay().getRotation())
                     .build();
         } else {
             imageCapture = new ImageCapture.Builder()
                     .setFlashMode(ImageCapture.FLASH_MODE_OFF)
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                    .setTargetRotation(previewView.getDisplay().getRotation())
+                    .setTargetRotation(binding.previewView.getDisplay().getRotation())
                     .build();
         }
 

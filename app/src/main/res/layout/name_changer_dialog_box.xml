@@ -24,7 +24,7 @@
             <TextView
                 android:id="@+id/textView10"
                 android:padding="10dp"
-                android:textColor="@color/text_color"
+                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Enter New Name:-" />
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:ems="10"
-                android:textColor="@color/text_color"
+                android:textColor="@color/black"
                 android:layout_marginRight="20dp"
                 android:padding="10dp"
                 android:inputType="textPersonName"
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/button_state_listener"
-                    android:textColor="@color/text_color"
+                    android:textColor="@color/black"
                     android:text="Cancel" />
 
                 <Button
@@ -60,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="@color/text_color"
+                    android:textColor="@color/black"
                     android:background="@drawable/button_state_listener"
                     android:text="Ok" />
             </LinearLayout>

@@ -25,10 +25,10 @@
                 android:id="@+id/textView9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/light"
+                android:background="@color/colorPrimary"
                 android:padding="10dp"
                 android:text="TextView"
-                android:textColor="@color/text_color"
+                android:textColor="@color/black"
                 android:textSize="20dp" />
 
             <LinearLayout
@@ -41,18 +41,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/button_state_listener"
-                    android:text="Cancel"
-                    android:textColor="@color/text_color" />
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/white"
+                    android:text="Cancel"/>
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/listDivider" />
 
                 <Button
                     android:id="@+id/button2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/button_state_listener"
-                    android:text="Delete"
-                    android:textColor="@color/red" />
+                    android:textColor="@color/red"
+                    android:background="@color/white"
+                    android:text="Delete"/>
             </LinearLayout>
         </LinearLayout>
 

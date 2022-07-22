@@ -11,7 +11,7 @@
     <string name="saveDocButtonCD">Save document button</string>
     <string name="deleteSelectedDocumentsCD">Delete selected documents</string>
     <string name="noDocumentsCD">No documents yet</string>
-    <string name="clickButtonGuideCD">Click on the button to add document</string>
+    <string name="clickButtonGuideCD">Welcome to DocMaker</string>
     <string name="addNewDocCD">Add new document</string>
     <string name="deleteDocButtonCD">Delete document button</string>
     <string name="previewDocCD">Preview document</string>
@@ -39,7 +39,7 @@
     <string name="allDocString">DocMaker</string>
     <string name="docViewAlertText">Do you want to delete the selected images?</string>
     <string name="docViewImagePosition">%1$d</string>
-    <string name="t1">Click to add \nor capture photos</string>
+    <string name="t1">Add / capture photos</string>
     <string name="t2">Save</string>
     <string name="t3">Preview</string>
     <string name="t4">DocMaker_6_11_2020_18_6_40</string>

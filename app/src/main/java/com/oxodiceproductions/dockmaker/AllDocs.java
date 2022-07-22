@@ -1,30 +1,39 @@
 package com.oxodiceproductions.dockmaker;
 
+import static androidx.core.content.FileProvider.getUriForFile;
+
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.oxodiceproductions.dockmaker.databinding.ActivityAllDocsBinding;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,47 +47,30 @@ import java.util.TimerTask;
 public class AllDocs extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /*This activity show all the documents present in the database*/
     ArrayList<DocumentDataModel> arrayList = new ArrayList<>();
-    RecyclerView recyclerView;
-    Toolbar toolbar;
-    FloatingActionButton addNewDocFloatingActionButton;
-    FrameLayout empty_home_frame_layout;
-    ProgressBar progressBar;
     AllDocsRecyclerViewAdapter adapter;
-    SwipeRefreshLayout swipeRefreshLayout;
-    ImageView clearAnimationImageView;
-    NavigationView navigationView;
-    DrawerLayout drawerLayout;
-
-
-    /* arrayList :- it is a list of all the documents present in the database. It has type of document_model which is a custom java class for documents
-     * listView:-It is the listView for all the documents
-     * addNewDocFloatingActionButton:-It is used to create a new document and change the activity to that particular document
-     * empty_home_frame_layout:-When no documents are present the it will show a empty document sign board
-     * progressBar:-This is a simple progress bar
-     * swipeRefreshLayout:-It is the object of the swipe refresh layout functionality for refreshing the listView
-     * deleteSelectedDocumentsButton:-After the user selects all the documents in the listView the it must be able to collectively delete all the items selected.It is visible when any item is selected
-     * */
+    ActivityAllDocsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_docs);
+        binding = ActivityAllDocsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        IDProvider();
+//        IDProvider();
 
-        toolbar.inflateMenu(R.menu.toolbar_menu);
-        toolbar.setTitleTextColor(Color.BLACK);
+        binding.toolBarAllDocs.inflateMenu(R.menu.toolbar_menu);
+        binding.toolBarAllDocs.setTitleTextColor(Color.BLACK);
 
-        clearAnimationImageView.setVisibility(View.GONE);
+        binding.clearCacheImage.setVisibility(View.GONE);
 
-        swipeRefreshLayout.setOnRefreshListener(this::Initializer);
+        binding.swipeRefreshAllDoc.setOnRefreshListener(this::Initializer);
 
         //Navigation Drawer setup
-        navigationView.setNavigationItemSelectedListener(this);
+        binding.navView.setNavigationItemSelectedListener(this);
 
         Initializer();
 
-        toolbar.setOnMenuItemClickListener(item -> {
+        binding.toolBarAllDocs.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_settings) {
                 startActivity(new Intent(AllDocs.this, MySettings.class));
             }
@@ -91,12 +83,12 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             return false;
         });
 
-        toolbar.setOnClickListener((view) -> {
-            drawerLayout.openDrawer(GravityCompat.START);
+        binding.toolBarAllDocs.setOnClickListener((view) -> {
+            binding.drawerLayout.openDrawer(GravityCompat.START);
         });
 
-        addNewDocFloatingActionButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.addDocButton.setOnClickListener(view -> {
+            binding.progressBarAllDocs.setVisibility(View.VISIBLE);
 
             /* Here the document is created.
              * Each document has a unique name given by the calender function.
@@ -120,13 +112,13 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
     public void deleteUnusedFiles() {
         Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.memory_free_anim);
-        clearAnimationImageView.setVisibility(View.VISIBLE);
-        clearAnimationImageView.setAnimation(animation);
+        binding.clearCacheImage.setVisibility(View.VISIBLE);
+        binding.clearCacheImage.setAnimation(animation);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runOnUiThread(() -> clearAnimationImageView.setVisibility(View.GONE));
+                runOnUiThread(() -> binding.clearCacheImage.setVisibility(View.GONE));
             }
         }, 3000);
         MyDatabase myDatabase = null;
@@ -156,7 +148,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 }
             }
         } catch (Exception e) {
-            progressBar.setVisibility(View.GONE);
+            binding.progressBarAllDocs.setVisibility(View.GONE);
             //Toast.makeText(AllDocs.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
             myDatabase.close();
@@ -197,8 +189,8 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         /* This function fill the arrayList which documents to show in the listView.
          * Here the database is used to fetch all the documents.
          * ListView adapter is used to insert documents in the listView*/
-        progressBar.setVisibility(View.VISIBLE);
-        addNewDocFloatingActionButton.setVisibility(View.VISIBLE);
+        binding.progressBarAllDocs.setVisibility(View.VISIBLE);
+        binding.addDocButton.setVisibility(View.VISIBLE);
         arrayList.clear();
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         Cursor cc = myDatabase.LoadDocuments();
@@ -222,21 +214,22 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
             Collections.sort(arrayList);
 
+//            int a=10/0;
             //adapter setup
-            adapter = new AllDocsRecyclerViewAdapter(addNewDocFloatingActionButton, arrayList, getApplicationContext(), this, recyclerView);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-            recyclerView.setAdapter(adapter);
+            adapter = new AllDocsRecyclerViewAdapter(binding.addDocButton, arrayList, getApplicationContext(), this);
+            binding.allDocsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            binding.allDocsRecyclerView.setAdapter(adapter);
 
-            empty_home_frame_layout.setVisibility(View.GONE);
-            swipeRefreshLayout.setRefreshing(false);
+            binding.emptyHomeTvAllDocs.setVisibility(View.GONE);
+            binding.swipeRefreshAllDoc.setRefreshing(false);
         } catch (Exception e) {
-            empty_home_frame_layout.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-            swipeRefreshLayout.setVisibility(View.GONE);
+            binding.emptyHomeTvAllDocs.setVisibility(View.VISIBLE);
+            binding.allDocsRecyclerView.setVisibility(View.GONE);
+            binding.swipeRefreshAllDoc.setVisibility(View.GONE);
         } finally {
             myDatabase.close();
         }
-        progressBar.setVisibility(View.GONE);
+        binding.progressBarAllDocs.setVisibility(View.GONE);
     }
 
     @Override
@@ -244,27 +237,27 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         finishAffinity();
     }
 
-    void IDProvider() {
-        /*Here all the ui elements are provides ids.
-         * Since the objects are global so they can be provide is anywhere and it will kept there along the execution of the activity*/
+    /* void IDProvider() {
+     *//*Here all the ui elements are provides ids.
+     * Since the objects are global so they can be provide is anywhere and it will kept there along the execution of the activity*//*
         recyclerView = findViewById(R.id.all_docs_recycler_view);
-        clearAnimationImageView = findViewById(R.id.imageView4);
-        progressBar = findViewById(R.id.progressBar2);
-        toolbar = findViewById(R.id.toolBarAllDocs);
-        empty_home_frame_layout = findViewById(R.id.empty_home_id);
-        progressBar.setVisibility(View.GONE);
-        swipeRefreshLayout = findViewById(R.id.swipe_all_doc);
-        addNewDocFloatingActionButton = findViewById(R.id.floatingActionButton2);
-        empty_home_frame_layout.setVisibility(View.GONE);
+        clearAnimationImageView = findViewById(R.id.clear_cache_image);
+        binding.progressBarAllDocs = findViewById(R.id.progress_bar_all_docs);
+        binding.toolBarAllDocs = findViewById(R.id.toolBarAllDocs);
+        empty_home_textview = findViewById(R.id.empty_home_tv_all_docs);
+        binding.progressBarAllDocs.setVisibility(View.GONE);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_all_doc);
+        addNewDocFloatingActionButton = findViewById(R.id.add_doc_button);
+        empty_home_textview.setVisibility(View.GONE);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-    }
+    }*/
 
     private void clearCache() {
-        progressBar.setVisibility(View.VISIBLE);
+        binding.progressBarAllDocs.setVisibility(View.VISIBLE);
         deleteUnusedFiles();
         deleteCache(getApplicationContext());
-        progressBar.setVisibility(View.GONE);
+        binding.progressBarAllDocs.setVisibility(View.GONE);
     }
 
     private void shareApp() {
@@ -279,7 +272,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        drawerLayout.closeDrawer(GravityCompat.START);
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
         if (id == R.id.nav_share_app) {
             shareApp();
         } else if (id == R.id.nav_about_app) {
@@ -289,5 +282,193 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         }
         return true;
     }
+
+    private class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecyclerViewAdapter.MyDocViewHolder> {
+
+        private final String TAG = "tagJi";
+        ArrayList<DocumentDataModel> arrayList;
+        Context context;
+        Activity activity;
+        FloatingActionButton createDocumentFAB;
+
+        public AllDocsRecyclerViewAdapter(FloatingActionButton createDocumentFAB, ArrayList<DocumentDataModel> arrayList, Context context, Activity activity) {
+            this.arrayList = arrayList;
+            this.context = context;
+            this.activity = activity;
+            this.createDocumentFAB = createDocumentFAB;
+        }
+
+
+        @NonNull
+        @Override
+        public AllDocsRecyclerViewAdapter.MyDocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(context).inflate(R.layout.doc_rep, parent, false);
+            return new AllDocsRecyclerViewAdapter.MyDocViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull AllDocsRecyclerViewAdapter.MyDocViewHolder holder, int position) {
+//            holder.binding.toolBarAllDocs.setTitle(arrayList.get(position).getDocName());
+            holder.docNameTv.setText(arrayList.get(position).getDocName());
+            holder.time_created_tv.setText(context.getString(R.string.time, arrayList.get(position).getTimeCreated()));
+            holder.date_created_tv.setText(context.getString(R.string.date, arrayList.get(position).getDateCreated()));
+            holder.number_of_pics_tv.setText(context.getString(R.string.pics, arrayList.get(position).getNumberOfPics()));
+            holder.indexNumberTextView.setText("" + (position + 1));
+
+            //thumbnail extraction
+            MyDatabase myDatabase = null;
+            try {
+                myDatabase = new MyDatabase(context);
+                Cursor cc = myDatabase.LoadImagePaths(arrayList.get(position).getDocId());
+                cc.moveToFirst();
+                File file = new File(cc.getString(0));
+                RequestOptions options = new RequestOptions().fitCenter().sizeMultiplier(0.2f);
+                if (file.exists()) {
+                    Glide.with(context).applyDefaultRequestOptions(options)
+                            .load(file)
+                            .into(holder.sample_image);
+                }
+            } catch (Exception e) {
+                RequestOptions options = new RequestOptions().fitCenter().sizeMultiplier(0.2f);
+                Glide.with(context).applyDefaultRequestOptions(options)
+                        .load(R.drawable.ic_baseline_broken_image_24)
+                        .into(holder.sample_image);
+            } finally {
+                myDatabase.close();
+            }
+
+
+            //click listeners
+            holder.optionsButton.setOnClickListener(v -> {
+                int visibility = holder.optionsLayout.getVisibility();
+                if (visibility == View.GONE) {
+                    holder.optionsLayout.setVisibility(View.VISIBLE);
+                } else {
+                    holder.optionsLayout.setVisibility(View.GONE);
+                }
+            });
+
+            holder.shareButton.setOnClickListener(v -> {
+                String DocId = arrayList.get(holder.getAdapterPosition()).getDocId();
+                SharePdfButtonListener(DocId);
+            });
+
+            holder.deleteButton.setOnClickListener(v -> {
+                String DocId = arrayList.get(holder.getAdapterPosition()).getDocId();
+                String DocName = arrayList.get(holder.getAdapterPosition()).getDocName();
+                int position1 = holder.getAdapterPosition();
+                DeleteDoc(DocId, DocName, position1);
+            });
+
+            holder.detailsButton.setOnClickListener(v -> ShowDocDetails(arrayList.get(position)));
+
+        }
+
+        private void ShowDocDetails(DocumentDataModel doc) {
+            MyAlertCreator myAlertCreator = new MyAlertCreator();
+            //size calculations
+            float size = Float.parseFloat(doc.getSize());
+            size = size / (1048576f);//1024 * 1024 = 1048576
+//        Log.d(TAG, "ShowDocDetails: " + Float.parseFloat(doc.getSize()));
+            String text = context.getString(R.string.docDetails, doc.getDocName(), doc.getDateCreated(), doc.getTimeCreated(), doc.getNumberOfPics(), String.format("%.2f MB", size));
+            myAlertCreator.showDialog(activity, text);
+        }
+
+        @Override
+        public int getItemCount() {
+            return arrayList.size();
+        }
+
+        void GotoDocumentView(int i) {
+            Intent in = new Intent(context, DocumentViewActivity.class);
+            in.putExtra("DocId", arrayList.get(i).getDocId());
+            in.putExtra("first_time", false);
+            activity.startActivity(in);
+        }
+
+        private void SharePdfButtonListener(String DocId) {
+            new Thread(() -> {
+                MyDatabase myDatabase = null;
+                try {
+                    ArrayList<String> ImagePaths = new ArrayList<>();
+                    myDatabase = new MyDatabase(context);
+                    Cursor cc = myDatabase.LoadImagePaths(DocId);
+                    try {
+                        cc.moveToFirst();
+                        do {
+                            ImagePaths.add(cc.getString(0));
+                        } while (cc.moveToNext());
+                    } catch (Exception e) {
+                    }
+                    if (!ImagePaths.isEmpty()) {
+                        PDFMaker pdfMaker = new PDFMaker(context);
+                        String filepath = pdfMaker.MakeTempPDF(ImagePaths, myDatabase.getDocName(DocId));
+                        if (!filepath.equals("")) {
+                            File fileToShare = new File(filepath);
+                            Uri contentUri = getUriForFile(context, "com.oxodiceproductions.dockmaker", fileToShare);
+                            context.grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                            shareIntent.setType("application/pdf");
+                            shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                            activity.startActivity(Intent.createChooser(shareIntent, "Share with"));
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.d("tagJi", "SharePdfButtonListener: " + e.getMessage());
+                } finally {
+                    myDatabase.close();
+                }
+            }).start();
+        }
+
+        public void DeleteDoc(String DocId, String DocName, int position) {
+            //do not put notifyItemRemoved in a thread because it will not work there properly.
+            new AlertDialog.Builder(activity).setTitle("Do you want to delete this document")
+                    .setMessage(DocName)
+                    .setCancelable(true)
+                    .setPositiveButton("delete", (dialog, which) -> {
+
+                        CommonOperations.deleteDocument(context, DocId);
+
+                        arrayList.remove(position);
+                        notifyItemRemoved(position);
+                        dialog.dismiss();
+                    }).setNegativeButton("cancel", (dialog, which) -> dialog.dismiss())
+                    .show();
+        }
+
+        class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            TextView date_created_tv, time_created_tv, number_of_pics_tv, docNameTv;
+            ImageView sample_image;
+            TextView indexNumberTextView;
+            ImageButton optionsButton, deleteButton, shareButton, detailsButton;
+            LinearLayout optionsLayout;
+
+            public MyDocViewHolder(@NonNull View itemView) {
+                super(itemView);
+                date_created_tv = itemView.findViewById(R.id.textView3);
+                time_created_tv = itemView.findViewById(R.id.textView2);
+                sample_image = itemView.findViewById(R.id.doc_imageview);
+                number_of_pics_tv = itemView.findViewById(R.id.textView5);
+                docNameTv = itemView.findViewById(R.id.doc_name_tv);
+                optionsButton = itemView.findViewById(R.id.doc_options_button);
+                indexNumberTextView = itemView.findViewById(R.id.index_number_text_view);
+                deleteButton = itemView.findViewById(R.id.doc_rep_delete);
+                shareButton = itemView.findViewById(R.id.doc_rep_share);
+                detailsButton = itemView.findViewById(R.id.doc_rep_details);
+                optionsLayout = itemView.findViewById(R.id.doc_rep_options_layout);
+                itemView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                TextView indexTv = v.findViewById(R.id.index_number_text_view);
+                int i = Integer.parseInt(indexTv.getText().toString()) - 1;
+                GotoDocumentView(i);
+            }
+        }
+    }
+
 
 }

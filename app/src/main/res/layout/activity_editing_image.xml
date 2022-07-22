@@ -8,7 +8,7 @@
     tools:context=".EditingImageActivity">
 
     <LinearLayout
-        android:id="@+id/crop_top_view"
+        android:id="@+id/edit_top_layout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/my_button_color"
@@ -19,11 +19,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/edit_back_button"
+            android:id="@+id/back_button_edit_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:backgroundTint="@color/my_button_color"
+            style="@style/MaterialButtonStyle"
             android:contentDescription="@string/backButtonCD"
             android:minWidth="48dp"
             android:minHeight="48dp"
@@ -41,13 +41,13 @@
         android:layout_marginBottom="5dp"
         android:contentDescription="@string/CD4"
 
-        custom:layout_constraintBottom_toTopOf="@id/crop_bottom_view"
+        custom:layout_constraintBottom_toTopOf="@id/edit_bottom_view"
         custom:layout_constraintEnd_toEndOf="parent"
         custom:layout_constraintStart_toStartOf="parent"
-        custom:layout_constraintTop_toBottomOf="@+id/crop_top_view" />
+        custom:layout_constraintTop_toBottomOf="@+id/edit_top_layout" />
 
     <LinearLayout
-        android:id="@+id/crop_bottom_view"
+        android:id="@+id/edit_bottom_view"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/my_button_color"
@@ -58,17 +58,17 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/imageButton12"
+            android:id="@+id/rotate_button_edit_image"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/my_button_color"
+            style="@style/MaterialButtonStyle"
             android:contentDescription="@string/rotateButtonCD"
             android:src="@drawable/ic_baseline_rotate_right_24"
             tools:ignore="TouchTargetSizeCheck" />
 
         <ImageButton
-            android:id="@+id/imageButton13"
+            android:id="@+id/flip_button_edit_image"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -91,11 +91,11 @@
             android:visibility="gone" />
 
         <Button
-            android:id="@+id/button7"
+            android:id="@+id/crop_button_edit_image"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/my_button_color"
+            style="@style/MaterialButtonStyle"
             android:minHeight="48dp"
             android:text="@string/cropText"
             android:textAllCaps="false"
@@ -122,7 +122,7 @@
     -->
 
     <ProgressBar
-        android:id="@+id/progressBar5"
+        android:id="@+id/progress_bar_edit_image"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

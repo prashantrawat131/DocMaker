@@ -21,28 +21,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.oxodiceproductions.dockmaker.databinding.ActivityMainBinding;
+
 public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     int camera_permission_request_code, write_permission_request_code;
     boolean all_permissions_granted = false;
     boolean dialog_running = false;
     boolean first_time = true;
-    TextView textView;
+    ActivityMainBinding binding;
 
-    //TextView appNameTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding=ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        //mycode
 
         createNotificationChannel();
 
-        textView = findViewById(R.id.textView7);
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
         Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.splash_screen_text_anim);
-        textView.setAnimation(animation);
+        binding.appNameTvSplashScreen.setAnimation(animation);
         animation.start();
         CheckPermissions();
     }

@@ -26,7 +26,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
-            android:id="@+id/progressBar2"
+            android:id="@+id/progress_bar_all_docs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -37,45 +37,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolBarAllDocs" />
 
-        <FrameLayout
-            android:id="@+id/empty_home_id"
+        <TextView
+            android:id="@+id/empty_home_tv_all_docs"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/app_bg"
-            app:layout_constraintBottom_toBottomOf="@+id/all_docs_mainLayout"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="@color/transparent"
+            android:drawablePadding="50dp"
+            android:text="@string/clickButtonGuideCD"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:translationZ="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolBarAllDocs">
+            app:layout_constraintTop_toBottomOf="@+id/toolBarAllDocs"
+            app:drawableTopCompat="@drawable/app_icon_orange_foreground" />
 
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:background="@color/app_bg"
-                android:contentDescription="@string/noDocumentsCD"
-                app:srcCompat="@drawable/ic_baseline_picture_as_pdf_24" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|bottom"
-                android:layout_marginBottom="50dp"
-                android:background="@color/app_bg"
-                android:text="@string/clickButtonGuideCD"
-                android:textAlignment="center"
-                android:textColor="@color/text_color" />
-        </FrameLayout>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_all_doc"
+            android:id="@+id/swipe_refresh_all_doc"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_below="@id/toolBarAllDocs"
             android:background="@color/app_bg"
-            app:layout_constraintBottom_toBottomOf="@+id/all_docs_mainLayout"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolBarAllDocs">
+            app:layout_constraintTop_toBottomOf="@+id/toolBarAllDocs">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/all_docs_recycler_view"
@@ -84,16 +74,15 @@
                 android:background="@color/app_bg" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButton2"
+            android:id="@+id/add_doc_button"
+            style="@style/MaterialButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="32dp"
-            android:backgroundTint="@color/floating_action_button_background"
             android:clickable="true"
             android:contentDescription="@string/addNewDocCD"
             android:focusable="true"
@@ -103,7 +92,7 @@
             app:maxImageSize="56dp" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/clear_cache_image"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_alignParentBottom="true"

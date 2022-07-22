@@ -43,10 +43,11 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:layout_weight="1"
+            android:visibility="gone"
             android:gravity="center_vertical|center_horizontal"
             android:padding="10dp"
             android:text="Size :\n2.2 Mb"
-            android:textColor="@color/text_color" />
+            android:textColor="@color/black" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -73,7 +74,8 @@
                 android:layout_gravity="center"
                 android:gravity="center_horizontal|center_vertical"
                 android:text="5"
-                android:textColor="@color/text_color" />
+                android:textSize="20sp"
+                android:textColor="@color/black" />
 
             <ImageButton
                 android:id="@+id/down_button"
@@ -92,8 +94,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|center"
-            android:layout_weight="1"
-            android:buttonTint="@color/text_color"
+            android:layout_marginEnd="10dp"
+            android:buttonTint="@color/black"
             android:focusable="false" />
     </LinearLayout>
 

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/button5"
+        app:layout_constraintBottom_toTopOf="@id/save_setttings_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,7 +23,7 @@
             android:background="@color/medium"
             android:padding="10dp"
             android:text="@string/t5"
-            android:textColor="@color/text_color"
+            android:textColor="@color/black"
             android:textSize="30sp" />
 
         <TextView
@@ -34,27 +34,27 @@
             android:text="@string/t6" />
 
         <RadioGroup
-            android:id="@+id/radioGroup"
+            android:id="@+id/image_quality_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
 
             <RadioButton
-                android:id="@+id/radioButton"
+                android:id="@+id/low_image_quality_button"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:buttonTint="@color/radio_button_color"
                 android:text="@string/t7" />
 
             <RadioButton
-                android:id="@+id/radioButton2"
+                android:id="@+id/medium_image_quality_button"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:buttonTint="@color/radio_button_color"
                 android:text="@string/t8" />
 
             <RadioButton
-                android:id="@+id/radioButton3"
+                android:id="@+id/high_image_quality_button"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:buttonTint="@color/radio_button_color"
@@ -64,7 +64,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/save_setttings_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_state_listener"

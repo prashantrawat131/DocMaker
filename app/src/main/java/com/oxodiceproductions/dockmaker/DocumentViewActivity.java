@@ -2,6 +2,8 @@ package com.oxodiceproductions.dockmaker;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,58 +12,56 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.oxodiceproductions.dockmaker.databinding.ActivityDocumentViewBinding;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
 
 public class DocumentViewActivity extends AppCompatActivity {
     ArrayList<String> ImagePaths = new ArrayList<>();
     ArrayList<Boolean> ImagePathsChecker = new ArrayList<>();
+
     String DocId, DocName;
-    RecyclerView recyclerView;
+
     ArrayList<Uri> galleryImagesUris = new ArrayList<>();
     ArrayList<String> galleryImagesPaths = new ArrayList<>();
-    //    boolean first_time = false;
-    TextView doc_name_tv;
-    LinearLayout docViewOptionsLinearLayout;
-    SwipeRefreshLayout swipeRefreshLayout;
-    ConstraintLayout mainLayout;
-    FrameLayout emptyListFrameLayout;
-    FloatingActionButton clickPhotosButton, selectPhotosButton;
-    ProgressBar progressBar;
-    int SelectPhotosRequestCode = 10;
-    ImageButton checkedPhotosDeleteButton, backButton, sharePdfButton, downloadDocButton, deleteDocButton, pdfPreviewButton;
 
-    // Request code for creating a PDF document.
-//    private static final int CREATE_FILE = 1;
+    int SelectPhotosRequestCode = 10;
 
     private static final int galleryImagesId = 1800;
 
     public static boolean emptyAvailable = false;
 
+    ActivityDocumentViewBinding binding;
+
     /*
-     * 1)ImagePaths is an arraylist which is used to
-     * store the image paths for listView.
      * 2)ImagePathsChecker is an boolean arraylist
      * which stores the checked state of an image
      * and it helps in collective deletion of images in a document.
@@ -75,18 +75,6 @@ public class DocumentViewActivity extends AppCompatActivity {
      * which were selected by the user.This is because the images which are selected by the
      * user are being copied into the app dir as they are going to be copied at some point
      * so why not now.
-     * 5)guideViewSharedPreference is a shared preference object which is used to
-     * store the data of the guide provided to user initially.
-     * 6)emptyListFrameLayout is the layout to show when there are zero images in
-     * the document.
-     * 7)clickPhotosButton is button to click image to add in the document.
-     * 8)selectPhotosButton is use to fire an intent to send user to select photos
-     * from file manager to insert in document
-     * 9)SelectPhotosRequestCode is the request code when user comes from file manager
-     * with selected images.
-     * 10)checkedPhotosDeleteButton is used to delete the checked images.
-     * 11)CREATE_FILE is a request code to create a new document in iText
-     * 12) is used to check whether there are empty images or not
      * 13)emptyAvailable is used for making sure that before pdf preview or saving if there are any empty images or not.
      * Empty images cause error while making pdf file
      * */
@@ -94,32 +82,32 @@ public class DocumentViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_document_view);
+        binding = ActivityDocumentViewBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         InitialWork();
 
-//        first_time = getIntent().getExtras().getBoolean("first_time", true);
         DocId = getIntent().getExtras().getString("DocId", "-1");
 
         if (DocId.equals("-1")) {
-            progressBar.setVisibility(View.VISIBLE);
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
             GoToAllDocs();
         }
 
         MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         DocName = myDatabase.GetDocumentName(DocId);
         myDatabase.close();
-        doc_name_tv.setText(DocName);
+        binding.docNameTvDocView.setText(DocName);
 
-        swipeRefreshLayout.setOnRefreshListener(this::Initializer);
+        binding.swipeRefreshDocView.setOnRefreshListener(this::Initializer);
 
-        backButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.backButtonDocView.setOnClickListener(view -> {
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
             onBackPressed();
         });
 
-        sharePdfButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.shareDocButton.setOnClickListener(view -> {
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
             new Thread(() -> {
                 try {
                     PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
@@ -135,14 +123,14 @@ public class DocumentViewActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(getApplicationContext(), "File path not available", Toast.LENGTH_SHORT).show();
                     }
-                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                    runOnUiThread(() -> binding.progressBarDocView.setVisibility(View.GONE));
                 } catch (Exception e) {
-                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                    runOnUiThread(() -> binding.progressBarDocView.setVisibility(View.GONE));
                 }
             }).start();
         });
 
-        downloadDocButton.setOnClickListener(view -> {
+        binding.downloadDocButton.setOnClickListener(view -> {
 //            createFile();
             NotificationModule notificationModule = new NotificationModule();
             notificationModule.generateNotification(getApplicationContext(), DocName, "Go to downloads.");
@@ -157,47 +145,48 @@ public class DocumentViewActivity extends AppCompatActivity {
 
         });
 
-        deleteDocButton.setOnClickListener(view -> {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DocumentViewActivity.this);
+//        deleteDocButton.setOnClickListener(view -> {
+//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DocumentViewActivity.this);
+//
+//            final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
+//            alertDialogBuilder.setView(customView[0]);
+//
+//            TextView textView = customView[0].findViewById(R.id.textView9);
+//            Button cancel_button = customView[0].findViewById(R.id.button);
+//            Button ok_button = customView[0].findViewById(R.id.button2);
+//            textView.setText(getResources().getText(R.string.t14));
+//
+//            AlertDialog alertDialog = alertDialogBuilder.create();
+//            alertDialog.show();
+//
+//            ok_button.setOnClickListener(view1 -> {
+//                progressBar.setVisibility(View.VISIBLE);
+//                Runnable runnable = () -> {
+////                    MyDatabase myDatabase2 = new MyDatabase(getApplicationContext());
+////                    Cursor cc = myDatabase2.LoadImagePaths(DocId);
+////                    try {
+////                        cc.moveToFirst();
+////                        do {
+////                            CommonOperations.deleteFile(cc.getString(0));
+////                        } while (cc.moveToNext());
+////                    } catch (Exception ignored) {
+////                    }
+////                    myDatabase2.DeleteTable(DocId);
+////                    myDatabase2.close();
+//                    CommonOperations.deleteDocument(getApplicationContext(), DocId);
+//                    Intent in = new Intent(DocumentViewActivity.this, AllDocs.class);
+//                    startActivity(in);
+//                    finish();
+//                };
+//                Thread thread = new Thread(runnable);
+//                thread.start();
+//            });
+//            cancel_button.setOnClickListener(view12 -> alertDialog.dismiss());
+//            progressBar.setVisibility(View.GONE);
+//        });
 
-            final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
-            alertDialogBuilder.setView(customView[0]);
-
-            TextView textView = customView[0].findViewById(R.id.textView9);
-            Button cancel_button = customView[0].findViewById(R.id.button);
-            Button ok_button = customView[0].findViewById(R.id.button2);
-            textView.setText(getResources().getText(R.string.t14));
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-
-            ok_button.setOnClickListener(view1 -> {
-                progressBar.setVisibility(View.VISIBLE);
-                Runnable runnable = () -> {
-                    MyDatabase myDatabase2 = new MyDatabase(getApplicationContext());
-                    Cursor cc = myDatabase2.LoadImagePaths(DocId);
-                    try {
-                        cc.moveToFirst();
-                        do {
-                            CommonOperations.deleteFile(cc.getString(0));
-                        } while (cc.moveToNext());
-                    } catch (Exception ignored) {
-                    }
-                    myDatabase2.DeleteTable(DocId);
-                    myDatabase2.close();
-                    Intent in = new Intent(DocumentViewActivity.this, AllDocs.class);
-                    startActivity(in);
-                    finish();
-                };
-                Thread thread = new Thread(runnable);
-                thread.start();
-            });
-            cancel_button.setOnClickListener(view12 -> alertDialog.dismiss());
-            progressBar.setVisibility(View.GONE);
-        });
-
-        pdfPreviewButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.pdfPreviewDovView.setOnClickListener(view -> {
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
             Thread pdfCreationThread = new Thread(() -> {
                 boolean emptyAvailable = false;
                 try {
@@ -216,7 +205,7 @@ public class DocumentViewActivity extends AppCompatActivity {
                 } else {
                     PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
                     String path = pdfMaker.MakeTempPDF(ImagePaths, DocName);
-                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                    runOnUiThread(() -> binding.progressBarDocView.setVisibility(View.GONE));
                     if (!path.equals("")) {
                         Uri uri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", new File(path));
                         Intent in = new Intent(Intent.ACTION_VIEW);
@@ -233,7 +222,7 @@ public class DocumentViewActivity extends AppCompatActivity {
             pdfCreationThread.start();
         });
 
-        checkedPhotosDeleteButton.setOnClickListener(view -> {
+        binding.deleteSelectedImagesButton.setOnClickListener(view -> {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DocumentViewActivity.this);
 
             final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, findViewById(R.id.alert_main_layout), false)};
@@ -259,23 +248,23 @@ public class DocumentViewActivity extends AppCompatActivity {
             cancel_button.setOnClickListener(view2 -> alertDialog.dismiss());
         });
 
-        selectPhotosButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.gallerySelect.setOnClickListener(view -> {
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
             Intent fileManager = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             fileManager.setType("image/*");
             fileManager.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(fileManager, SelectPhotosRequestCode);
         });
 
-        clickPhotosButton.setOnClickListener(view -> {
-            progressBar.setVisibility(View.VISIBLE);
+        binding.clickNewImageButtonDocView.setOnClickListener(view -> {
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
             Intent in = new Intent(DocumentViewActivity.this, MyCamera.class);
             in.putExtra("DocId", DocId);
             startActivity(in);
             finish();
         });
 
-        doc_name_tv.setOnClickListener(view -> {
+        binding.docNameTvDocView.setOnClickListener(view -> {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
             View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.name_changer_dialog_box, null, false);
@@ -292,9 +281,9 @@ public class DocumentViewActivity extends AppCompatActivity {
             okButton.setOnClickListener(view2 -> {
                 if (!input.getText().toString().isEmpty()) {
                     DocName = input.getText().toString();
-                    doc_name_tv.setText(DocName);
+                    binding.docNameTvDocView.setText(DocName);
                     ChangeName();
-                    progressBar.setVisibility(View.GONE);
+                    binding.progressBarDocView.setVisibility(View.GONE);
                     alertDialog.dismiss();
                 } else {
                     Toast.makeText(DocumentViewActivity.this, "Please fill something", Toast.LENGTH_SHORT).show();
@@ -321,32 +310,17 @@ public class DocumentViewActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == CREATE_FILE) {
-//            if (resultCode == RESULT_OK) {
-//                assert data != null;
-//                Uri resultUri = data.getData();
-//                try {
-//                    ParcelFileDescriptor p = getContentResolver().openFileDescriptor(resultUri, "w");
-////                    Save(p);
-//                    PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
-//                    pdfMaker.Save(p, ImagePaths, progressBar);
-//                    p.close();
-////                    first_time = false;
-//                } catch (Exception ignored) {
-//                }
-//                progressBar.setVisibility(View.GONE);
-//            }
-//        }
+
         if (requestCode == SelectPhotosRequestCode) {
             if (resultCode == RESULT_OK) {
                 assert data != null;
-                progressBar.setVisibility(View.VISIBLE);
+                binding.progressBarDocView.setVisibility(View.VISIBLE);
                 if (data.getClipData() == null) {
 //                    this means only single image
                     Uri uri = data.getData();
                     galleryImagesUris.add(uri);
                 } else {
-//                    this is for multiple paragraphs
+//                    this is for multiple images
                     for (int i = 0; i < data.getClipData().getItemCount(); i++) {
                         galleryImagesUris.add(data.getClipData().getItemAt(i).getUri());
                     }
@@ -359,8 +333,8 @@ public class DocumentViewActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 assert data != null;
                 String ImagePath = data.getExtras().getString("ImagePath");
-                MyDatabase myDatabase=new MyDatabase(getApplicationContext());
-                myDatabase.InsertImage(DocId,ImagePath);
+                MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+                myDatabase.InsertImage(DocId, ImagePath);
                 myDatabase.close();
 
                 goForEditing();
@@ -391,10 +365,9 @@ public class DocumentViewActivity extends AppCompatActivity {
     }
 
     private void saveSelectedImage() {
-        progressBar.setVisibility(View.VISIBLE);
+        binding.progressBarDocView.setVisibility(View.VISIBLE);
         Runnable runnable = () -> {
             for (int i = 0; i < galleryImagesUris.size(); i++) {
-//                runOnUiThread(() -> );
 
                 MyImageCompressor myImageCompressor = new MyImageCompressor(getApplicationContext());
                 String filePath = myImageCompressor.compress(galleryImagesUris.get(i));
@@ -421,11 +394,11 @@ public class DocumentViewActivity extends AppCompatActivity {
 //    }
 
     void Initializer() {
-        progressBar.setVisibility(View.VISIBLE);
-        checkedPhotosDeleteButton.setVisibility(View.GONE);
-        docViewOptionsLinearLayout.setVisibility(View.VISIBLE);
-        selectPhotosButton.setVisibility(View.VISIBLE);
-        clickPhotosButton.setVisibility(View.VISIBLE);
+        binding.progressBarDocView.setVisibility(View.VISIBLE);
+        binding.deleteSelectedImagesButton.setVisibility(View.GONE);
+        binding.docViewOptionsLayout.setVisibility(View.VISIBLE);
+        binding.gallerySelect.setVisibility(View.VISIBLE);
+        binding.clickNewImageButtonDocView.setVisibility(View.VISIBLE);
         ImagePathsChecker.clear();
         ImagePaths.clear();
 
@@ -438,27 +411,28 @@ public class DocumentViewActivity extends AppCompatActivity {
             } while (cc.moveToNext());
 
             //recycler view setup
-            DocViewRecyclerViewAdapter adapter = new DocViewRecyclerViewAdapter(docViewOptionsLinearLayout, progressBar, selectPhotosButton, clickPhotosButton, ImagePathsChecker, checkedPhotosDeleteButton, recyclerView, DocId, ImagePaths, getApplicationContext(), DocumentViewActivity.this);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-            recyclerView.setAdapter(adapter);
+//            CommonOperations.log("Size: " + ImagePaths.size());
+            DocViewRecyclerViewAdapter adapter = new DocViewRecyclerViewAdapter();
+            binding.docRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            binding.docRecyclerView.setAdapter(adapter);
 
 //            ItemTouchHelper helper = new ItemTouchHelper(new MyTouches(adapter));
 //            helper.attachToRecyclerView(recyclerView);
 
-            swipeRefreshLayout.setRefreshing(false);
-            recyclerView.setVisibility(View.VISIBLE);
-            swipeRefreshLayout.setVisibility(View.VISIBLE);
-            emptyListFrameLayout.setVisibility(View.GONE);
+            binding.swipeRefreshDocView.setRefreshing(false);
+            binding.docRecyclerView.setVisibility(View.VISIBLE);
+            binding.swipeRefreshDocView.setVisibility(View.VISIBLE);
+            binding.emptyDocTvDocView.setVisibility(View.GONE);
             if (emptyAvailable) {
                 Toast.makeText(getApplicationContext(), "Empty images available", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            emptyListFrameLayout.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-            swipeRefreshLayout.setVisibility(View.GONE);
+            binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
+            binding.docRecyclerView.setVisibility(View.GONE);
+            binding.swipeRefreshDocView.setVisibility(View.GONE);
         }
 //        first_time = false;
-        progressBar.setVisibility(View.GONE);
+        binding.progressBarDocView.setVisibility(View.GONE);
     }
 
     @Override
@@ -486,23 +460,199 @@ public class DocumentViewActivity extends AppCompatActivity {
     }
 
     void InitialWork() {
-        recyclerView = findViewById(R.id.docRecyclerView);
-        clickPhotosButton = findViewById(R.id.floatingActionButton3);
-        doc_name_tv = findViewById(R.id.doc_name);
-        swipeRefreshLayout = findViewById(R.id.swipe_doc_view);
-        progressBar = findViewById(R.id.progressBar3);
-        checkedPhotosDeleteButton = findViewById(R.id.deleteSelectedDocumentsButton);
-        selectPhotosButton = findViewById(R.id.gallery_select);
-        emptyListFrameLayout = findViewById(R.id.empty_document_id);
-        emptyListFrameLayout.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
-        docViewOptionsLinearLayout = findViewById(R.id.doc_view_options);
-        mainLayout = findViewById(R.id.document_view_id);
-
-        backButton = findViewById(R.id.imageButton9);
-        sharePdfButton = findViewById(R.id.imageButton6);
-        pdfPreviewButton = findViewById(R.id.imageButton);
-        downloadDocButton = findViewById(R.id.save_doc_imageButton);
-        deleteDocButton = findViewById(R.id.imageButton7);
+//        recyclerView = findViewById(R.id.docRecyclerView);
+//        clickPhotosButton = findViewById(R.id.click_new_image_button_doc_view);
+//        doc_name_tv = findViewById(R.id.doc_name_tv_doc_view);
+//        swipeRefreshLayout = findViewById(R.id.swipe_refresh_doc_view);
+//        progressBar = findViewById(R.id.progress_bar_doc_view);
+//        checkedPhotosDeleteButton = findViewById(R.id.delete_selected_images_button);
+//        selectPhotosButton = findViewById(R.id.gallery_select);
+//        emptyListTextView = findViewById(R.id.empty_doc_tv_doc_view);
+        binding.emptyDocTvDocView.setVisibility(View.GONE);
+        binding.progressBarDocView.setVisibility(View.GONE);
+//        docViewOptionsLinearLayout = findViewById(R.id.doc_view_options_layout);
+//        mainLayout = findViewById(R.id.doc_view_main_layout);
+//
+//        backButton = findViewById(R.id.back_button_doc_view);
+//        sharePdfButton = findViewById(R.id.share_doc_button);
+//        pdfPreviewButton = findViewById(R.id.imageButton);
+//        downloadDocButton = findViewById(R.id.download_doc_button);
+//        deleteDocButton = findViewById(R.id.imageButton7);
     }
+
+
+    public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecyclerViewAdapter.MyDocViewHolder> {
+        int numberOfCheckedImages = 0;
+
+        @NonNull
+        @Override
+        public MyDocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.simple_image_layout, parent, false);
+            return new MyDocViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MyDocViewHolder holder, int position) {
+
+            File imageFile = new File(ImagePaths.get(position));
+            holder.positionTextView.setText(getString(R.string.docViewImagePosition, position + 1));
+            float size = (float) imageFile.length() / (1024 * 1024);
+
+            DocumentViewActivity.emptyAvailable = (size == 0.0f);
+
+            String sizeString = "Size:\n" + String.format(Locale.getDefault(), "%.2f MB", size);
+            holder.sizeTextView.setText(sizeString);
+
+            RequestOptions options = new RequestOptions().sizeMultiplier(0.5f);
+            options = options.centerCrop();
+            Glide.with(getApplicationContext()).applyDefaultRequestOptions(options)
+                    .load(imageFile)
+                    .placeholder(R.drawable.image_placeholder).into(holder.imageView);
+
+            holder.checkBox.setChecked(ImagePathsChecker.get(position));
+
+            holder.checkBox.setOnClickListener(view2 -> {
+                CheckBox checkBox = view2.findViewById(R.id.single_image_checkbox);
+                if (checkBox.isChecked()) {
+                    //this means after user clicked the checkbox become checked
+                    selectImage(position);
+                } else {
+                    //this means after user clicked the checkbox become unchecked
+                    deselectImage(position);
+                }
+            });
+
+            upDownButtonControls(position, holder.upButton, holder.downButton);
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return ImagePaths.size();
+        }
+
+        class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            ImageView imageView;
+            CheckBox checkBox;
+            TextView sizeTextView, positionTextView;
+            ImageButton upButton, downButton;
+
+            public MyDocViewHolder(@NonNull View itemView) {
+                super(itemView);
+                imageView = itemView.findViewById(R.id.imageView3);
+                checkBox = itemView.findViewById(R.id.single_image_checkbox);
+                sizeTextView = itemView.findViewById(R.id.textView6);
+                positionTextView = itemView.findViewById(R.id.positionTextView);
+                upButton = itemView.findViewById(R.id.up_button);
+                downButton = itemView.findViewById(R.id.down_button);
+                itemView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+
+                //this is a temporary method to get position i have to change this
+                TextView textView = v.findViewById(R.id.positionTextView);
+                int position = Integer.parseInt(textView.getText().toString()) - 1;
+
+                if (numberOfCheckedImages == 0) {
+                    //this means no image is numberOfCheckedImages and the user wants to preview the image
+                    GoToSingleImage(position);
+                } else {
+                    CheckBox checkBox = v.findViewById(R.id.single_image_checkbox);
+                    if (checkBox.isChecked()) {
+                        //this means the user wants to remove the selection
+                        checkBox.setChecked(false);
+                        deselectImage(position);
+                    } else {
+                        //this means the user wants to select the image
+                        checkBox.setChecked(true);
+                        selectImage(position);
+                    }
+                }
+            }
+        }
+
+        void Swap(int p1, int p2) {
+            Runnable runnable = () -> {
+                //database operations must be performed in separate thread
+                MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+                myDatabase.updateDoc(ImagePaths.get(p1), ImagePaths.get(p2), DocId);
+                myDatabase.close();
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+
+            Collections.swap(ImagePaths, p1, p2);
+            Collections.swap(ImagePathsChecker, p1, p2);
+            this.notifyDataSetChanged();
+        }
+
+        void selectImage(int i) {
+            numberOfCheckedImages++;
+            ImagePathsChecker.set(i, true);
+            lookUp();
+        }
+
+        void deselectImage(int i) {
+            numberOfCheckedImages--;
+            ImagePathsChecker.set(i, false);
+            lookUp();
+        }
+
+        void lookUp() {
+        /*this function looks up whether any image is numberOfCheckedImages
+		or not then it will perform the respective tasks
+		*/
+            if (numberOfCheckedImages == 0) {
+                binding.deleteSelectedImagesButton.setVisibility(View.GONE);
+                binding.clickNewImageButtonDocView.setVisibility(View.VISIBLE);
+                binding.docViewOptionsLayout.setVisibility(View.VISIBLE);
+                binding.gallerySelect.setVisibility(View.VISIBLE);
+            } else {
+                binding.docViewOptionsLayout.setVisibility(View.GONE);
+                binding.deleteSelectedImagesButton.setVisibility(View.VISIBLE);
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotation_left_right_repeat);
+                binding.deleteSelectedImagesButton.startAnimation(animation);
+                binding.clickNewImageButtonDocView.setVisibility(View.GONE);
+                binding.gallerySelect.setVisibility(View.GONE);
+            }
+        }
+
+        void upDownButtonControls(int i, ImageButton upButton, ImageButton downButton) {
+
+            //removes up button from first image
+            if (i == 0) {
+                upButton.setVisibility(View.GONE);
+                downButton.setVisibility(View.VISIBLE);
+            }
+
+            //removes down button from last image
+            if (i == ImagePaths.size() - 1) {
+                downButton.setVisibility(View.GONE);
+                upButton.setVisibility(View.VISIBLE);
+            }
+
+            //setting up click listeners
+            upButton.setOnClickListener(view22 -> Swap(i, i - 1));
+            downButton.setOnClickListener(view23 -> Swap(i, i + 1));
+
+            upButton.setFocusable(false);//for clicking the recyclerView item
+            downButton.setFocusable(false);//for clicking the recyclerView item
+        }
+
+        void GoToSingleImage(int single_image_position) {
+            binding.progressBarDocView.setVisibility(View.VISIBLE);
+            Runnable runnable = () -> {
+                Intent in = new Intent(getApplicationContext(), SingleImage.class);
+                in.putExtra("ImagePath", ImagePaths.get(single_image_position));
+                in.putExtra("DocId", DocId);
+                startActivity(in);
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
+    }
+
+
 }

@@ -4,50 +4,48 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.oxodiceproductions.dockmaker.databinding.ActivityMySettingsBinding;
 
 public class MySettings extends AppCompatActivity {
 
     int pdf_image_quality;
     SharedPreferences sharedPreferences;
-    Button save_button;
-    RadioGroup radioGroup;
-    RadioButton low_rd, medium_rd, high_rd;
+    ActivityMySettingsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_settings);
+        binding=ActivityMySettingsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         sharedPreferences = getSharedPreferences("DocMakerSettings", MODE_PRIVATE);
 
-        save_button = findViewById(R.id.button5);
-        radioGroup = findViewById(R.id.radioGroup);
-        low_rd = findViewById(R.id.radioButton);
-        medium_rd = findViewById(R.id.radioButton2);
-        high_rd = findViewById(R.id.radioButton3);
-        save_button.setVisibility(View.GONE);
+//        save_button = findViewById(R.id.button5);
+//        radioGroup = findViewById(R.id.radioGroup);
+//        low_rd = findViewById(R.id.radioButton);
+//        medium_rd = findViewById(R.id.radioButton2);
+//        high_rd = findViewById(R.id.radioButton3);
+        binding.saveSetttingsButton.setVisibility(View.GONE);
 
         Initializer();
 
-        radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            if (i == R.id.radioButton) {
+        binding.imageQualityRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            if (i == R.id.low_image_quality_button) {
                 pdf_image_quality = 1;//low
             }
-            if (i == R.id.radioButton2) {
+            if (i == R.id.medium_image_quality_button) {
                 pdf_image_quality = 2;//medium
             }
-            if (i == R.id.radioButton3) {
+            if (i == R.id.high_image_quality_button) {
                 pdf_image_quality = 3;//high
             }
-            save_button.setVisibility(View.VISIBLE);
+            binding.saveSetttingsButton.setVisibility(View.VISIBLE);
         });
 
-        save_button.setOnClickListener(view->{
+        binding.saveSetttingsButton.setOnClickListener(view->{
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt("pdf_image_quality", pdf_image_quality);
             editor.apply();
@@ -59,13 +57,13 @@ public class MySettings extends AppCompatActivity {
         pdf_image_quality = sharedPreferences.getInt("pdf_image_quality", 2);
         switch (pdf_image_quality) {
             case 1:
-                low_rd.setChecked(true);
+                binding.lowImageQualityButton.setChecked(true);
                 break;
             case 2:
-                medium_rd.setChecked(true);
+                binding.mediumImageQualityButton.setChecked(true);
                 break;
             case 3:
-                high_rd.setChecked(true);
+                binding.highImageQualityButton.setChecked(true);
                 break;
         }
     }
