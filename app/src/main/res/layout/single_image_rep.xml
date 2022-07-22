@@ -60,12 +60,13 @@
 
             <ImageButton
                 android:id="@+id/up_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center"
+                android:scaleType="fitCenter"
                 android:backgroundTint="@color/app_bg"
                 android:focusable="false"
-                android:src="@drawable/move_image_arrow" />
+                android:src="@drawable/triangle" />
 
             <TextView
                 android:id="@+id/positionTextView"
@@ -79,13 +80,14 @@
 
             <ImageButton
                 android:id="@+id/down_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center"
+                android:scaleType="fitCenter"
                 android:backgroundTint="@color/app_bg"
                 android:focusable="false"
                 android:rotation="180"
-                android:src="@drawable/move_image_arrow" />
+                android:src="@drawable/triangle" />
 
         </LinearLayout>
 

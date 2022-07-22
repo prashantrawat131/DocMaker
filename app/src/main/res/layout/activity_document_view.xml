@@ -25,14 +25,14 @@
         android:layout_gravity="center"
         android:background="@color/transparent"
         android:drawablePadding="50dp"
+        android:drawableTint="#77909090"
         android:gravity="center"
         android:scaleX="3"
         android:scaleY="3"
-        android:translationZ="2dp"
         android:text="@string/t1"
         android:textColor="#77909090"
         android:textSize="10sp"
-        android:drawableTint="#77909090"
+        android:translationZ="2dp"
         app:drawableTopCompat="@drawable/ic_baseline_photo_camera_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,55 +72,35 @@
 
         <ImageButton
             android:id="@+id/back_button_doc_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/circular_button"
+            style="@style/DocViewOptionImageButtonStyle"
             android:contentDescription="@string/backButtonCD"
             android:rotation="-90"
             android:src="@drawable/ic_baseline_arrow_upward_24" />
 
         <ImageButton
             android:id="@+id/share_doc_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
+            style="@style/DocViewOptionImageButtonStyle"
             android:background="@drawable/circular_button"
             android:contentDescription="@string/shareCD"
             android:src="@drawable/ic_baseline_share_24" />
 
         <ImageButton
             android:id="@+id/download_doc_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/circular_button"
+            style="@style/DocViewOptionImageButtonStyle"
             android:contentDescription="@string/saveDocButtonCD"
-            android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_get_app_24" />
 
         <ImageButton
             android:id="@+id/delete_doc_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:backgroundTint="@color/my_button_color"
+            style="@style/DocViewOptionImageButtonStyle"
             android:contentDescription="@string/deleteDocButtonCD"
-            android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_delete_24"
             android:visibility="gone" />
 
         <ImageButton
             android:id="@+id/pdf_preview_dov_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/circular_button"
+            style="@style/DocViewOptionImageButtonStyle"
             android:contentDescription="@string/previewDocCD"
-            android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_picture_as_pdf_24" />
 
     </LinearLayout>

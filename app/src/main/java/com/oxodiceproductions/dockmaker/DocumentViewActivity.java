@@ -2,8 +2,6 @@ package com.oxodiceproductions.dockmaker;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -20,11 +18,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -34,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.oxodiceproductions.dockmaker.databinding.ActivityDocumentViewBinding;
 
 import java.io.File;
@@ -53,9 +52,9 @@ public class DocumentViewActivity extends AppCompatActivity {
     ArrayList<Uri> galleryImagesUris = new ArrayList<>();
     ArrayList<String> galleryImagesPaths = new ArrayList<>();
 
-    int SelectPhotosRequestCode = 10;
+//    int SelectPhotosRequestCode = 10;
 
-    private static final int galleryImagesId = 1800;
+//    private static final int galleryImagesId = 1800;
 
     public static boolean emptyAvailable = false;
 
@@ -253,7 +252,8 @@ public class DocumentViewActivity extends AppCompatActivity {
             Intent fileManager = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             fileManager.setType("image/*");
             fileManager.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            startActivityForResult(fileManager, SelectPhotosRequestCode);
+            galleryImageSelectActivityLauncher.launch(fileManager);
+//            startActivityForResult(fileManager, SelectPhotosRequestCode);
         });
 
         binding.clickNewImageButtonDocView.setOnClickListener(view -> {
@@ -307,7 +307,7 @@ public class DocumentViewActivity extends AppCompatActivity {
         CommonOperations.deleteFile(ImagePath);
     }
 
-    @Override
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -336,11 +336,34 @@ public class DocumentViewActivity extends AppCompatActivity {
                 MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                 myDatabase.InsertImage(DocId, ImagePath);
                 myDatabase.close();
-
                 goForEditing();
             }
         }
-    }
+    }*/
+
+    ActivityResultLauncher<Intent> galleryImageSelectActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    assert result.getResultCode() == RESULT_OK;
+                    Intent data = result.getData();
+                    assert data != null;
+                    binding.progressBarDocView.setVisibility(View.VISIBLE);
+                    if (data.getClipData() == null) {
+//                    this means only single image
+                        Uri uri = data.getData();
+                        galleryImagesUris.add(uri);
+                    } else {
+//                    this is for multiple images
+                        for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                            galleryImagesUris.add(data.getClipData().getItemAt(i).getUri());
+                        }
+                    }
+                    saveSelectedImage();
+                }
+            }
+    );
 
     void goForEditing() {
 //        if (galleryImagesPaths.size() > 0) {
@@ -360,9 +383,26 @@ public class DocumentViewActivity extends AppCompatActivity {
 
             Intent in = new Intent(DocumentViewActivity.this, EditingImageActivity.class);
             in.putExtra("ImagePath", imagePathForEditing);
-            startActivityForResult(in, galleryImagesId);
+            editImageActivityLauncher.launch(in);
+//            startActivityForResult(in, galleryImagesId);
         }
     }
+
+    ActivityResultLauncher<Intent> editImageActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Intent data = result.getData();
+                    assert data != null;
+                    String ImagePath = data.getExtras().getString("ImagePath");
+                    MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+                    myDatabase.InsertImage(DocId, ImagePath);
+                    myDatabase.close();
+                    goForEditing();
+                }
+            }
+    );
 
     private void saveSelectedImage() {
         binding.progressBarDocView.setVisibility(View.VISIBLE);
@@ -376,6 +416,8 @@ public class DocumentViewActivity extends AppCompatActivity {
                     galleryImagesPaths.add(filePath);
                 }
             }
+
+            galleryImagesUris.clear();
             goForEditing();
         };
 
@@ -480,14 +522,13 @@ public class DocumentViewActivity extends AppCompatActivity {
 //        deleteDocButton = findViewById(R.id.imageButton7);
     }
 
-
     public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecyclerViewAdapter.MyDocViewHolder> {
         int numberOfCheckedImages = 0;
 
         @NonNull
         @Override
         public MyDocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.simple_image_layout, parent, false);
+            View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.single_image_rep, parent, false);
             return new MyDocViewHolder(view);
         }
 
@@ -653,6 +694,4 @@ public class DocumentViewActivity extends AppCompatActivity {
             thread.start();
         }
     }
-
-
 }

@@ -346,6 +346,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 } else {
                     holder.optionsLayout.setVisibility(View.GONE);
                 }
+                holder.optionsButton.setRotation(180f);
             });
 
             holder.shareButton.setOnClickListener(v -> {
