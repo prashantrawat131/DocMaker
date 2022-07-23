@@ -237,22 +237,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         finishAffinity();
     }
 
-    /* void IDProvider() {
-     *//*Here all the ui elements are provides ids.
-     * Since the objects are global so they can be provide is anywhere and it will kept there along the execution of the activity*//*
-        recyclerView = findViewById(R.id.all_docs_recycler_view);
-        clearAnimationImageView = findViewById(R.id.clear_cache_image);
-        binding.progressBarAllDocs = findViewById(R.id.progress_bar_all_docs);
-        binding.toolBarAllDocs = findViewById(R.id.toolBarAllDocs);
-        empty_home_textview = findViewById(R.id.empty_home_tv_all_docs);
-        binding.progressBarAllDocs.setVisibility(View.GONE);
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_all_doc);
-        addNewDocFloatingActionButton = findViewById(R.id.add_doc_button);
-        empty_home_textview.setVisibility(View.GONE);
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-    }*/
-
     private void clearCache() {
         binding.progressBarAllDocs.setVisibility(View.VISIBLE);
         deleteUnusedFiles();
@@ -285,7 +269,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
     private class AllDocsRecyclerViewAdapter extends RecyclerView.Adapter<AllDocsRecyclerViewAdapter.MyDocViewHolder> {
 
-        private final String TAG = "tagJi";
         ArrayList<DocumentDataModel> arrayList;
         Context context;
         Activity activity;
@@ -341,12 +324,13 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             //click listeners
             holder.optionsButton.setOnClickListener(v -> {
                 int visibility = holder.optionsLayout.getVisibility();
+                ImageButton currentOptionsButton = (ImageButton) v.findViewById(R.id.doc_options_button);
                 if (visibility == View.GONE) {
                     holder.optionsLayout.setVisibility(View.VISIBLE);
                 } else {
                     holder.optionsLayout.setVisibility(View.GONE);
                 }
-                holder.optionsButton.setRotation(180f);
+                currentOptionsButton.setRotation(currentOptionsButton.getRotation() + 180);
             });
 
             holder.shareButton.setOnClickListener(v -> {
@@ -363,6 +347,9 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
             holder.detailsButton.setOnClickListener(v -> ShowDocDetails(arrayList.get(position)));
 
+            holder.clickLayout.setOnClickListener(view->{
+                GotoDocumentView(position);
+            });
         }
 
         private void ShowDocDetails(DocumentDataModel doc) {
@@ -439,12 +426,12 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                     .show();
         }
 
-        class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        class MyDocViewHolder extends RecyclerView.ViewHolder {//implements View.OnClickListener {
             TextView date_created_tv, time_created_tv, number_of_pics_tv, docNameTv;
             ImageView sample_image;
             TextView indexNumberTextView;
             ImageButton optionsButton, deleteButton, shareButton, detailsButton;
-            LinearLayout optionsLayout;
+            LinearLayout optionsLayout, clickLayout;
 
             public MyDocViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -459,15 +446,16 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 shareButton = itemView.findViewById(R.id.doc_rep_share);
                 detailsButton = itemView.findViewById(R.id.doc_rep_details);
                 optionsLayout = itemView.findViewById(R.id.doc_rep_options_layout);
-                itemView.setOnClickListener(this);
+                clickLayout =itemView.findViewById(R.id.doc_rep_click_layout);
+//                itemView.setOnClickListener(this);
             }
 
-            @Override
+         /*   @Override
             public void onClick(View v) {
                 TextView indexTv = v.findViewById(R.id.index_number_text_view);
                 int i = Integer.parseInt(indexTv.getText().toString()) - 1;
                 GotoDocumentView(i);
-            }
+            }*/
         }
     }
 

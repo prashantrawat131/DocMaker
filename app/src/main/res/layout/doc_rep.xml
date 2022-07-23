@@ -37,7 +37,7 @@
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/doc_options_button"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -107,6 +107,7 @@
             android:background="?android:attr/listDivider" />-->
 
         <LinearLayout
+            android:id="@+id/doc_rep_click_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/app_bg"

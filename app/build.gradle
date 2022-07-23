@@ -61,6 +61,13 @@ dependencies {
     //notification lib
     implementation "androidx.core:core:1.8.0"
 
+//    room library
+    def room_version = "2.4.2"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+
 
     //some other android basic implementations
     implementation 'androidx.appcompat:appcompat:1.4.2'
