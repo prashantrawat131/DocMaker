@@ -6,26 +6,28 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Document {
-    @PrimaryKey
-    int DocId;
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    long id;
 
     @ColumnInfo(name = "time")
     long time;
 
     @ColumnInfo(name = "name")
-    String DocName;
+    String name;
 
-    public Document(long time, String docName) {
+    public Document(long time, String name) {
         this.time = time;
-        DocName = docName;
+        this.name = name;
     }
 
-    public int getDocId() {
-        return DocId;
+    public long getId() {
+        return id;
     }
 
-    public void setDocId(int docId) {
-        DocId = docId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public long getTime() {
@@ -36,11 +38,11 @@ public class Document {
         this.time = time;
     }
 
-    public String getDocName() {
-        return DocName;
+    public String getName() {
+        return name;
     }
 
-    public void setDocName(String docName) {
-        DocName = docName;
+    public void setName(String name) {
+        this.name = name;
     }
 }

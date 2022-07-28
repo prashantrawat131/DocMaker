@@ -1,22 +1,23 @@
 package com.oxodiceproductions.dockmaker;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Environment;
 import android.os.FileUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import com.oxodiceproductions.dockmaker.Database.AppDatabase;
+import com.oxodiceproductions.dockmaker.Database.Document;
+import com.oxodiceproductions.dockmaker.Database.DocumentDao;
+import com.oxodiceproductions.dockmaker.Database.Image;
+import com.oxodiceproductions.dockmaker.Database.ImageDao;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class CommonOperations {
@@ -77,8 +78,23 @@ public class CommonOperations {
         }
     }
 
-    public static void deleteDocument(Context context,String docId){
+    public static void deleteDocument(Context context, long docId){
         new Thread(()->{
+            AppDatabase appDatabase= AppDatabase.getInstance(context);
+            DocumentDao documentDao=appDatabase.documentDao();
+//            Cursor cc = myDatabase2.LoadImagePaths(docId);
+            ImageDao imageDao=appDatabase.imageDao();
+            ArrayList<Image> images= (ArrayList<Image>) imageDao.getImagesByDocId(docId);
+            try {
+                for(Image image:images){
+                    CommonOperations.deleteFile(image.getImagePath());
+                    imageDao.delete(image);
+                }
+
+                documentDao.deleteDocById(docId);
+            } catch (Exception ignored) { }
+        }).start();
+        /*new Thread(()->{
             MyDatabase myDatabase2 = new MyDatabase(context);
             Cursor cc = myDatabase2.LoadImagePaths(docId);
             try {
@@ -89,7 +105,7 @@ public class CommonOperations {
             } catch (Exception ignored) { }
             myDatabase2.DeleteTable(docId);
             myDatabase2.close();
-        }).start();
+        }).start();*/
     }
 
     public static void log(String msg){

@@ -29,7 +29,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("create table if not exists documents(DocId varchar,SampleImageId varchar,DateCreated varchar,TimeCreated varchar,DocName varchar)");
     }
 
-    public void InsertDocument(String DocId, String SampleImageId, String DateCreated, String TimeCreated, String DocName) {
+    public void InsertDocument(long DocId, String SampleImageId, String DateCreated, String TimeCreated, String DocName) {
         //whenever a new document is created it is stored with the help of this function
         ContentValues contentValues = new ContentValues();
         contentValues.put("DocId", DocId);//0
@@ -42,7 +42,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.insert("documents", null, contentValues);
     }
 
-    public void retake(String DocId, String oldFileName, String newFileName) {
+    public void retake(long DocId, String oldFileName, String newFileName) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try {
             String sql = "update '" + DocId + "' set ImagePath='" + newFileName + "' where ImagePath='" + oldFileName + "'";
@@ -58,7 +58,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         return sqLiteDatabase.rawQuery("select * from documents", null);
     }
 
-    public Cursor LoadDocumentById(String DocId) {
+    public Cursor LoadDocumentById(long DocId) {
         /* It gives a particular document by its DocId
          * It gives it in the form of a cursor object, I may change it in future*/
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
@@ -77,7 +77,7 @@ public class MyDatabase extends SQLiteOpenHelper {
 
 
 
-    public String GetDocumentName(String DocId) {
+    public String GetDocumentName(long DocId) {
         /* It simply returns the name of the document by it DocId.
          * Initially the DocId and document name are same but
          * the user may change the document name */
@@ -86,7 +86,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         return cc.getString(4);
     }
 
-    public void SetDocumentName(String DocId, String DocName) {
+    public void SetDocumentName(long DocId, String DocName) {
 		/*It is used to change the name of the document.
 		Two documents can have same name so unique DocId is used for differentiation
 		 */
@@ -99,7 +99,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         InsertDocument(DocId, sampleImageId, dateCreated, timeCreated, DocName);
     }
 
-    public String getNumberOfPics(String DocId) {
+    public String getNumberOfPics(long DocId) {
 		/*It return the number of pics present in the document.
 		It uses another function to get the imagePaths for a particular document.
 		 */
@@ -108,7 +108,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         return cc.getCount() + "";
     }
 
-    public String getSize(String DocId) {
+    public String getSize(long DocId) {
         /* It is used to get the size of the document by
          * adding size of all the images*/
         Cursor cc = LoadImagePaths(DocId);
@@ -134,7 +134,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("create table if not exists '" + DocId + "'(ImagePath varchar)");
     }
 
-    public void InsertImage(String DocId, String ImagePath) {
+    public void InsertImage(long DocId, String ImagePath) {
         /* It is used to store the image paths in the unique table
          * created for each document*/
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -144,13 +144,13 @@ public class MyDatabase extends SQLiteOpenHelper {
     }
 
 
-    public Cursor LoadImagePaths(String DocId) {
+    public Cursor LoadImagePaths(long DocId) {
         /* It returns a cursor document containing all the image paths of a particular document*/
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         return sqLiteDatabase.rawQuery("select * from '" + DocId + "'", null);
     }
 
-    public void updateDoc(String ImagePath1, String ImagePath2, String DocId) {
+    public void updateDoc(String ImagePath1, String ImagePath2, long DocId) {
         /*This function is used when the user wants to change the
          * order of the images in the document*/
         String temp = "temp";
@@ -160,13 +160,13 @@ public class MyDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("update '" + DocId + "'set ImagePath = '" + ImagePath2 + "' where ImagePath='" + temp + "'");
     }
 
-    public void DeleteImage(String ImagePath, String DocId) {
+    public void DeleteImage(String ImagePath, long DocId) {
         /*To delete an image from the document i.e. the imagePath from the unique document table */
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         sqLiteDatabase.execSQL("delete from '" + DocId + "' where ImagePath = '" + ImagePath + "'");
     }
 
-    public void DeleteTable(String DocId) {
+    public void DeleteTable(long DocId) {
         /*To completely delete the document*/
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try{

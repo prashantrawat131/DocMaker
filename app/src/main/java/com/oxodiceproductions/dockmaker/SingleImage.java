@@ -12,9 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -29,7 +26,7 @@ import java.util.ArrayList;
 
 public class SingleImage extends AppCompatActivity {
     String ImagePath = "-1";
-    String DocId = "-1";
+    long DocId = "-1";
     SharedPreferences sharedPreferences;
     ArrayList<String> imagesList = new ArrayList<>();
     private GestureDetectorCompat gestureDetectorCompat;

@@ -13,11 +13,20 @@ public interface DocumentDao {
     List<Document> getAll();
 
     @Insert
-    void insert(Document document);
+    long insert(Document document);
 
     @Delete
     void delete(Document document);
 
-    @Query("update Document set name=:name where DocId=:id")
-    void updateName(int id,String name);
+    @Query("update Document set name=:name where id=:id")
+    void updateName(long id, String name);
+
+    @Query("delete from Document")
+    void deleteAll();
+
+    @Query("select * from Document where id=:DocId")
+    List<Document> getDocById(long DocId);
+
+    @Query("delete from Document where id=:DocId")
+    void deleteDocById(long DocId);
 }

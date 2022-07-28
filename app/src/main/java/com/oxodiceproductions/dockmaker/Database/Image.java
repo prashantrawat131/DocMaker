@@ -6,8 +6,9 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Image {
-    @PrimaryKey
-    int id;
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    long id;
 
     @ColumnInfo(name = "imagePath")
     String imagePath;
@@ -15,16 +16,20 @@ public class Image {
     @ColumnInfo(name = "imageIndex")
     int imageIndex;
 
-    public Image(String imagePath, int imageIndex) {
+    @ColumnInfo(name="docId")
+    long docId;
+
+    public Image(String imagePath, int imageIndex, long docId) {
         this.imagePath = imagePath;
         this.imageIndex = imageIndex;
+        this.docId = docId;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -42,5 +47,13 @@ public class Image {
 
     public void setImageIndex(int imageIndex) {
         this.imageIndex = imageIndex;
+    }
+
+    public long getDocId() {
+        return docId;
+    }
+
+    public void setDocId(long docId) {
+        this.docId = docId;
     }
 }

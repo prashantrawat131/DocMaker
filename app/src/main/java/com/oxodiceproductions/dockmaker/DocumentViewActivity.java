@@ -26,7 +26,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +33,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.oxodiceproductions.dockmaker.Database.AppDatabase;
+import com.oxodiceproductions.dockmaker.Database.Document;
+import com.oxodiceproductions.dockmaker.Database.DocumentDao;
+import com.oxodiceproductions.dockmaker.Database.Image;
+import com.oxodiceproductions.dockmaker.Database.ImageDao;
 import com.oxodiceproductions.dockmaker.databinding.ActivityDocumentViewBinding;
 
 import java.io.File;
@@ -47,36 +51,16 @@ public class DocumentViewActivity extends AppCompatActivity {
     ArrayList<String> ImagePaths = new ArrayList<>();
     ArrayList<Boolean> ImagePathsChecker = new ArrayList<>();
 
-    String DocId, DocName;
+    long DocId;
+    String DocName;
 
     ArrayList<Uri> galleryImagesUris = new ArrayList<>();
     ArrayList<String> galleryImagesPaths = new ArrayList<>();
 
-//    int SelectPhotosRequestCode = 10;
-
-//    private static final int galleryImagesId = 1800;
 
     public static boolean emptyAvailable = false;
 
     ActivityDocumentViewBinding binding;
-
-    /*
-     * 2)ImagePathsChecker is an boolean arraylist
-     * which stores the checked state of an image
-     * and it helps in collective deletion of images in a document.
-     * 3)galleryImagesUris is an Uri arrayList which is used to
-     * store the uris which are provided by the file manager
-     * when user selects them.
-     * 4)galleyImagesPaths is an String arrayList which stores the
-     * path to the file manager image which were selected by user but
-     * now these images are already copied into apps dir and the path which
-     * this arrayList stores are the paths to apps dir not to the original files
-     * which were selected by the user.This is because the images which are selected by the
-     * user are being copied into the app dir as they are going to be copied at some point
-     * so why not now.
-     * 13)emptyAvailable is used for making sure that before pdf preview or saving if there are any empty images or not.
-     * Empty images cause error while making pdf file
-     * */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,17 +70,24 @@ public class DocumentViewActivity extends AppCompatActivity {
 
         InitialWork();
 
-        DocId = getIntent().getExtras().getString("DocId", "-1");
+        DocId = getIntent().getExtras().getLong("DocId", -1);
 
-        if (DocId.equals("-1")) {
+        if (DocId == -1) {
             binding.progressBarDocView.setVisibility(View.VISIBLE);
             GoToAllDocs();
         }
 
-        MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+       /* MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         DocName = myDatabase.GetDocumentName(DocId);
-        myDatabase.close();
-        binding.docNameTvDocView.setText(DocName);
+        myDatabase.close();*/
+        new Thread(() -> {
+            AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+            DocumentDao documentDao = appDatabase.documentDao();
+            ArrayList<Document> documents = (ArrayList<Document>) documentDao.getDocById(DocId);
+            DocName = documents.get(0).getName();
+            runOnUiThread(() -> binding.docNameTvDocView.setText(DocName));
+        }).start();
+
 
         binding.swipeRefreshDocView.setOnRefreshListener(this::Initializer);
 
@@ -144,45 +135,6 @@ public class DocumentViewActivity extends AppCompatActivity {
 
         });
 
-//        deleteDocButton.setOnClickListener(view -> {
-//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DocumentViewActivity.this);
-//
-//            final View[] customView = {getLayoutInflater().inflate(R.layout.alert_box, null, false)};
-//            alertDialogBuilder.setView(customView[0]);
-//
-//            TextView textView = customView[0].findViewById(R.id.textView9);
-//            Button cancel_button = customView[0].findViewById(R.id.button);
-//            Button ok_button = customView[0].findViewById(R.id.button2);
-//            textView.setText(getResources().getText(R.string.t14));
-//
-//            AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.show();
-//
-//            ok_button.setOnClickListener(view1 -> {
-//                progressBar.setVisibility(View.VISIBLE);
-//                Runnable runnable = () -> {
-////                    MyDatabase myDatabase2 = new MyDatabase(getApplicationContext());
-////                    Cursor cc = myDatabase2.LoadImagePaths(DocId);
-////                    try {
-////                        cc.moveToFirst();
-////                        do {
-////                            CommonOperations.deleteFile(cc.getString(0));
-////                        } while (cc.moveToNext());
-////                    } catch (Exception ignored) {
-////                    }
-////                    myDatabase2.DeleteTable(DocId);
-////                    myDatabase2.close();
-//                    CommonOperations.deleteDocument(getApplicationContext(), DocId);
-//                    Intent in = new Intent(DocumentViewActivity.this, AllDocs.class);
-//                    startActivity(in);
-//                    finish();
-//                };
-//                Thread thread = new Thread(runnable);
-//                thread.start();
-//            });
-//            cancel_button.setOnClickListener(view12 -> alertDialog.dismiss());
-//            progressBar.setVisibility(View.GONE);
-//        });
 
         binding.pdfPreviewDovView.setOnClickListener(view -> {
             binding.progressBarDocView.setVisibility(View.VISIBLE);
@@ -211,9 +163,6 @@ public class DocumentViewActivity extends AppCompatActivity {
                         in.setDataAndType(uri, "application/pdf");
                         in.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(in);
-//                        Intent intent=new Intent(document_view.this,PdfPReview.class);
-//                        intent.putExtra("path",path);
-//                        startActivity(intent);
                     }
                 }
             });
@@ -301,45 +250,18 @@ public class DocumentViewActivity extends AppCompatActivity {
     }
 
     void delete(String ImagePath) {
-        MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+        new Thread(() -> {
+            AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+            ImageDao imageDao = appDatabase.imageDao();
+            imageDao.deleteImageByPath(ImagePath);
+            CommonOperations.deleteFile(ImagePath);
+        }).start();
+       /* MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         myDatabase.DeleteImage(ImagePath, DocId);
         myDatabase.close();
-        CommonOperations.deleteFile(ImagePath);
+        CommonOperations.deleteFile(ImagePath);*/
     }
 
-   /* @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == SelectPhotosRequestCode) {
-            if (resultCode == RESULT_OK) {
-                assert data != null;
-                binding.progressBarDocView.setVisibility(View.VISIBLE);
-                if (data.getClipData() == null) {
-//                    this means only single image
-                    Uri uri = data.getData();
-                    galleryImagesUris.add(uri);
-                } else {
-//                    this is for multiple images
-                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
-                        galleryImagesUris.add(data.getClipData().getItemAt(i).getUri());
-                    }
-                }
-                saveSelectedImage();
-            }
-        }
-
-        if (requestCode == galleryImagesId) {
-            if (resultCode == RESULT_OK) {
-                assert data != null;
-                String ImagePath = data.getExtras().getString("ImagePath");
-                MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-                myDatabase.InsertImage(DocId, ImagePath);
-                myDatabase.close();
-                goForEditing();
-            }
-        }
-    }*/
 
     ActivityResultLauncher<Intent> galleryImageSelectActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -366,15 +288,6 @@ public class DocumentViewActivity extends AppCompatActivity {
     );
 
     void goForEditing() {
-//        if (galleryImagesPaths.size() > 0) {
-//            Intent in = new Intent(document_view.this, EditImageActivity.class);
-//            in.putExtra("ImagePath", galleryImagesPaths.get(0));
-//            in.putExtra("DocId", DocId);
-//            in.putExtra("fromGallery", true);
-//            in.putExtra("galleryImagesPaths", galleryImagesPaths);
-//            startActivity(in);
-//        }
-
 
         //checking if there are images left to crop
         if (galleryImagesPaths.size() > 0) {
@@ -396,10 +309,20 @@ public class DocumentViewActivity extends AppCompatActivity {
                     Intent data = result.getData();
                     assert data != null;
                     String ImagePath = data.getExtras().getString("ImagePath");
+                    new Thread(() -> {
+                        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+                        ImageDao imageDao = appDatabase.imageDao();
+                        Image newImage = new Image(ImagePath, imageDao.getAll().size(), DocId);
+                        imageDao.insert(newImage);
+                        runOnUiThread(() -> {
+                            goForEditing();
+                        });
+                    });
+                    /*
                     MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                     myDatabase.InsertImage(DocId, ImagePath);
                     myDatabase.close();
-                    goForEditing();
+                    goForEditing();*/
                 }
             }
     );
@@ -444,7 +367,44 @@ public class DocumentViewActivity extends AppCompatActivity {
         ImagePathsChecker.clear();
         ImagePaths.clear();
 
-        try (MyDatabase myDatabase = new MyDatabase(getApplicationContext())) {
+        try {
+            AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+            ImageDao imageDao=appDatabase.imageDao();
+            ArrayList<Image> images= (ArrayList<Image>) imageDao.getImagesByDocId(DocId);
+//            Cursor cc = myDatabase.LoadImagePaths(DocId);
+//            cc.moveToFirst();
+            for (Image image:images){
+                ImagePaths.add(image.getImagePath());
+                ImagePathsChecker.add(false);
+            }
+            /*do {
+                ImagePaths.add(cc.getString(0));
+                ImagePathsChecker.add(false);
+            } while (cc.moveToNext());*/
+
+            //recycler view setup
+//            CommonOperations.log("Size: " + ImagePaths.size());
+            DocViewRecyclerViewAdapter adapter = new DocViewRecyclerViewAdapter();
+            binding.docRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            binding.docRecyclerView.setAdapter(adapter);
+
+//            ItemTouchHelper helper = new ItemTouchHelper(new MyTouches(adapter));
+//            helper.attachToRecyclerView(recyclerView);
+
+            binding.swipeRefreshDocView.setRefreshing(false);
+            binding.docRecyclerView.setVisibility(View.VISIBLE);
+            binding.swipeRefreshDocView.setVisibility(View.VISIBLE);
+            binding.emptyDocTvDocView.setVisibility(View.GONE);
+            if (emptyAvailable) {
+                Toast.makeText(getApplicationContext(), "Empty images available", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
+            binding.docRecyclerView.setVisibility(View.GONE);
+            binding.swipeRefreshDocView.setVisibility(View.GONE);
+        }
+
+       /* try (MyDatabase myDatabase = new MyDatabase(getApplicationContext())) {
             Cursor cc = myDatabase.LoadImagePaths(DocId);
             cc.moveToFirst();
             do {
@@ -472,7 +432,7 @@ public class DocumentViewActivity extends AppCompatActivity {
             binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
             binding.docRecyclerView.setVisibility(View.GONE);
             binding.swipeRefreshDocView.setVisibility(View.GONE);
-        }
+        }*/
 //        first_time = false;
         binding.progressBarDocView.setVisibility(View.GONE);
     }
@@ -495,31 +455,18 @@ public class DocumentViewActivity extends AppCompatActivity {
 
     void ChangeName() {
         new Thread(() -> {
-            MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-            myDatabase.SetDocumentName(DocId, DocName);
-            myDatabase.close();
+            AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+            DocumentDao documentDao=appDatabase.documentDao();
+            documentDao.updateName(DocId,DocName);
+//            MyDatabase myDatabase = new MyDatabase(getApplicationContext());
+//            myDatabase.SetDocumentName(DocId, DocName);
+//            myDatabase.close();
         }).start();
     }
 
     void InitialWork() {
-//        recyclerView = findViewById(R.id.docRecyclerView);
-//        clickPhotosButton = findViewById(R.id.click_new_image_button_doc_view);
-//        doc_name_tv = findViewById(R.id.doc_name_tv_doc_view);
-//        swipeRefreshLayout = findViewById(R.id.swipe_refresh_doc_view);
-//        progressBar = findViewById(R.id.progress_bar_doc_view);
-//        checkedPhotosDeleteButton = findViewById(R.id.delete_selected_images_button);
-//        selectPhotosButton = findViewById(R.id.gallery_select);
-//        emptyListTextView = findViewById(R.id.empty_doc_tv_doc_view);
         binding.emptyDocTvDocView.setVisibility(View.GONE);
         binding.progressBarDocView.setVisibility(View.GONE);
-//        docViewOptionsLinearLayout = findViewById(R.id.doc_view_options_layout);
-//        mainLayout = findViewById(R.id.doc_view_main_layout);
-//
-//        backButton = findViewById(R.id.back_button_doc_view);
-//        sharePdfButton = findViewById(R.id.share_doc_button);
-//        pdfPreviewButton = findViewById(R.id.imageButton);
-//        downloadDocButton = findViewById(R.id.download_doc_button);
-//        deleteDocButton = findViewById(R.id.imageButton7);
     }
 
     public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecyclerViewAdapter.MyDocViewHolder> {
@@ -615,14 +562,28 @@ public class DocumentViewActivity extends AppCompatActivity {
         }
 
         void Swap(int p1, int p2) {
-            Runnable runnable = () -> {
+           /* Runnable runnable = () -> {
                 //database operations must be performed in separate thread
                 MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                 myDatabase.updateDoc(ImagePaths.get(p1), ImagePaths.get(p2), DocId);
                 myDatabase.close();
             };
             Thread thread = new Thread(runnable);
-            thread.start();
+            thread.start();*/
+
+            new Thread(()->{
+                AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+                ImageDao imageDao=appDatabase.imageDao();
+
+                Image image1=imageDao.getImageByIndex(DocId,p1);
+                Image image2=imageDao.getImageByIndex(DocId,p2);
+
+                image1.setImageIndex(p2);
+                image2.setImageIndex(p1);
+
+                imageDao.update(image1);
+                imageDao.update(image2);
+            }).start();
 
             Collections.swap(ImagePaths, p1, p2);
             Collections.swap(ImagePathsChecker, p1, p2);

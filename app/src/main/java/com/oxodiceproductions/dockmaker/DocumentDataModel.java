@@ -1,7 +1,7 @@
 package com.oxodiceproductions.dockmaker;
 
 public class DocumentDataModel implements Comparable<DocumentDataModel> {
-    String DocId;
+    long DocId;
     String SampleImageId;
     String DateCreated;
     String TimeCreated;
@@ -28,7 +28,7 @@ public class DocumentDataModel implements Comparable<DocumentDataModel> {
         this.check = check;
     }
 
-    public DocumentDataModel(boolean check, String docId, String sampleImageId, String dateCreated, String timeCreated, String docName, String size, String NumberOfPics) {
+    public DocumentDataModel(boolean check, long docId, String sampleImageId, String dateCreated, String timeCreated, String docName, String size, String NumberOfPics) {
         DocId = docId;
         SampleImageId = sampleImageId;
         DateCreated = dateCreated;
@@ -39,7 +39,7 @@ public class DocumentDataModel implements Comparable<DocumentDataModel> {
         this.check = check;
     }
 
-    public String getDocId() {
+    public long getDocId() {
         return DocId;
     }
 
@@ -54,6 +54,8 @@ public class DocumentDataModel implements Comparable<DocumentDataModel> {
     }
 
 
+
+
     public String getDocName() {
         return DocName;
     }
@@ -66,6 +68,14 @@ public class DocumentDataModel implements Comparable<DocumentDataModel> {
 
     public String getNumberOfPics() {
         return NumberOfPics;
+    }
+
+    public String getSampleImageId() {
+        return SampleImageId;
+    }
+
+    public void setSampleImageId(String sampleImageId) {
+        SampleImageId = sampleImageId;
     }
 
     @Override
