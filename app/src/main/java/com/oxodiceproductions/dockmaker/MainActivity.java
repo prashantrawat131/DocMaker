@@ -56,6 +56,18 @@ public class MainActivity extends AppCompatActivity {
         CheckPermissions();
 
         importDataToNewDatabase();
+
+        testing();
+    }
+
+    private void testing() {
+      /*  new Thread(() -> {
+            AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+            ImageDao imageDao = appDatabase.imageDao();
+            for (Image image : imageDao.getAll()) {
+                CommonOperations.log(image.getImageIndex() + " " + image.getId() + " " + image.getImagePath());
+            }
+        }).start();*/
     }
 
     private void importDataToNewDatabase() {
@@ -65,14 +77,14 @@ public class MainActivity extends AppCompatActivity {
             DocumentDao documentDao = appDatabase.documentDao();
             ImageDao imageDao = appDatabase.imageDao();
             Cursor docCursor = myDatabase.LoadDocuments();
-//            appDatabase.documentDao().deleteAll();
-//            appDatabase.imageDao().deleteAll();
+            appDatabase.documentDao().deleteAll();
+            appDatabase.imageDao().deleteAll();
             if (documentDao.getAll() == null || documentDao.getAll().size() == 0) {
                 try {
                     docCursor.moveToFirst();
                     do {
                         try {
-                            long DocId = docCursor.getString(0);
+                            String DocId = docCursor.getString(0);
                             String DateCreated = docCursor.getString(2);
                             String TimeCreated = docCursor.getString(3);
                             String DocName = docCursor.getString(4);

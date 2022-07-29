@@ -462,11 +462,17 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         private void ShowDocDetails(DocumentDataModel doc) {
             MyAlertCreator myAlertCreator = new MyAlertCreator();
             //size calculations
-            float size = Float.parseFloat(doc.getSize());
-            size = size / (1048576f);//1024 * 1024 = 1048576
+//            float size = Float.parseFloat(doc.getSize());
+//            size = size / (1048576f);//1024 * 1024 = 1048576
 //        Log.d(TAG, "ShowDocDetails: " + Float.parseFloat(doc.getSize()));
-            String text = getApplicationContext().getString(R.string.docDetails, doc.getDocName(), doc.getDateCreated(), doc.getTimeCreated(), doc.getNumberOfPics(), String.format("%.2f MB", size));
-            myAlertCreator.showDialog(getApplicationContext(), text);
+            String text = getApplicationContext()
+                    .getString(
+                            R.string.docDetails,
+                            doc.getDocName(),
+                            doc.getDateCreated(),
+                            doc.getTimeCreated(),
+                            doc.getNumberOfPics());
+            myAlertCreator.showDialog(AllDocs.this, text);
         }
 
         @Override
@@ -484,19 +490,19 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         private void SharePdfButtonListener(long DocId) {
             new Thread(() -> {
                 try {
-                    ArrayList<String> ImagePaths = new ArrayList<>();
+//                    ArrayList<String> ImagePaths = new ArrayList<>();
                     String DocName = "";
                     AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
                     ImageDao imageDao = appDatabase.imageDao();
                     ArrayList<Image> images = (ArrayList<Image>) imageDao.getImagesByDocId(DocId);
                     Collections.sort(images, (o1, o2) -> Integer.compare(o1.getImageIndex(), o2.getImageIndex()));
-                    for (Image image : images) {
-                        ImagePaths.add(image.getImagePath());
-                    }
-                    if (!ImagePaths.isEmpty()) {
+//                    for (Image image : images) {
+//                        ImagePaths.add(image.getImagePath());
+//                    }
+                    if (!images.isEmpty()) {
                         PDFMaker pdfMaker = new PDFMaker(getApplicationContext());
 //                        String filepath = pdfMaker.MakeTempPDF(ImagePaths, myDatabase.getDocName(DocId));
-                        String filepath = pdfMaker.MakeTempPDF(ImagePaths, DocName);
+                        String filepath = pdfMaker.MakeTempPDF(images, DocName);
                         if (!filepath.equals("")) {
                             File fileToShare = new File(filepath);
                             Uri contentUri = getUriForFile(getApplicationContext(), "com.oxodiceproductions.dockmaker", fileToShare);
@@ -516,7 +522,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
         public void DeleteDoc(long DocId, String DocName, int position) {
             //do not put notifyItemRemoved in a thread because it will not work there properly.
-            new AlertDialog.Builder(getApplicationContext()).setTitle("Do you want to delete this document")
+            new AlertDialog.Builder(AllDocs.this).setTitle("Do you want to delete this document")
                     .setMessage(DocName)
                     .setCancelable(true)
                     .setPositiveButton("delete", (dialog, which) -> {

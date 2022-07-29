@@ -65,7 +65,7 @@
     <string name="pics">Pics: %1$s</string>
 
     <!--    All docs -->
-    <string name="docDetails"><b>DocName:</b> %1$s\n\n<b>Date of Creation:</b> %2$s\n\n<b>Time of Creation:</b> %3$s\n\n<b>Pics:</b> %4$s\n\n<b>Size:</b> %5$s</string>
+    <string name="docDetails"><b>DocName:</b> %1$s\n\n<b>Date of Creation:</b> %2$s\n\n<b>Time of Creation:</b> %3$s\n\n<b>Pics:</b> %4$s</string>
 
     <string name="about_app">
         <b>DocMaker</b>\n

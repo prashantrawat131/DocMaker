@@ -19,6 +19,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 
+import com.oxodiceproductions.dockmaker.Database.AppDatabase;
+import com.oxodiceproductions.dockmaker.Database.Image;
+import com.oxodiceproductions.dockmaker.Database.ImageDao;
 import com.oxodiceproductions.dockmaker.databinding.ActivitySingleImageBinding;
 
 import java.io.File;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 
 public class SingleImage extends AppCompatActivity {
     String ImagePath = "-1";
-    long DocId = "-1";
+    long DocId = -1;
     SharedPreferences sharedPreferences;
     ArrayList<String> imagesList = new ArrayList<>();
     private GestureDetectorCompat gestureDetectorCompat;
@@ -40,7 +43,7 @@ public class SingleImage extends AppCompatActivity {
         setContentView(binding.getRoot());
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
         ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
-        DocId = getIntent().getExtras().getString("DocId", "-1");
+        DocId = getIntent().getExtras().getLong("DocId", -1);
         binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
         binding.progressBarSingleImage.setVisibility(View.GONE);
 
@@ -83,7 +86,20 @@ public class SingleImage extends AppCompatActivity {
             alertDialog.show();
 
             ok_button.setOnClickListener(view12 -> {
-                Runnable runnable = () -> {
+                new Thread(()->{
+                    AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+                    ImageDao imageDao=appDatabase.imageDao();
+                    imageDao.deleteImageByPath(ImagePath);
+
+                    CommonOperations.deleteFile(ImagePath);
+
+                    Intent in = new Intent(SingleImage.this, DocumentViewActivity.class);
+                    in.putExtra(Constants.SP_DOC_ID, DocId);
+                    startActivity(in);
+                    finish();
+                }).start();
+
+                /*Runnable runnable = () -> {
                     //deleting from database
                     MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                     myDatabase.DeleteImage(ImagePath, DocId);
@@ -101,7 +117,7 @@ public class SingleImage extends AppCompatActivity {
                 };
 
                 Thread thread = new Thread(runnable);
-                thread.start();
+                thread.start();*/
             });
             cancel_button.setOnClickListener(view1 -> {
                 binding.progressBarSingleImage.setVisibility(View.GONE);
@@ -121,7 +137,7 @@ public class SingleImage extends AppCompatActivity {
         binding.retakeSingleImage.setOnClickListener(view -> {
             binding.progressBarSingleImage.setVisibility(View.VISIBLE);
             Intent in = new Intent(SingleImage.this, MyCamera.class);
-            in.putExtra("DocId", DocId);
+            in.putExtra(Constants.SP_DOC_ID, DocId);
             in.putExtra("ImagePath", ImagePath);
             startActivity(in);
             finish();
@@ -141,6 +157,26 @@ public class SingleImage extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == editingSingleImageId) {
             if (resultCode == RESULT_OK) {
+
+                new Thread(()->{
+                    AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+                    ImageDao imageDao=appDatabase.imageDao();
+
+                    String newImagePath = data.getExtras().getString("ImagePath");
+                    Image image=imageDao.getImageByImagePath(DocId,ImagePath);
+                    image.setImagePath(newImagePath);
+
+                    imageDao.update(image);
+
+                    runOnUiThread(()->{
+                        //setting the new image
+                        ImagePath = newImagePath;
+                        binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
+                        binding.progressBarSingleImage.setVisibility(View.GONE);
+                    });
+                }).start();
+
+                /*
                 String newImagePath = data.getExtras().getString("ImagePath");
                 MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                 myDatabase.retake(DocId, ImagePath, newImagePath);
@@ -149,7 +185,7 @@ public class SingleImage extends AppCompatActivity {
                 //setting the new image
                 ImagePath = newImagePath;
                 binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
-                binding.progressBarSingleImage.setVisibility(View.GONE);
+                binding.progressBarSingleImage.setVisibility(View.GONE);*/
             }
         }
     }
@@ -173,7 +209,21 @@ public class SingleImage extends AppCompatActivity {
     }
 
     void populateImageList() {
-        MyDatabase database = new MyDatabase(getApplicationContext());
+
+        new Thread(()->{
+            AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+            ImageDao imageDao=appDatabase.imageDao();
+            ArrayList<Image> imageArrayList = (ArrayList<Image>) imageDao.getImagesByDocId(DocId);
+            for (Image image:imageArrayList){
+                imagesList.add(image.getImagePath());
+            }
+
+            runOnUiThread(()->{
+                String index = "" + (imagesList.indexOf(ImagePath) + 1);
+                binding.singleImageIndexTv.setText(index);
+            });
+        }).start();
+       /* MyDatabase database = new MyDatabase(getApplicationContext());
         Cursor cc = database.LoadImagePaths(DocId);
         try {
             cc.moveToFirst();
@@ -186,7 +236,7 @@ public class SingleImage extends AppCompatActivity {
             database.close();
         }
         String index = "" + (imagesList.indexOf(ImagePath) + 1);
-        binding.singleImageIndexTv.setText(index);
+        binding.singleImageIndexTv.setText(index);*/
     }
 
     void move(int x) {
@@ -207,7 +257,7 @@ public class SingleImage extends AppCompatActivity {
     public void onBackPressed() {
         binding.progressBarSingleImage.setVisibility(View.VISIBLE);
         Intent in = new Intent(SingleImage.this, DocumentViewActivity.class);
-        in.putExtra("DocId", DocId);
+        in.putExtra(Constants.SP_DOC_ID, DocId);
         startActivity(in);
     }
 }

@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.oxodiceproductions.dockmaker.Database.Image;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class PDFMaker {
     }
 
     //native version
-    public void Save(ParcelFileDescriptor pfd, ArrayList<String> ImagePaths, ProgressBar progressBar) {
+    public void Save(ParcelFileDescriptor pfd, ArrayList<Image> ImagePaths, ProgressBar progressBar) {
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -38,7 +40,7 @@ public class PDFMaker {
 
 
     //native android method starts here
-    public String MakeTempPDF(ArrayList<String> ImagePaths,String DocName) {
+    public String MakeTempPDF(ArrayList<Image> ImagePaths, String DocName) {
 //        if (progressBar != null) {
 //            progressBar.setVisibility(View.VISIBLE);
 //        }
@@ -65,7 +67,7 @@ public class PDFMaker {
         return filepath;
     }
 
-    private void pdfCreation(ArrayList<String> ImagePaths, FileOutputStream fileOutputStream) throws Exception {
+    private void pdfCreation(ArrayList<Image> ImagePaths, FileOutputStream fileOutputStream) throws Exception {
         int pageCount = 0;
 
         //document creation
@@ -76,7 +78,7 @@ public class PDFMaker {
         for (int i = 0; i < ImagePaths.size(); i++) {
 
             //loading bitmap
-            Bitmap bitmap = BitmapFactory.decodeFile(ImagePaths.get(i));
+            Bitmap bitmap = BitmapFactory.decodeFile(ImagePaths.get(i).getImagePath());
 
             //setting page info for current page
             PdfDocument.Page page;
@@ -98,7 +100,7 @@ public class PDFMaker {
         pdfDocument.close();
     }
 
-    public void downloadPdf(ArrayList<String> ImagePaths,FileOutputStream fileOutputStream){
+    public void downloadPdf(ArrayList<Image> ImagePaths,FileOutputStream fileOutputStream){
         try {
             pdfCreation(ImagePaths,fileOutputStream);
         } catch (Exception e) {

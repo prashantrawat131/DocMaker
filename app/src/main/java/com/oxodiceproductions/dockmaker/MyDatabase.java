@@ -99,7 +99,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         InsertDocument(DocId, sampleImageId, dateCreated, timeCreated, DocName);
     }
 
-    public String getNumberOfPics(long DocId) {
+    public String getNumberOfPics(String DocId) {
 		/*It return the number of pics present in the document.
 		It uses another function to get the imagePaths for a particular document.
 		 */
@@ -108,7 +108,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         return cc.getCount() + "";
     }
 
-    public String getSize(long DocId) {
+    public String getSize(String DocId) {
         /* It is used to get the size of the document by
          * adding size of all the images*/
         Cursor cc = LoadImagePaths(DocId);
@@ -134,7 +134,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("create table if not exists '" + DocId + "'(ImagePath varchar)");
     }
 
-    public void InsertImage(long DocId, String ImagePath) {
+    public void InsertImage(String DocId, String ImagePath) {
         /* It is used to store the image paths in the unique table
          * created for each document*/
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -144,7 +144,7 @@ public class MyDatabase extends SQLiteOpenHelper {
     }
 
 
-    public Cursor LoadImagePaths(long DocId) {
+    public Cursor LoadImagePaths(String DocId) {
         /* It returns a cursor document containing all the image paths of a particular document*/
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         return sqLiteDatabase.rawQuery("select * from '" + DocId + "'", null);
@@ -166,7 +166,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("delete from '" + DocId + "' where ImagePath = '" + ImagePath + "'");
     }
 
-    public void DeleteTable(long DocId) {
+    public void DeleteTable(String DocId) {
         /*To completely delete the document*/
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try{

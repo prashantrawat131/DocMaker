@@ -35,5 +35,8 @@ public interface ImageDao {
     void update(Image image);
 
     @Query("select * from Image where id=:id and imageIndex=:imageIndex")
-    Image getImageByIndex(long id,int imageIndex);
+    Image getImageByIndex(long id, int imageIndex);
+
+    @Query("select * from Image where id=:id and imagePath=:imagePath")
+    Image getImageByImagePath(long id, String imagePath);
 }

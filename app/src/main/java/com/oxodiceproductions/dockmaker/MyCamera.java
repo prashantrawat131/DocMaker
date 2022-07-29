@@ -22,6 +22,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.oxodiceproductions.dockmaker.Database.AppDatabase;
+import com.oxodiceproductions.dockmaker.Database.Image;
+import com.oxodiceproductions.dockmaker.Database.ImageDao;
 import com.oxodiceproductions.dockmaker.databinding.ActivityMyCameraBinding;
 
 import java.io.File;
@@ -37,7 +40,7 @@ public class MyCamera extends AppCompatActivity {
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     ImageCapture imageCapture;
     Executor executor;
-    long DocId = "-2";
+    long DocId = -2;
     Camera camera;
     SharedPreferences settingsSharedPreferences, sharedPreferences;
     String ImagePath = "-1", retakeImagePath = "-1";
@@ -64,7 +67,7 @@ public class MyCamera extends AppCompatActivity {
         try {
             //taking DocId
             //also taking ImagePath in case of retake image
-            DocId = getIntent().getExtras().getString("DocId", "-1");
+            DocId = getIntent().getExtras().getLong("DocId", -1);
             ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
             retakeImagePath = ImagePath;
         } catch (Exception ignored) {
@@ -211,15 +214,37 @@ public class MyCamera extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==cameraImageEditingId&&resultCode==RESULT_OK){
             String newImagePath=data.getExtras().getString("ImagePath");
-            MyDatabase myDatabase=new MyDatabase(getApplicationContext());
+            new Thread(()->{
+                AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
+                ImageDao imageDao=appDatabase.imageDao();
+
+                if(retakeImagePath.equals("-1")){
+                    int index=imageDao.getImagesByDocId(DocId).size();
+                    Image newImage=new Image(newImagePath,index,DocId);
+                    imageDao.insert(newImage);
+//                    myDatabase.InsertImage(DocId,newImagePath);
+                }
+                else{
+                    Image image=imageDao.getImageByImagePath(DocId,retakeImagePath);
+                    image.setImagePath(newImagePath);
+                    imageDao.update(image);
+                    CommonOperations.deleteFile(retakeImagePath);
+//                    myDatabase.retake(DocId,retakeImagePath,newImagePath);
+                }
+
+                runOnUiThread(()->{
+                    GoToDocumentView();
+                });
+            }).start();
+
+           /* MyDatabase myDatabase=new MyDatabase(getApplicationContext());
             if(retakeImagePath.equals("-1")){
                 myDatabase.InsertImage(DocId,newImagePath);
             }
             else{
                 myDatabase.retake(DocId,retakeImagePath,newImagePath);
             }
-            myDatabase.close();
-            GoToDocumentView();
+            myDatabase.close();*/
         }
     }
 
