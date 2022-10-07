@@ -4,7 +4,6 @@ import static androidx.core.content.FileProvider.getUriForFile;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -136,7 +135,7 @@ public class SingleImage extends AppCompatActivity {
 
         binding.retakeSingleImage.setOnClickListener(view -> {
             binding.progressBarSingleImage.setVisibility(View.VISIBLE);
-            Intent in = new Intent(SingleImage.this, MyCamera.class);
+            Intent in = new Intent(SingleImage.this, CameraActivity.class);
             in.putExtra(Constants.SP_DOC_ID, DocId);
             in.putExtra("ImagePath", ImagePath);
             startActivity(in);

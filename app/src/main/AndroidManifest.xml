@@ -18,11 +18,11 @@
         <activity
             android:name=".EditingImageActivity"
             android:exported="false" />
-        <activity android:name=".MySettings" />
+        <activity android:name=".Settings" />
         <activity android:name=".AllDocs" />
         <activity android:name=".SingleImage" />
         <activity android:name=".DocumentViewActivity" />
-        <activity android:name=".MyCamera" />
+        <activity android:name=".CameraActivity" />
         <activity android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

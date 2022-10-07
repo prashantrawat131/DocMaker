@@ -5,13 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.edmodo.cropper.CropImageView;
 import com.oxodiceproductions.dockmaker.databinding.ActivityEditingImageBinding;
 
 import java.io.ByteArrayOutputStream;
@@ -28,7 +24,7 @@ public class EditingImageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivityEditingImageBinding.inflate(getLayoutInflater());
+        binding = ActivityEditingImageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
 //        IdProvider();
@@ -37,11 +33,11 @@ public class EditingImageActivity extends AppCompatActivity {
 
         binding.progressBarEditImage.setVisibility(View.GONE);
 
-        binding.backButtonEditImage.setOnClickListener(view->{
+        binding.backButtonEditImage.setOnClickListener(view -> {
             onBackPressed();
         });
 
-        binding.rotateButtonEditImage.setOnClickListener(view->{
+        binding.rotateButtonEditImage.setOnClickListener(view -> {
             binding.cropImageView.rotateImage(90);
         });
 
@@ -67,9 +63,9 @@ public class EditingImageActivity extends AppCompatActivity {
                 fileOutputStream.close();
 
                 //sending the path of the cropped image
-                Intent replyIntent=new Intent();
-                replyIntent.putExtra("ImagePath",ImagePath);
-                setResult(RESULT_OK,replyIntent);
+                Intent replyIntent = new Intent();
+                replyIntent.putExtra("ImagePath", ImagePath);
+                setResult(RESULT_OK, replyIntent);
                 finish();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -79,7 +75,7 @@ public class EditingImageActivity extends AppCompatActivity {
     }
 
 
-    private void InitialWork(){
+    private void InitialWork() {
         ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
 
         bitmap = BitmapFactory.decodeFile(ImagePath);

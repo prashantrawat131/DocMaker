@@ -74,7 +74,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
         binding.toolBarAllDocs.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_settings) {
-                startActivity(new Intent(AllDocs.this, MySettings.class));
+                startActivity(new Intent(AllDocs.this, Settings.class));
             }
             if (item.getItemId() == R.id.action_share_app) {
                 shareApp();
@@ -227,9 +227,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
     }
 
     public void Initializer() {
-        /* This function fill the arrayList which documents to show in the listView.
-         * Here the database is used to fetch all the documents.
-         * ListView adapter is used to insert documents in the listView*/
         binding.progressBarAllDocs.setVisibility(View.VISIBLE);
         binding.addDocButton.setVisibility(View.VISIBLE);
         arrayList.clear();
@@ -238,6 +235,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
             DocumentDao documentDao = appDatabase.documentDao();
             ImageDao imageDao = appDatabase.imageDao();
+
             ArrayList<Document> documents = (ArrayList<Document>) documentDao.getAll();
             if (documents == null) {
                 CommonOperations.log("There are no documents");
@@ -248,10 +246,13 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 try {
                     long DocId = document.getId();
                     String DocName = document.getName();
-                    ArrayList<Image> images = (ArrayList<Image>) imageDao.getImagesByDocId(document.getId());
+
+                    ArrayList<Image> images = (ArrayList<Image>) imageDao.getImagesByDocId(DocId);
                     String sampleImageId = "";
+                    String numberOfImages = "0";
                     if (images != null) {
                         if (images.size() > 0) {
+                            numberOfImages = images.size() + "";
                             sampleImageId = images.get(0).getImagePath();
                         }
                     }
@@ -262,30 +263,20 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                     SimpleDateFormat dateSdf = new SimpleDateFormat("dd/MM/yyyy");
                     SimpleDateFormat timeSdf = new SimpleDateFormat("hh:mm");
 
-                    String dateCreated = dateSdf.format(calendar.getTime()).toString();
-                    String timeCreated = timeSdf.format(calendar.getTime()).toString();
-
-                    String numberOfImages = "0";
-                    if (images != null) {
-                        numberOfImages = images.size() + "";
-                        CommonOperations.log("Number of images: " + images.size());
-                    }
-
-                    arrayList.add(
-                            new DocumentDataModel(
-                                    false, DocId, sampleImageId
-                                    , dateCreated, timeCreated, DocName, "",
-                                    numberOfImages));
+                    String dateCreated = dateSdf.format(calendar.getTime());
+                    String timeCreated = timeSdf.format(calendar.getTime());
 
 
+                    arrayList.add(new DocumentDataModel(
+                            false, DocId, sampleImageId
+                            , dateCreated, timeCreated, DocName, "",
+                            numberOfImages));
                 } catch (Exception e) {
                     CommonOperations.logError("Single document reading error: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
-           /* for (DocumentDataModel model : arrayList) {
-                CommonOperations.log(model.getDocName() + " " + model.getDocId() + " ");
-            }*/
+
 //            Collections.sort(arrayList);
             runOnUiThread(() -> {
                 try {
@@ -304,8 +295,6 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 binding.progressBarAllDocs.setVisibility(View.GONE);
             });
         }).start();
-
-
     }
 
     /*public void Initializer() {
@@ -385,7 +374,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         } else if (id == R.id.nav_about_app) {
 //            GoToAboutApp();
         } else if (id == R.id.nav_setting) {
-            startActivity(new Intent(AllDocs.this, MySettings.class));
+            startActivity(new Intent(AllDocs.this, Settings.class));
         }
         return true;
     }
@@ -460,7 +449,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         }
 
         private void ShowDocDetails(DocumentDataModel doc) {
-            MyAlertCreator myAlertCreator = new MyAlertCreator();
+            AlertCreator alertCreator = new AlertCreator();
             //size calculations
 //            float size = Float.parseFloat(doc.getSize());
 //            size = size / (1048576f);//1024 * 1024 = 1048576
@@ -472,7 +461,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                             doc.getDateCreated(),
                             doc.getTimeCreated(),
                             doc.getNumberOfPics());
-            myAlertCreator.showDialog(AllDocs.this, text);
+            alertCreator.showDialog(AllDocs.this, text);
         }
 
         @Override

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
-public class MyAlertCreator {
+public class AlertCreator {
 
 //    Todo:Change the name of this class to dialogCreator
 

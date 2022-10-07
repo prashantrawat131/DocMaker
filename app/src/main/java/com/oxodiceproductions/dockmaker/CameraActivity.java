@@ -36,7 +36,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 
-public class MyCamera extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity {
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     ImageCapture imageCapture;
     Executor executor;
@@ -188,7 +188,7 @@ public class MyCamera extends AppCompatActivity {
 
     void GoToCompress() {
         //Image compression
-        MyImageCompressor imageCompressor = new MyImageCompressor(getApplicationContext());
+        ImageCompressor imageCompressor = new ImageCompressor(getApplicationContext());
         String finalFilePath = imageCompressor.compress(capturedImage);
 
         //deleting old image
@@ -200,7 +200,7 @@ public class MyCamera extends AppCompatActivity {
     }
 
     private void GoToCrop() {
-        Intent in = new Intent(MyCamera.this, EditingImageActivity.class);
+        Intent in = new Intent(CameraActivity.this, EditingImageActivity.class);
 //        Log.d(TAG, "GoToCrop: "+new File(ImagePath).length());
         in.putExtra("ImagePath", ImagePath);
 //        in.putExtra("DocId", DocId);
@@ -249,7 +249,7 @@ public class MyCamera extends AppCompatActivity {
     }
 
     private void GoToDocumentView() {
-        Intent in = new Intent(MyCamera.this, DocumentViewActivity.class);
+        Intent in = new Intent(CameraActivity.this, DocumentViewActivity.class);
         in.putExtra("DocId", DocId);
         startActivity(in);
         finish();
@@ -258,7 +258,7 @@ public class MyCamera extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent in = new Intent(MyCamera.this, DocumentViewActivity.class);
+        Intent in = new Intent(CameraActivity.this, DocumentViewActivity.class);
         in.putExtra("DocId", DocId);
         startActivity(in);
         finish();

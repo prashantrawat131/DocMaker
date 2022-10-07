@@ -13,13 +13,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-public class MyImageCompressor {
+public class ImageCompressor {
 
     Context context;
     //offset is a variable for unique name every time
     private static int offset = 0;
 
-    public MyImageCompressor(Context context) {
+    public ImageCompressor(Context context) {
         this.context = context;
     }
 

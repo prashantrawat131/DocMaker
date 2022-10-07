@@ -77,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
             DocumentDao documentDao = appDatabase.documentDao();
             ImageDao imageDao = appDatabase.imageDao();
             Cursor docCursor = myDatabase.LoadDocuments();
-            appDatabase.documentDao().deleteAll();
-            appDatabase.imageDao().deleteAll();
+//            appDatabase.documentDao().deleteAll();
+//            appDatabase.imageDao().deleteAll();
             if (documentDao.getAll() == null || documentDao.getAll().size() == 0) {
                 try {
                     docCursor.moveToFirst();

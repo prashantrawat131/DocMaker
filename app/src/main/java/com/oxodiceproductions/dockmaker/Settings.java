@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.oxodiceproductions.dockmaker.databinding.ActivityMySettingsBinding;
 
-public class MySettings extends AppCompatActivity {
+public class Settings extends AppCompatActivity {
 
     int pdf_image_quality;
     SharedPreferences sharedPreferences;
@@ -75,7 +75,7 @@ public class MySettings extends AppCompatActivity {
     }
 
     void GoToAllDocs() {
-        Intent in = new Intent(MySettings.this, AllDocs.class);
+        Intent in = new Intent(Settings.this, AllDocs.class);
         startActivity(in);
         finish();
     }
