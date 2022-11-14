@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -395,8 +396,31 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
         public void onBindViewHolder(@NonNull AllDocsRecyclerViewAdapter.MyDocViewHolder holder, int position) {
 //            holder.binding.toolBarAllDocs.setTitle(arrayList.get(position).getDocName());
             holder.docNameTv.setText(arrayList.get(position).getDocName());
-            holder.time_created_tv.setText(getApplicationContext().getString(R.string.time, arrayList.get(position).getTimeCreated()));
-            holder.date_created_tv.setText(getApplicationContext().getString(R.string.date, arrayList.get(position).getDateCreated()));
+
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+                SimpleDateFormat parser = new SimpleDateFormat("dd/MM/yyyy");
+                Date parsedDate = parser.parse(arrayList.get(position).getDateCreated());
+                String dateStr = sdf.format(parsedDate);
+                holder.date_created_tv.setText(dateStr);
+            } catch (Exception e) {
+                CommonOperations.log("Error: " + e.getMessage());
+                String dateStr = "Date: " + arrayList.get(position).getDateCreated();
+                holder.date_created_tv.setText(dateStr);
+            }
+
+            try{
+//                Todo:Change "hh:mm" to "hh:mm a" after some time
+                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
+                SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
+                Date parsedTime = parser.parse(arrayList.get(position).getTimeCreated());
+                String timeStr = sdf.format(parsedTime);
+                holder.time_created_tv.setText(timeStr);
+            }catch (Exception e){
+                String timeStr = "Time: " + arrayList.get(position).getTimeCreated();
+                holder.time_created_tv.setText(timeStr);
+            }
+//            holder.date_created_tv.setText(getApplicationContext().getString(R.string.date, arrayList.get(position).getDateCreated()));
             holder.number_of_pics_tv.setText(getApplicationContext().getString(R.string.pics, arrayList.get(position).getNumberOfPics()));
             holder.indexNumberTextView.setText("" + (position + 1));
 

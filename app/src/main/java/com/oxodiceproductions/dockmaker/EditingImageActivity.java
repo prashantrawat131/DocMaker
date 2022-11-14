@@ -83,15 +83,7 @@ public class EditingImageActivity extends AppCompatActivity {
         binding.cropImageView.setImageBitmap(bitmap);
     }
 
-   /* private void IdProvider(){
-        flipButton = findViewById(R.id.flip_button_edit_image);
-        backButton = findViewById(R.id.back_button_edit_image);
-        cropImageView = findViewById(R.id.crop_imageView);
-        progressBar = findViewById(R.id.progress_bar_edit_image);
-        bnwButton = findViewById(R.id.bnwButton);
-        rotateImageButton=findViewById(R.id.rotate_button_edit_image);
-        cropButton=findViewById(R.id.crop_button_edit_image);
-    }*/
+
 
     private void Exit() {
         binding.progressBarEditImage.setVisibility(View.VISIBLE);

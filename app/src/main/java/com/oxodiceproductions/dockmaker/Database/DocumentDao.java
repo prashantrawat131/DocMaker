@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public interface DocumentDao {
-    @Query("select * from Document")
+    @Query("select * from Document order by time DESC")
     List<Document> getAll();
 
     @Insert

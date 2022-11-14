@@ -13,7 +13,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
@@ -38,7 +41,7 @@ public class SingleImage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivitySingleImageBinding.inflate(getLayoutInflater());
+        binding = ActivitySingleImageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         sharedPreferences = getSharedPreferences("DocMaker", MODE_PRIVATE);
         ImagePath = getIntent().getExtras().getString("ImagePath", "-1");
@@ -85,9 +88,9 @@ public class SingleImage extends AppCompatActivity {
             alertDialog.show();
 
             ok_button.setOnClickListener(view12 -> {
-                new Thread(()->{
-                    AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
-                    ImageDao imageDao=appDatabase.imageDao();
+                new Thread(() -> {
+                    AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+                    ImageDao imageDao = appDatabase.imageDao();
                     imageDao.deleteImageByPath(ImagePath);
 
                     CommonOperations.deleteFile(ImagePath);
@@ -128,9 +131,12 @@ public class SingleImage extends AppCompatActivity {
             binding.progressBarSingleImage.setVisibility(View.VISIBLE);
             Intent in = new Intent(SingleImage.this, EditingImageActivity.class);
             in.putExtra("ImagePath", ImagePath);
+            editImageActivityLauncher.launch(in);
+            /*Intent in = new Intent(SingleImage.this, EditingImageActivity.class);
+            in.putExtra("ImagePath", ImagePath);
 //            in.putExtra("DocId", DocId);
 //            in.putExtra("retakeImagePath", ImagePath);
-            startActivityForResult(in, editingSingleImageId);
+            startActivityForResult(in, editingSingleImageId);*/
         });
 
         binding.retakeSingleImage.setOnClickListener(view -> {
@@ -151,23 +157,69 @@ public class SingleImage extends AppCompatActivity {
         });
     }
 
-    @Override
+
+    ActivityResultLauncher<Intent> editImageActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+//                    CommonOperations.log("Arriving after result");
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data == null) {
+                            CommonOperations.log("Data is null");
+                            return;
+                        }
+//                        assert data != null;
+                        String receivedImagePath = data.getExtras().getString("ImagePath");
+
+                        CommonOperations.log("Received image path: " + receivedImagePath);
+
+                        new Thread(() -> {
+                            try {
+                                AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+                                ImageDao imageDao = appDatabase.imageDao();
+
+                                Image image = imageDao.getImageByImagePath(DocId, ImagePath);
+                                image.setImagePath(receivedImagePath);
+
+                                imageDao.update(image);
+
+                                //setting the new image
+                                imagesList.set(imagesList.indexOf(ImagePath), receivedImagePath);
+                                ImagePath = receivedImagePath;
+                                runOnUiThread(() -> {
+                                    binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
+                                    binding.progressBarSingleImage.setVisibility(View.GONE);
+                                });
+                            } catch (Exception e) {
+                                CommonOperations.log("Error while updating the image path for edited image: " + e.getMessage());
+                            }
+                        }).start();
+
+                    }
+                }
+            }
+    );
+
+
+/*    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == editingSingleImageId) {
             if (resultCode == RESULT_OK) {
 
-                new Thread(()->{
-                    AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
-                    ImageDao imageDao=appDatabase.imageDao();
+                new Thread(() -> {
+                    AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+                    ImageDao imageDao = appDatabase.imageDao();
 
                     String newImagePath = data.getExtras().getString("ImagePath");
-                    Image image=imageDao.getImageByImagePath(DocId,ImagePath);
+                    Image image = imageDao.getImageByImagePath(DocId, ImagePath);
                     image.setImagePath(newImagePath);
 
                     imageDao.update(image);
 
-                    runOnUiThread(()->{
+                    runOnUiThread(() -> {
                         //setting the new image
                         ImagePath = newImagePath;
                         binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
@@ -175,7 +227,7 @@ public class SingleImage extends AppCompatActivity {
                     });
                 }).start();
 
-                /*
+                *//*
                 String newImagePath = data.getExtras().getString("ImagePath");
                 MyDatabase myDatabase = new MyDatabase(getApplicationContext());
                 myDatabase.retake(DocId, ImagePath, newImagePath);
@@ -184,10 +236,10 @@ public class SingleImage extends AppCompatActivity {
                 //setting the new image
                 ImagePath = newImagePath;
                 binding.imageSingleImage.setImageURI(Uri.fromFile(new File(ImagePath)));
-                binding.progressBarSingleImage.setVisibility(View.GONE);*/
+                binding.progressBarSingleImage.setVisibility(View.GONE);*//*
             }
         }
-    }
+    }*/
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -209,15 +261,15 @@ public class SingleImage extends AppCompatActivity {
 
     void populateImageList() {
 
-        new Thread(()->{
-            AppDatabase appDatabase=AppDatabase.getInstance(getApplicationContext());
-            ImageDao imageDao=appDatabase.imageDao();
+        new Thread(() -> {
+            AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+            ImageDao imageDao = appDatabase.imageDao();
             ArrayList<Image> imageArrayList = (ArrayList<Image>) imageDao.getImagesByDocId(DocId);
-            for (Image image:imageArrayList){
+            for (Image image : imageArrayList) {
                 imagesList.add(image.getImagePath());
             }
 
-            runOnUiThread(()->{
+            runOnUiThread(() -> {
                 String index = "" + (imagesList.indexOf(ImagePath) + 1);
                 binding.singleImageIndexTv.setText(index);
             });

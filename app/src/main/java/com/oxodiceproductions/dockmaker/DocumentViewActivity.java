@@ -43,13 +43,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 public class DocumentViewActivity extends AppCompatActivity {
     ArrayList<Image> imagesArrayList = new ArrayList<>();
     ArrayList<Boolean> ImagePathsChecker = new ArrayList<>();
+
+    int numberOfCheckedImages = 0;
 
     long DocId;
     String DocName;
@@ -198,6 +199,9 @@ public class DocumentViewActivity extends AppCompatActivity {
                 }
 
                 refreshRecyclerView();
+
+                numberOfCheckedImages=0;
+                updateScene();
 
                 alertDialog.dismiss();
             });
@@ -491,7 +495,6 @@ public class DocumentViewActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -518,8 +521,27 @@ public class DocumentViewActivity extends AppCompatActivity {
         binding.deleteSelectedImagesButton.setVisibility(View.GONE);
     }
 
+    void updateScene() {
+        /*this function looks up whether any image is numberOfCheckedImages
+		or not then it will perform the respective tasks
+		*/
+        if (numberOfCheckedImages == 0) {
+            binding.deleteSelectedImagesButton.setVisibility(View.GONE);
+            binding.clickNewImageButtonDocView.setVisibility(View.VISIBLE);
+            binding.docViewOptionsLayout.setVisibility(View.VISIBLE);
+            binding.gallerySelect.setVisibility(View.VISIBLE);
+        } else {
+            binding.docViewOptionsLayout.setVisibility(View.GONE);
+            binding.deleteSelectedImagesButton.setVisibility(View.VISIBLE);
+            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotation_left_right_repeat);
+            binding.deleteSelectedImagesButton.startAnimation(animation);
+            binding.clickNewImageButtonDocView.setVisibility(View.GONE);
+            binding.gallerySelect.setVisibility(View.GONE);
+        }
+    }
+
+
     public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecyclerViewAdapter.MyDocViewHolder> {
-        int numberOfCheckedImages = 0;
 
         @NonNull
         @Override
@@ -633,49 +655,31 @@ public class DocumentViewActivity extends AppCompatActivity {
                 imageDao.update(image1);
                 imageDao.update(image2);
             }).start();*/
-
+/*
             Collections.swap(imagesArrayList, p1, p2);
             Collections.swap(ImagePathsChecker, p1, p2);
 
             runOnUiThread(() -> {
                 this.notifyDataSetChanged();
-            });
+            });*/
         }
 
         void selectImage(int i) {
             numberOfCheckedImages++;
             ImagePathsChecker.set(i, true);
-            lookUp();
+            updateScene();
         }
 
         void deselectImage(int i) {
             numberOfCheckedImages--;
             ImagePathsChecker.set(i, false);
-            lookUp();
+            updateScene();
         }
 
-        void lookUp() {
-        /*this function looks up whether any image is numberOfCheckedImages
-		or not then it will perform the respective tasks
-		*/
-            if (numberOfCheckedImages == 0) {
-                binding.deleteSelectedImagesButton.setVisibility(View.GONE);
-                binding.clickNewImageButtonDocView.setVisibility(View.VISIBLE);
-                binding.docViewOptionsLayout.setVisibility(View.VISIBLE);
-                binding.gallerySelect.setVisibility(View.VISIBLE);
-            } else {
-                binding.docViewOptionsLayout.setVisibility(View.GONE);
-                binding.deleteSelectedImagesButton.setVisibility(View.VISIBLE);
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotation_left_right_repeat);
-                binding.deleteSelectedImagesButton.startAnimation(animation);
-                binding.clickNewImageButtonDocView.setVisibility(View.GONE);
-                binding.gallerySelect.setVisibility(View.GONE);
-            }
-        }
 
         void upDownButtonControls(int i, ImageButton upButton, ImageButton downButton) {
 
-            //removes up button from first image
+           /* //removes up button from first image
             if (i == 0) {
                 upButton.setVisibility(View.GONE);
                 downButton.setVisibility(View.VISIBLE);
@@ -693,7 +697,7 @@ public class DocumentViewActivity extends AppCompatActivity {
             downButton.setOnClickListener(view23 -> Swap(index, index + 1));
 
             upButton.setFocusable(false);//for clicking the recyclerView item
-            downButton.setFocusable(false);//for clicking the recyclerView item
+            downButton.setFocusable(false);//for clicking the recyclerView item*/
         }
 
         void GoToSingleImage(int single_image_position) {

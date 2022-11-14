@@ -7,7 +7,7 @@ android {
         applicationId "com.oxodiceproductions.docmaker"
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 36
+        versionCode 37
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
