@@ -15,14 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -409,19 +408,19 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 holder.date_created_tv.setText(dateStr);
             }
 
-            try{
+            try {
 //                Todo:Change "hh:mm" to "hh:mm a" after some time
                 SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
                 SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
                 Date parsedTime = parser.parse(arrayList.get(position).getTimeCreated());
                 String timeStr = sdf.format(parsedTime);
                 holder.time_created_tv.setText(timeStr);
-            }catch (Exception e){
+            } catch (Exception e) {
                 String timeStr = "Time: " + arrayList.get(position).getTimeCreated();
                 holder.time_created_tv.setText(timeStr);
             }
 //            holder.date_created_tv.setText(getApplicationContext().getString(R.string.date, arrayList.get(position).getDateCreated()));
-            holder.number_of_pics_tv.setText(getApplicationContext().getString(R.string.pics, arrayList.get(position).getNumberOfPics()));
+            holder.number_of_pics_tv.setText(arrayList.get(position).getNumberOfPics());
             holder.indexNumberTextView.setText("" + (position + 1));
 
             //thumbnail extraction
@@ -442,7 +441,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
 
             //click listeners
-            holder.optionsButton.setOnClickListener(v -> {
+           /* holder.optionsButton.setOnClickListener(v -> {
                 int visibility = holder.optionsLayout.getVisibility();
                 ImageButton currentOptionsButton = (ImageButton) v.findViewById(R.id.doc_options_button);
                 if (visibility == View.GONE) {
@@ -451,9 +450,9 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                     holder.optionsLayout.setVisibility(View.GONE);
                 }
                 currentOptionsButton.setRotation(currentOptionsButton.getRotation() + 180);
-            });
+            });*/
 
-            holder.shareButton.setOnClickListener(v -> {
+         /*   holder.shareButton.setOnClickListener(v -> {
                 long DocId = arrayList.get(holder.getAdapterPosition()).getDocId();
                 SharePdfButtonListener(DocId);
             });
@@ -466,7 +465,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             });
 
             holder.detailsButton.setOnClickListener(v -> ShowDocDetails(arrayList.get(position)));
-
+*/
             holder.clickLayout.setOnClickListener(view -> {
                 GotoDocumentView(position);
             });
@@ -553,8 +552,9 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
             TextView date_created_tv, time_created_tv, number_of_pics_tv, docNameTv;
             ImageView sample_image;
             TextView indexNumberTextView;
-            ImageButton optionsButton, deleteButton, shareButton, detailsButton;
-            LinearLayout optionsLayout, clickLayout;
+            //            ImageButton optionsButton, deleteButton, shareButton, detailsButton;
+//            LinearLayout optionsLayout;
+            CardView clickLayout;
 
             public MyDocViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -563,12 +563,12 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 sample_image = itemView.findViewById(R.id.doc_imageview);
                 number_of_pics_tv = itemView.findViewById(R.id.textView5);
                 docNameTv = itemView.findViewById(R.id.doc_name_tv);
-                optionsButton = itemView.findViewById(R.id.doc_options_button);
+//                optionsButton = itemView.findViewById(R.id.doc_options_button);
                 indexNumberTextView = itemView.findViewById(R.id.index_number_text_view);
-                deleteButton = itemView.findViewById(R.id.doc_rep_delete);
-                shareButton = itemView.findViewById(R.id.doc_rep_share);
-                detailsButton = itemView.findViewById(R.id.doc_rep_details);
-                optionsLayout = itemView.findViewById(R.id.doc_rep_options_layout);
+//                deleteButton = itemView.findViewById(R.id.doc_rep_delete);
+//                shareButton = itemView.findViewById(R.id.doc_rep_share);
+//                detailsButton = itemView.findViewById(R.id.doc_rep_details);
+//                optionsLayout = itemView.findViewById(R.id.doc_rep_options_layout);
                 clickLayout = itemView.findViewById(R.id.doc_rep_click_layout);
 //                itemView.setOnClickListener(this);
             }

@@ -200,7 +200,7 @@ public class DocumentViewActivity extends AppCompatActivity {
 
                 refreshRecyclerView();
 
-                numberOfCheckedImages=0;
+                numberOfCheckedImages = 0;
                 updateScene();
 
                 alertDialog.dismiss();
@@ -559,8 +559,8 @@ public class DocumentViewActivity extends AppCompatActivity {
 
             DocumentViewActivity.emptyAvailable = (size == 0.0f);
 
-            String sizeString = "Size:\n" + String.format(Locale.getDefault(), "%.2f MB", size);
-            holder.sizeTextView.setText(sizeString);
+//            String sizeString = "Size:\n" + String.format(Locale.getDefault(), "%.2f MB", size);
+//            holder.sizeTextView.setText(sizeString);
 
             RequestOptions options = new RequestOptions().sizeMultiplier(0.5f);
             options = options.centerCrop();
@@ -568,9 +568,9 @@ public class DocumentViewActivity extends AppCompatActivity {
                     .load(imageFile)
                     .placeholder(R.drawable.image_placeholder).into(holder.imageView);
 
-            holder.checkBox.setChecked(ImagePathsChecker.get(position));
+//            holder.checkBox.setChecked(ImagePathsChecker.get(position));
 
-            holder.checkBox.setOnClickListener(view2 -> {
+          /*  holder.checkBox.setOnClickListener(view2 -> {
                 CheckBox checkBox = view2.findViewById(R.id.single_image_checkbox);
                 if (checkBox.isChecked()) {
                     //this means after user clicked the checkbox become checked
@@ -580,8 +580,8 @@ public class DocumentViewActivity extends AppCompatActivity {
                     deselectImage(position);
                 }
             });
-
-            upDownButtonControls(position, holder.upButton, holder.downButton);
+*/
+//            upDownButtonControls(position, holder.upButton, holder.downButton);
 
         }
 
@@ -592,18 +592,19 @@ public class DocumentViewActivity extends AppCompatActivity {
 
         class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             ImageView imageView;
-            CheckBox checkBox;
-            TextView sizeTextView, positionTextView;
-            ImageButton upButton, downButton;
+//            CheckBox checkBox;
+//            TextView sizeTextView;
+            TextView positionTextView;
+//            ImageButton upButton, downButton;
 
             public MyDocViewHolder(@NonNull View itemView) {
                 super(itemView);
                 imageView = itemView.findViewById(R.id.imageView3);
-                checkBox = itemView.findViewById(R.id.single_image_checkbox);
-                sizeTextView = itemView.findViewById(R.id.textView6);
+//                checkBox = itemView.findViewById(R.id.single_image_checkbox);
+//                sizeTextView = itemView.findViewById(R.id.textView6);
                 positionTextView = itemView.findViewById(R.id.positionTextView);
-                upButton = itemView.findViewById(R.id.up_button);
-                downButton = itemView.findViewById(R.id.down_button);
+//                upButton = itemView.findViewById(R.id.up_button);
+//                downButton = itemView.findViewById(R.id.down_button);
                 itemView.setOnClickListener(this);
             }
 
@@ -618,7 +619,7 @@ public class DocumentViewActivity extends AppCompatActivity {
                     //this means no image is numberOfCheckedImages and the user wants to preview the image
                     GoToSingleImage(position);
                 } else {
-                    CheckBox checkBox = v.findViewById(R.id.single_image_checkbox);
+                    /*CheckBox checkBox = v.findViewById(R.id.single_image_checkbox);
                     if (checkBox.isChecked()) {
                         //this means the user wants to remove the selection
                         checkBox.setChecked(false);
@@ -627,7 +628,7 @@ public class DocumentViewActivity extends AppCompatActivity {
                         //this means the user wants to select the image
                         checkBox.setChecked(true);
                         selectImage(position);
-                    }
+                    }*/
                 }
             }
         }

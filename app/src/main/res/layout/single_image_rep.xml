@@ -1,106 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:id="@+id/simple_image_cardView"
-    android:background="@color/extra_light">
+    android:layout_width="300dp"
+    android:layout_height="400dp"
+    android:layout_marginTop="10dp"
+    android:layout_gravity="center_horizontal"
+    android:padding="10dp"
+    android:background="#cccccc">
 
-    <LinearLayout
 
-        android:background="@color/extra_light"
-        android:id="@+id/linearLayoutSimpleImage"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/positionTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:layout_gravity="center"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="5"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/image_rep_card_view"
-            android:layout_width="70dp"
-            android:background="@color/extra_light"
-            android:layout_height="140dp"
-            android:layout_weight="1"
-            app:cardCornerRadius="10dp">
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageView3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/app_bg"
+        android:scaleType="centerCrop"
+        app:srcCompat="@android:drawable/ic_menu_gallery" />
 
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@color/app_bg"
-                android:scaleType="centerCrop"
-                app:srcCompat="@android:drawable/ic_menu_gallery" />
-        </androidx.cardview.widget.CardView>
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/linearLayoutSimpleImage"-->
+    <!--        android:layout_width="100dp"-->
+    <!--        android:layout_height="300dp"-->
+    <!--        android:background="@color/extra_light"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        android:padding="10dp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent">-->
 
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:visibility="gone"
-            android:gravity="center_vertical|center_horizontal"
-            android:padding="10dp"
-            android:text="Size :\n2.2 Mb"
-            android:textColor="@color/black" />
+    <!--        <androidx.cardview.widget.CardView-->
+    <!--            android:id="@+id/image_rep_card_view"-->
+    <!--            android:layout_width="70dp"-->
+    <!--            android:layout_height="140dp"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:background="@color/extra_light"-->
+    <!--            app:cardCornerRadius="10dp">-->
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:background="@color/extra_light"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+    <!--          -->
+    <!--        </androidx.cardview.widget.CardView>-->
 
-            <ImageButton
-                android:id="@+id/up_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:visibility="gone"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:backgroundTint="@color/app_bg"
-                android:focusable="false"
-                android:src="@drawable/triangle" />
+    <!--        <TextView-->
+    <!--            android:id="@+id/textView6"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_margin="10dp"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:gravity="center_vertical|center_horizontal"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:text="Size :\n2.2 Mb"-->
+    <!--            android:textColor="@color/black"-->
+    <!--            android:visibility="gone" />-->
 
-            <TextView
-                android:id="@+id/positionTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center_horizontal|center_vertical"
-                android:text="5"
-                android:textSize="20sp"
-                android:textColor="@color/black" />
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_margin="10dp"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:background="@color/extra_light"-->
+    <!--            android:gravity="center_vertical"-->
+    <!--            android:orientation="vertical"-->
+    <!--            android:visibility="gone">-->
 
-            <ImageButton
-                android:id="@+id/down_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:visibility="gone"
-                android:backgroundTint="@color/app_bg"
-                android:focusable="false"
-                android:rotation="180"
-                android:src="@drawable/triangle" />
+    <!--            <ImageButton-->
+    <!--                android:id="@+id/up_button"-->
+    <!--                android:layout_width="50dp"-->
+    <!--                android:layout_height="50dp"-->
+    <!--                android:layout_gravity="center"-->
+    <!--                android:backgroundTint="@color/app_bg"-->
+    <!--                android:focusable="false"-->
+    <!--                android:scaleType="fitCenter"-->
+    <!--                android:src="@drawable/triangle"-->
+    <!--                android:visibility="gone" />-->
 
-        </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/single_image_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|center"
-            android:layout_marginEnd="10dp"
-            android:buttonTint="@color/black"
-            android:focusable="false" />
-    </LinearLayout>
+    <!--            <ImageButton-->
+    <!--                android:id="@+id/down_button"-->
+    <!--                android:layout_width="50dp"-->
+    <!--                android:layout_height="50dp"-->
+    <!--                android:layout_gravity="center"-->
+    <!--                android:backgroundTint="@color/app_bg"-->
+    <!--                android:focusable="false"-->
+    <!--                android:rotation="180"-->
+    <!--                android:scaleType="fitCenter"-->
+    <!--                android:src="@drawable/triangle"-->
+    <!--                android:visibility="gone" />-->
 
-</RelativeLayout>
+    <!--        </LinearLayout>-->
+
+    <!--        <CheckBox-->
+    <!--            android:id="@+id/single_image_checkbox"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_gravity="right|center"-->
+    <!--            android:layout_marginEnd="10dp"-->
+    <!--            android:buttonTint="@color/black"-->
+    <!--            android:focusable="false"-->
+    <!--            android:visibility="gone" />-->
+    <!--    </LinearLayout>-->
+
+</FrameLayout>
