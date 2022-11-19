@@ -3,20 +3,22 @@ package com.oxodiceproductions.dockmaker;
 import static androidx.core.content.FileProvider.getUriForFile;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,13 +47,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class DocumentViewActivity extends AppCompatActivity {
     ArrayList<Image> imagesArrayList = new ArrayList<>();
     ArrayList<Boolean> ImagePathsChecker = new ArrayList<>();
 
     int numberOfCheckedImages = 0;
+
+    DocViewRecyclerViewAdapter adapter;
 
     long DocId;
     String DocName;
@@ -77,9 +81,6 @@ public class DocumentViewActivity extends AppCompatActivity {
             GoToAllDocs();
         }
 
-       /* MyDatabase myDatabase = new MyDatabase(getApplicationContext());
-        DocName = myDatabase.GetDocumentName(DocId);
-        myDatabase.close();*/
         new Thread(() -> {
             AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
             DocumentDao documentDao = appDatabase.documentDao();
@@ -88,9 +89,9 @@ public class DocumentViewActivity extends AppCompatActivity {
             runOnUiThread(() -> binding.docNameTvDocView.setText(DocName));
         }).start();
 
-        populateList();
+        setAdapter();
 
-//        binding.swipeRefreshDocView.setOnRefreshListener(this::Initializer);
+        populateList();
 
         binding.backButtonDocView.setOnClickListener(view -> {
             binding.progressBarDocView.setVisibility(View.VISIBLE);
@@ -255,26 +256,38 @@ public class DocumentViewActivity extends AppCompatActivity {
             cancelButton.setOnClickListener(view2 -> alertDialog.dismiss());
         });
 
+
+    }
+
+    private void setAdapter() {
+        imagesArrayList = new ArrayList<>();
+        adapter = new DocViewRecyclerViewAdapter();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        binding.docRecyclerView.setLayoutManager(linearLayoutManager);
+        binding.docRecyclerView.setAdapter(adapter);
     }
 
     private void refreshRecyclerView() {
-        if (imagesArrayList.size() < 0) {
-            binding.docRecyclerView.setVisibility(View.GONE);
-            binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
-            CommonOperations.log("List empty so quiting refresh recycler view");
-            return;
-        }
+        runOnUiThread(() -> {
+            if (imagesArrayList.size() == 0) {
+                binding.docRecyclerView.setVisibility(View.GONE);
+                binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
+                CommonOperations.log("List empty so quiting refresh recycler view");
+                return;
+            }
 
-        DocViewRecyclerViewAdapter adapter = new DocViewRecyclerViewAdapter();
-        binding.docRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        binding.docRecyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
 
+            binding.emptyDocTvDocView.setVisibility(View.GONE);
 
-        if (emptyAvailable) {
-            Toast.makeText(getApplicationContext(), "Empty images available", Toast.LENGTH_SHORT).show();
-        }
+            CommonOperations.log("Adapter set up successful");
 
-        binding.progressBarDocView.setVisibility(View.GONE);
+            if (emptyAvailable) {
+                Toast.makeText(getApplicationContext(), "Empty images available", Toast.LENGTH_SHORT).show();
+            }
+
+            binding.progressBarDocView.setVisibility(View.GONE);
+        });
     }
 
    /* private void saveTheCurrentListToDatabase(boolean exitApp) {
@@ -445,7 +458,6 @@ public class DocumentViewActivity extends AppCompatActivity {
                 AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
                 ImageDao imageDao = appDatabase.imageDao();
                 ArrayList<Image> images = (ArrayList<Image>) imageDao.getImagesByDocId(DocId);
-//                CommonOperations.log("Images list size: "+images.size());
                 for (Image image : images) {
 //                    CommonOperations.log("Adding: " + image.getId() + " " + image.getImagePath() + " " + image.getImageIndex());
                     imagesArrayList.add(image);
@@ -456,7 +468,6 @@ public class DocumentViewActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
                     binding.docRecyclerView.setVisibility(View.GONE);
-//                    binding.swipeRefreshDocView.setVisibility(View.GONE);
                     binding.progressBarDocView.setVisibility(View.GONE);
                 });
             }
@@ -491,7 +502,6 @@ public class DocumentViewActivity extends AppCompatActivity {
             binding.docRecyclerView.setVisibility(View.GONE);
             binding.swipeRefreshDocView.setVisibility(View.GONE);
         }*/
-//        first_time = false;
     }
 
 
@@ -540,6 +550,10 @@ public class DocumentViewActivity extends AppCompatActivity {
         }
     }
 
+//    public int dpFromPx(float px) {
+////        CommonOperations.log(getResources().getDisplayMetrics().density+" density");
+//        return (int) (px / getResources().getDisplayMetrics().density);
+//    }
 
     public class DocViewRecyclerViewAdapter extends RecyclerView.Adapter<DocViewRecyclerViewAdapter.MyDocViewHolder> {
 
@@ -561,6 +575,42 @@ public class DocumentViewActivity extends AppCompatActivity {
 
 //            String sizeString = "Size:\n" + String.format(Locale.getDefault(), "%.2f MB", size);
 //            holder.sizeTextView.setText(sizeString);
+
+            BitmapFactory.Options bitmapLoadOptions = new BitmapFactory.Options();
+            bitmapLoadOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(imageFile.getPath(), bitmapLoadOptions);
+
+            int width = bitmapLoadOptions.outWidth;
+            int height = bitmapLoadOptions.outHeight;
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int screenHeight = displayMetrics.heightPixels;
+            int screenWidth = displayMetrics.widthPixels;
+            int maxImageWidth = (int) ((float) screenWidth / 1.5f);//this is in dp
+            int minImageWidth = (int) ((float) maxImageWidth / 1.5f);
+//            int actualWidth = dpFromPx(width);
+//            int actualHeight = dpFromPx(height);
+
+            float ratio = (float) width / (float) height;
+            if ((int) ratio == 0) {
+                ratio += 1;
+            }
+
+            if (width >= maxImageWidth) {
+                width = maxImageWidth;
+                height = width / (int) ratio;
+            } else if (width < minImageWidth) {
+                width = minImageWidth;
+                height = width / (int) ratio;
+            }
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
+//            layoutParams.gravity = GravityCompat.END;
+            holder.imageView.setLayoutParams(layoutParams);
+
+//            FrameLayout.LayoutParams mainLayoutParam = (FrameLayout.LayoutParams) holder.mainLayout.getLayoutParams();
+//            mainLayoutParam.gravity = GravityCompat.END;
+//            holder.mainLayout.setLayoutParams(mainLayoutParam);
 
             RequestOptions options = new RequestOptions().sizeMultiplier(0.5f);
             options = options.centerCrop();
@@ -592,13 +642,15 @@ public class DocumentViewActivity extends AppCompatActivity {
 
         class MyDocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             ImageView imageView;
-//            CheckBox checkBox;
+            //            CheckBox checkBox;
 //            TextView sizeTextView;
             TextView positionTextView;
+            LinearLayout mainLayout;
 //            ImageButton upButton, downButton;
 
             public MyDocViewHolder(@NonNull View itemView) {
                 super(itemView);
+                mainLayout = itemView.findViewById(R.id.simple_image_cardView);
                 imageView = itemView.findViewById(R.id.imageView3);
 //                checkBox = itemView.findViewById(R.id.single_image_checkbox);
 //                sizeTextView = itemView.findViewById(R.id.textView6);
@@ -677,10 +729,12 @@ public class DocumentViewActivity extends AppCompatActivity {
             updateScene();
         }
 
+/*
 
         void upDownButtonControls(int i, ImageButton upButton, ImageButton downButton) {
 
-           /* //removes up button from first image
+           */
+/* //removes up button from first image
             if (i == 0) {
                 upButton.setVisibility(View.GONE);
                 downButton.setVisibility(View.VISIBLE);
@@ -698,8 +752,10 @@ public class DocumentViewActivity extends AppCompatActivity {
             downButton.setOnClickListener(view23 -> Swap(index, index + 1));
 
             upButton.setFocusable(false);//for clicking the recyclerView item
-            downButton.setFocusable(false);//for clicking the recyclerView item*/
+            downButton.setFocusable(false);//for clicking the recyclerView item*//*
+
         }
+*/
 
         void GoToSingleImage(int single_image_position) {
             binding.progressBarDocView.setVisibility(View.VISIBLE);

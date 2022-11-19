@@ -113,10 +113,12 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/docRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@color/app_bg"
                 android:padding="10dp"
+                android:layout_gravity="bottom|end"
+                tools:listitem="@layout/single_image_rep"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
