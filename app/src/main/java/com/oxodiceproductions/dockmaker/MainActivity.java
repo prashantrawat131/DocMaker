@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();*/
     }
 
-    private void importDataToNewDatabase() {
+   /* private void importDataToNewDatabase() {
         new Thread(() -> {
             AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
             MyDatabase myDatabase = new MyDatabase(getApplicationContext());
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
-    }
+    }*/
 
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
