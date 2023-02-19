@@ -18,12 +18,12 @@
         <activity
             android:name=".ui.activity.editing.EditingImageActivity"
             android:exported="false" />
-        <activity android:name=".ui.activity.settings.Settings" />
-        <activity android:name=".ui.activity.all_docs.AllDocs" />
-        <activity android:name=".ui.activity.single_image.SingleImage" />
-        <activity android:name=".ui.activity.document_view.DocumentViewActivity" />
+        <activity android:name=".ui.activity.settings.SettingsActivity" />
         <activity android:name=".ui.activity.camera.CameraActivity" />
-        <activity android:name=".ui.activity.main.MainActivity"
+        <activity android:name=".ui.activity.all_docs.AllDocsActivity" />
+        <activity android:name=".ui.activity.single_image.SingleImageActivity" />
+        <activity android:name=".ui.activity.document_view.DocumentViewActivity" />
+        <activity android:name=".ui.activity.main.MainPage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

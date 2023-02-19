@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/app_bg"
-    tools:context="com.oxodiceproductions.dockmaker.ui.activity.settings.Settings">
+    tools:context="com.oxodiceproductions.dockmaker.ui.activity.settings.SettingsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
