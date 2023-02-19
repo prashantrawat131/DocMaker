@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.model;
 
 public class DocumentDataModel implements Comparable<DocumentDataModel> {
     long DocId;

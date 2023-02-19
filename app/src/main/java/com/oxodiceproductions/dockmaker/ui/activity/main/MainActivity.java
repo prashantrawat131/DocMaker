@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.main;
 
 
 import android.Manifest;
@@ -7,7 +7,6 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,14 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.oxodiceproductions.dockmaker.Database.AppDatabase;
-import com.oxodiceproductions.dockmaker.Database.Document;
-import com.oxodiceproductions.dockmaker.Database.DocumentDao;
-import com.oxodiceproductions.dockmaker.Database.Image;
-import com.oxodiceproductions.dockmaker.Database.ImageDao;
+import com.oxodiceproductions.dockmaker.R;
 import com.oxodiceproductions.dockmaker.databinding.ActivityMainBinding;
-
-import java.text.SimpleDateFormat;
+import com.oxodiceproductions.dockmaker.ui.activity.all_docs.AllDocs;
 
 public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;

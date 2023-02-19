@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.single_image;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
@@ -21,10 +21,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 
+import com.oxodiceproductions.dockmaker.databinding.ActivitySingleImageBinding;
+import com.oxodiceproductions.dockmaker.ui.activity.camera.CameraActivity;
+import com.oxodiceproductions.dockmaker.ui.activity.document_view.DocumentViewActivity;
+import com.oxodiceproductions.dockmaker.ui.activity.editing.EditingImageActivity;
+import com.oxodiceproductions.dockmaker.utils.CO;
+import com.oxodiceproductions.dockmaker.utils.Constants;
 import com.oxodiceproductions.dockmaker.Database.AppDatabase;
 import com.oxodiceproductions.dockmaker.Database.Image;
 import com.oxodiceproductions.dockmaker.Database.ImageDao;
-import com.oxodiceproductions.dockmaker.databinding.ActivitySingleImageBinding;
+import com.oxodiceproductions.dockmaker.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -93,7 +99,7 @@ public class SingleImage extends AppCompatActivity {
                     ImageDao imageDao = appDatabase.imageDao();
                     imageDao.deleteImageByPath(ImagePath);
 
-                    CommonOperations.deleteFile(ImagePath);
+                    CO.deleteFile(ImagePath);
 
                     Intent in = new Intent(SingleImage.this, DocumentViewActivity.class);
                     in.putExtra(Constants.SP_DOC_ID, DocId);
@@ -153,7 +159,7 @@ public class SingleImage extends AppCompatActivity {
         binding.nextSingleImage.setOnClickListener(view -> move(1));
 
         binding.downloadSingleImage.setOnClickListener(view -> {
-            CommonOperations.downloadImage(getApplicationContext(), ImagePath);
+            CO.downloadImage(getApplicationContext(), ImagePath);
         });
     }
 
@@ -167,13 +173,13 @@ public class SingleImage extends AppCompatActivity {
                     if (result.getResultCode() == RESULT_OK) {
                         Intent data = result.getData();
                         if (data == null) {
-                            CommonOperations.log("Data is null");
+                            CO.log("Data is null");
                             return;
                         }
 //                        assert data != null;
                         String receivedImagePath = data.getExtras().getString("ImagePath");
 
-                        CommonOperations.log("Received image path: " + receivedImagePath);
+                        CO.log("Received image path: " + receivedImagePath);
 
                         new Thread(() -> {
                             try {
@@ -193,7 +199,7 @@ public class SingleImage extends AppCompatActivity {
                                     binding.progressBarSingleImage.setVisibility(View.GONE);
                                 });
                             } catch (Exception e) {
-                                CommonOperations.log("Error while updating the image path for edited image: " + e.getMessage());
+                                CO.log("Error while updating the image path for edited image: " + e.getMessage());
                             }
                         }).start();
 

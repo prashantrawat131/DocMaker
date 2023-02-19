@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.camera;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,10 +22,15 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.oxodiceproductions.dockmaker.databinding.ActivityMyCameraBinding;
+import com.oxodiceproductions.dockmaker.ui.activity.document_view.DocumentViewActivity;
+import com.oxodiceproductions.dockmaker.ui.activity.editing.EditingImageActivity;
+import com.oxodiceproductions.dockmaker.utils.CO;
 import com.oxodiceproductions.dockmaker.Database.AppDatabase;
+import com.oxodiceproductions.dockmaker.utils.ImageCompressor;
+import com.oxodiceproductions.dockmaker.R;
 import com.oxodiceproductions.dockmaker.Database.Image;
 import com.oxodiceproductions.dockmaker.Database.ImageDao;
-import com.oxodiceproductions.dockmaker.databinding.ActivityMyCameraBinding;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -228,7 +233,7 @@ public class CameraActivity extends AppCompatActivity {
                     Image image=imageDao.getImageByImagePath(DocId,retakeImagePath);
                     image.setImagePath(newImagePath);
                     imageDao.update(image);
-                    CommonOperations.deleteFile(retakeImagePath);
+                    CO.deleteFile(retakeImagePath);
 //                    myDatabase.retake(DocId,retakeImagePath,newImagePath);
                 }
 

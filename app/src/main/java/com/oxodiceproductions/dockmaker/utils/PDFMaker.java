@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

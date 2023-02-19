@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.all_docs;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
@@ -29,7 +29,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
+import com.oxodiceproductions.dockmaker.ui.activity.document_view.DocumentViewActivity;
+import com.oxodiceproductions.dockmaker.ui.activity.settings.Settings;
+import com.oxodiceproductions.dockmaker.utils.AlertCreator;
+import com.oxodiceproductions.dockmaker.utils.CO;
+import com.oxodiceproductions.dockmaker.utils.Constants;
 import com.oxodiceproductions.dockmaker.Database.AppDatabase;
+import com.oxodiceproductions.dockmaker.model.DocumentDataModel;
+import com.oxodiceproductions.dockmaker.utils.PDFMaker;
+import com.oxodiceproductions.dockmaker.R;
 import com.oxodiceproductions.dockmaker.Database.Document;
 import com.oxodiceproductions.dockmaker.Database.DocumentDao;
 import com.oxodiceproductions.dockmaker.Database.Image;
@@ -238,7 +246,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
 
             ArrayList<Document> documents = (ArrayList<Document>) documentDao.getAll();
             if (documents == null) {
-                CommonOperations.log("There are no documents");
+                CO.log("There are no documents");
                 return;
             }
 
@@ -272,7 +280,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                             , dateCreated, timeCreated, DocName, "",
                             numberOfImages));
                 } catch (Exception e) {
-                    CommonOperations.logError("Single document reading error: " + e.getMessage());
+                    CO.logError("Single document reading error: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -403,7 +411,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                 String dateStr = sdf.format(parsedDate);
                 holder.date_created_tv.setText(dateStr);
             } catch (Exception e) {
-                CommonOperations.log("Error: " + e.getMessage());
+                CO.log("Error: " + e.getMessage());
                 String dateStr = "Date: " + arrayList.get(position).getDateCreated();
                 holder.date_created_tv.setText(dateStr);
             }
@@ -539,7 +547,7 @@ public class AllDocs extends AppCompatActivity implements NavigationView.OnNavig
                     .setCancelable(true)
                     .setPositiveButton("delete", (dialog, which) -> {
 
-                        CommonOperations.deleteDocument(getApplicationContext(), DocId);
+                        CO.deleteDocument(getApplicationContext(), DocId);
 
                         arrayList.remove(position);
                         notifyItemRemoved(position);

@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.utils;
 
 import android.content.Context;
 import android.os.Build;
@@ -18,7 +18,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class CommonOperations {
+public class CO {
 
     public static void deleteFile(String filePath) {
         try {
@@ -27,7 +27,7 @@ public class CommonOperations {
                 file.delete();
             }
         } catch (Exception e) {
-            CommonOperations.logError("Error on CommonOperations.deleteFile: " + e.getMessage());
+            CO.logError("Error on CommonOperations.deleteFile: " + e.getMessage());
         }
     }
 
@@ -88,7 +88,7 @@ public class CommonOperations {
             ArrayList<Image> images = (ArrayList<Image>) imageDao.getImagesByDocId(docId);
             try {
                 for (Image image : images) {
-                    CommonOperations.deleteFile(image.getImagePath());
+                    CO.deleteFile(image.getImagePath());
                     imageDao.delete(image);
                 }
 

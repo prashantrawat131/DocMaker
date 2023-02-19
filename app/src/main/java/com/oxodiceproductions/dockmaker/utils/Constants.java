@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.utils;
 
 public  class Constants {
     public static String TAG="tagJi";

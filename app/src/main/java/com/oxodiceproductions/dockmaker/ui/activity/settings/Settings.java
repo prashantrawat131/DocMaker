@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.settings;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,7 +7,9 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.oxodiceproductions.dockmaker.R;
 import com.oxodiceproductions.dockmaker.databinding.ActivityMySettingsBinding;
+import com.oxodiceproductions.dockmaker.ui.activity.all_docs.AllDocs;
 
 public class Settings extends AppCompatActivity {
 

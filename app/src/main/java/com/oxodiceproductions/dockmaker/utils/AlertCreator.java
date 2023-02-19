@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;

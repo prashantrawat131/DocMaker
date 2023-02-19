@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.document_view;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
@@ -16,7 +16,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,18 +28,27 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.oxodiceproductions.dockmaker.databinding.ActivityDocumentViewBinding;
+import com.oxodiceproductions.dockmaker.ui.activity.single_image.SingleImage;
+import com.oxodiceproductions.dockmaker.ui.activity.all_docs.AllDocs;
+import com.oxodiceproductions.dockmaker.ui.activity.camera.CameraActivity;
+import com.oxodiceproductions.dockmaker.ui.activity.editing.EditingImageActivity;
+import com.oxodiceproductions.dockmaker.utils.CO;
 import com.oxodiceproductions.dockmaker.Database.AppDatabase;
 import com.oxodiceproductions.dockmaker.Database.Document;
 import com.oxodiceproductions.dockmaker.Database.DocumentDao;
 import com.oxodiceproductions.dockmaker.Database.Image;
 import com.oxodiceproductions.dockmaker.Database.ImageDao;
-import com.oxodiceproductions.dockmaker.databinding.ActivityDocumentViewBinding;
+import com.oxodiceproductions.dockmaker.utils.ImageCompressor;
+import com.oxodiceproductions.dockmaker.R;
+import com.oxodiceproductions.dockmaker.utils.AlertCreator;
+import com.oxodiceproductions.dockmaker.utils.NotificationModule;
+import com.oxodiceproductions.dockmaker.utils.PDFMaker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -272,7 +280,7 @@ public class DocumentViewActivity extends AppCompatActivity {
             if (imagesArrayList.size() == 0) {
                 binding.docRecyclerView.setVisibility(View.GONE);
                 binding.emptyDocTvDocView.setVisibility(View.VISIBLE);
-                CommonOperations.log("List empty so quiting refresh recycler view");
+                CO.log("List empty so quiting refresh recycler view");
                 return;
             }
 
@@ -280,7 +288,7 @@ public class DocumentViewActivity extends AppCompatActivity {
 
             binding.emptyDocTvDocView.setVisibility(View.GONE);
 
-            CommonOperations.log("Adapter set up successful");
+            CO.log("Adapter set up successful");
 
             if (emptyAvailable) {
                 Toast.makeText(getApplicationContext(), "Empty images available", Toast.LENGTH_SHORT).show();
@@ -328,7 +336,7 @@ public class DocumentViewActivity extends AppCompatActivity {
             AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
             ImageDao imageDao = appDatabase.imageDao();
             imageDao.deleteImageByPath(ImagePath);
-            CommonOperations.deleteFile(ImagePath);
+            CO.deleteFile(ImagePath);
         }).start();
        /* MyDatabase myDatabase = new MyDatabase(getApplicationContext());
         myDatabase.DeleteImage(ImagePath, DocId);
@@ -386,7 +394,7 @@ public class DocumentViewActivity extends AppCompatActivity {
                     if (result.getResultCode() == RESULT_OK) {
                         Intent data = result.getData();
                         if (data == null) {
-                            CommonOperations.log("Data is null");
+                            CO.log("Data is null");
                             return;
                         }
 //                        assert data != null;
@@ -406,7 +414,7 @@ public class DocumentViewActivity extends AppCompatActivity {
                             });
                         }).start();
                     } else {
-                        CommonOperations.log("Result not ok");
+                        CO.log("Result not ok");
                     }
                     /*
                     MyDatabase myDatabase = new MyDatabase(getApplicationContext());

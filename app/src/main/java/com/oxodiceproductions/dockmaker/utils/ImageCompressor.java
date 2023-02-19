@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -29,7 +29,7 @@ public class ImageCompressor {
             appDir.mkdirs();
         }
         try {
-            String child = CommonOperations.getUniqueName("jpg", ++offset);
+            String child = CO.getUniqueName("jpg", ++offset);
             File tempFile = new File(appDir, child);
             FileOutputStream outputStream = new FileOutputStream(tempFile);
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
@@ -133,7 +133,7 @@ public class ImageCompressor {
 
     public File getFile() {
         //this file returns a image file for writing and it also increments the offset for different images
-        String child = CommonOperations.getUniqueName("jpg", ++offset);
+        String child = CO.getUniqueName("jpg", ++offset);
         File appDir = new File(context.getFilesDir().getPath());
         if (!appDir.exists()) {
             appDir.mkdirs();

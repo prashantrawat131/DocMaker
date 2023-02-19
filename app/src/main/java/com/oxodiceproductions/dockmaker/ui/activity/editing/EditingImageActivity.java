@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker;
+package com.oxodiceproductions.dockmaker.ui.activity.editing;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.oxodiceproductions.dockmaker.utils.CO;
 import com.oxodiceproductions.dockmaker.databinding.ActivityEditingImageBinding;
 
 import java.io.ByteArrayOutputStream;
@@ -27,8 +28,6 @@ public class EditingImageActivity extends AppCompatActivity {
         binding = ActivityEditingImageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-//        IdProvider();
-
         InitialWork();
 
         binding.progressBarEditImage.setVisibility(View.GONE);
@@ -44,10 +43,10 @@ public class EditingImageActivity extends AppCompatActivity {
         binding.cropButtonEditImage.setOnClickListener(view -> {
             binding.progressBarEditImage.setVisibility(View.VISIBLE);
             //old file getting deleted
-            CommonOperations.deleteFile(ImagePath);
+            CO.deleteFile(ImagePath);
 
             //creating new file name and saving it
-            String uniqueName = CommonOperations.getUniqueName("jpg", 0);//date + time + ".jpg";
+            String uniqueName = CO.getUniqueName("jpg", 0);//date + time + ".jpg";
             File appDir = new File(getFilesDir().getPath());
             if (!appDir.exists()) {
                 appDir.mkdirs();
