@@ -77,4 +77,5 @@
         - Use the cache clear functionality in the app to clear unwanted images.\n
         - Keep the camera steady while clicking images (use can click on the screen to focus).\n
     </string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

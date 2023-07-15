@@ -113,7 +113,8 @@ class MainPage : AppCompatActivity(){
             all_permissions_granted = true
         }
         if (!dialog_running && !first_time && !all_permissions_granted) {
-            cross_check()
+//            cross_check()
+            Next()
         }
     }
 
@@ -141,13 +142,13 @@ class MainPage : AppCompatActivity(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 dialog_running = true
-                displayNeverAskAgainDialog()
+//                displayNeverAskAgainDialog()
             } else if (!shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 dialog_running = true
-                displayNeverAskAgainDialog()
+//                displayNeverAskAgainDialog()
             } else if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 dialog_running = true
-                displayNeverAskAgainDialog()
+//                displayNeverAskAgainDialog()
             } else {
                 all_permissions_granted = true
                 Next()

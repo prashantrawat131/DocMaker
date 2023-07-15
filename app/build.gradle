@@ -12,6 +12,9 @@ android {
         versionCode 37
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
 
     buildTypes {
@@ -31,6 +34,15 @@ android {
     }
     buildFeatures {
         viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.4'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 
@@ -60,6 +72,12 @@ dependencies {
 
     //glide library
     implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
+    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation "androidx.compose.ui:ui:$compose_ui_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
+    implementation 'androidx.compose.material:material:1.1.1'
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     //image cropper library
@@ -67,6 +85,8 @@ dependencies {
 
     //notification lib
     implementation "androidx.core:core:1.8.0"
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 
 //    room library
     def room_version = "2.5.0"

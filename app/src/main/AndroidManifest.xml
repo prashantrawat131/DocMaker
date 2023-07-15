@@ -16,6 +16,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.compose.MainActivity"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.activity.editing.EditingImageActivity"
             android:exported="false" />
         <activity android:name=".ui.activity.settings.SettingsActivity" />
@@ -23,14 +38,10 @@
         <activity android:name=".ui.activity.all_docs.AllDocsActivity" />
         <activity android:name=".ui.activity.single_image.SingleImageActivity" />
         <activity android:name=".ui.activity.document_view.DocumentViewActivity" />
-        <activity android:name=".ui.activity.main.MainPage"
+        <activity
+            android:name=".ui.activity.main.MainPage"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+          </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
