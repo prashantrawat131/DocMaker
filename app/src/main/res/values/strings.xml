@@ -78,4 +78,5 @@
         - Keep the camera steady while clicking images (use can click on the screen to focus).\n
     </string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
 </resources>

@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".ui.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/app_icon_orange"
         android:label="@string/app_name"
@@ -16,15 +17,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.compose.MainActivity"
+            android:name=".ui.compose.SplashScreen"
             android:exported="true"
-            android:label="@string/title_activity_main"
+            android:label="@string/title_activity_splash_screen"
             android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".ui.compose.AllDocs"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme">
 
             <meta-data
                 android:name="android.app.lib_name"
@@ -40,8 +51,7 @@
         <activity android:name=".ui.activity.document_view.DocumentViewActivity" />
         <activity
             android:name=".ui.activity.main.MainPage"
-            android:exported="true">
-          </activity>
+            android:exported="true"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
