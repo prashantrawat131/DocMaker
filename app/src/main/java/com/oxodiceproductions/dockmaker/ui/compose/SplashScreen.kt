@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.RepeatMode
@@ -17,6 +18,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
+import com.oxodiceproductions.dockmaker.utils.CO
 
 class SplashScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,7 @@ class SplashScreen : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     SplashView(this) {
+                        CO.log("goToMainActivity")
                         val intent = Intent(this, AllDocs::class.java)
                         startActivity(intent)
                         finish()
@@ -52,10 +56,12 @@ class SplashScreen : ComponentActivity() {
 fun SplashView(context: Context, goToMainActivity: () -> Unit) {
 
 //    After 2 seconds, go to the main activity
-    val handler = Handler(Looper.getMainLooper())
-    handler.postDelayed({
-        goToMainActivity()
-    }, 2000)
+    LaunchedEffect(Unit){
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            goToMainActivity()
+        }, 2000)
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),

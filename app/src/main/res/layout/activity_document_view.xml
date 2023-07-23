@@ -19,8 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -57,7 +55,6 @@
                 android:text="@string/t4"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
-
 
             <ImageButton
                 android:id="@+id/share_doc_button"

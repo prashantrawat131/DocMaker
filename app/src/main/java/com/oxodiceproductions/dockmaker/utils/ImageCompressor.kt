@@ -112,7 +112,6 @@ class ImageCompressor(val context: Context) {
         return maxWidth
     }
 
-
     fun getFile(): File {
         //this file returns a image file for writing and it also increments the offset for different images
         val child = getUniqueName("jpg", ++offset)

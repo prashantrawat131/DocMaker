@@ -94,9 +94,13 @@ dependencies {
 
 //    room library
     def room_version = "2.5.0"
-
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
+//    Room ktx
+    implementation "androidx.room:room-ktx:$room_version"
+
+//    Coil
+    implementation "io.coil-kt:coil-compose:2.4.0"
 
     // To use Kotlin annotation processing tool (kapt)
     kapt "androidx.room:room-compiler:$room_version"

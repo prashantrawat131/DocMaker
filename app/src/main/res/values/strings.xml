@@ -79,4 +79,7 @@
     </string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_activity_document_view">DocumentView</string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_editng">EditngActivity</string>
 </resources>

@@ -17,6 +17,33 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.compose.EditingActivity"
+            android:exported="false"
+            android:label="@string/title_activity_editng"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.compose.CameraActivity"
+            android:exported="false"
+            android:label="@string/title_activity_camera"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.compose.DocumentView"
+            android:exported="false"
+            android:label="@string/title_activity_document_view"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.compose.SplashScreen"
             android:exported="true"
             android:label="@string/title_activity_splash_screen"
@@ -24,24 +51,24 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".ui.compose.AllDocs"
             android:exported="true"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme">
-
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity
+        <!--
+ <activity
             android:name=".ui.activity.editing.EditingImageActivity"
             android:exported="false" />
         <activity android:name=".ui.activity.settings.SettingsActivity" />
@@ -51,8 +78,8 @@
         <activity android:name=".ui.activity.document_view.DocumentViewActivity" />
         <activity
             android:name=".ui.activity.main.MainPage"
-            android:exported="true"/>
-
+            android:exported="true" />
+        -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.oxodiceproductions.dockmaker"

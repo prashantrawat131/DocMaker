@@ -73,8 +73,8 @@ class CO {
             } catch (ignored: Exception) {
             }
         }
-
-        fun deleteDocument(context: Context?, docId: Long) {
+/*
+         fun deleteDocument(context: Context?, docId: Long) {
             Thread {
                 val appDatabase = AppDatabase.getInstance(context)
                 val documentDao = appDatabase.documentDao()
@@ -87,23 +87,11 @@ class CO {
                         CO.deleteFile(image.imagePath)
                         imageDao.delete(image)
                     }
-                    documentDao.deleteDocById(docId)
+//                    documentDao.deleteDocById(docId)
                 } catch (ignored: Exception) {
                 }
             }.start()
-            /*new Thread(()->{
-                MyDatabase myDatabase2 = new MyDatabase(context);
-                Cursor cc = myDatabase2.LoadImagePaths(docId);
-                try {
-                    cc.moveToFirst();
-                    do {
-                        CommonOperations.deleteFile(cc.getString(0));
-                    } while (cc.moveToNext());
-                } catch (Exception ignored) { }
-                myDatabase2.DeleteTable(docId);
-                myDatabase2.close();
-            }).start();*/
-        }
+        }*/
 
         fun log(msg: String) {
             Log.d(Constants.TAG, msg + "")

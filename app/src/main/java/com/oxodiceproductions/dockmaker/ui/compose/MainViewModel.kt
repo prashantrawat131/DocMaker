@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Document
+import com.oxodiceproductions.dockmaker.database.Image
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -15,11 +16,13 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
     val TAG = "MainViewModel"
     val allDocsResponse = MutableLiveData<List<Document?>>()
     val addDocResponse = MutableLiveData<Long>()
+    val addImageResponse = MutableLiveData<Long>()
+    val loadImagesResponse = MutableLiveData<List<Image?>>()
 
     fun getAllDocs(onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
-                allDocsResponse.postValue(database.documentDao().all)
+                allDocsResponse.postValue(database.documentDao().getAll())
             } catch (e: Exception) {
                 onException(e)
             }
@@ -38,6 +41,32 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
                         Calendar.getInstance().timeInMillis, DocName
                     )
                 addDocResponse.value = documentDao.insert(newDocument)
+            } catch (e: Exception) {
+                onException(e)
+            }
+        }
+    }
+
+    fun addImageToDocument(docId: Long, imagePath: String, onException: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val imageDao = database.imageDao()
+                val index = imageDao.all()?.size ?: 0
+                val newImage = Image(
+                    imagePath, index, docId
+                )
+                addImageResponse.value = imageDao.insert(newImage)
+            } catch (e: Exception) {
+                onException(e)
+            }
+        }
+    }
+
+    fun loadImagesForDoc(docId: Long, onException: (Exception) -> Unit){
+        viewModelScope.launch {
+            try {
+                val imageDao = database.imageDao()
+                loadImagesResponse.value = imageDao.getImagesByDocId(docId)
             } catch (e: Exception) {
                 onException(e)
             }

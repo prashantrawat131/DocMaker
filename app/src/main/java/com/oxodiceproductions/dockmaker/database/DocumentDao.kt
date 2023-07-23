@@ -7,24 +7,24 @@ import androidx.room.Query
 
 @Dao
 interface DocumentDao {
-    @get:Query("select * from Document order by time DESC")
-    val all: List<Document?>?
+    @Query("select * from Document order by time DESC")
+    suspend fun getAll(): List<Document?>?
 
     @Insert
-    fun insert(document: Document?): Long
+    suspend fun insert(document: Document?): Long
 
     @Delete
-    fun delete(document: Document?)
+    suspend fun delete(document: Document?)
 
     @Query("update Document set name=:name where id=:id")
-    fun updateName(id: Long, name: String?)
+    suspend fun updateName(id: Long, name: String?)
 
     @Query("delete from Document")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     @Query("select * from Document where id=:DocId")
-    fun getDocById(DocId: Long): List<Document?>?
+    suspend fun getDocById(DocId: Long): List<Document?>?
 
     @Query("delete from Document where id=:DocId")
-    fun deleteDocById(DocId: Long)
+    suspend fun deleteDocById(DocId: Long)
 }

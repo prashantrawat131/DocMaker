@@ -3,6 +3,7 @@ package com.oxodiceproductions.dockmaker.ui.compose
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -13,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,12 +26,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Document
-import com.oxodiceproductions.dockmaker.ui.activity.document_view.DocumentViewActivity
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
 import com.oxodiceproductions.dockmaker.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 @AndroidEntryPoint
 class AllDocs : ComponentActivity() {
@@ -58,7 +58,8 @@ class AllDocs : ComponentActivity() {
         }
 
         mainViewModel.addDocResponse.observe(this) {
-            val intent = Intent(this, DocumentViewActivity::class.java)
+            Log.d("AllDocs", "addDocResponse: $it")
+            val intent = Intent(this, DocumentView::class.java)
             intent.putExtra(Constants.SP_DOC_ID, it)
             intent.putExtra("first_time", false)
             startActivity(intent)
@@ -68,6 +69,13 @@ class AllDocs : ComponentActivity() {
 
 @Composable
 fun Main(context: Context, mainViewModel: MainViewModel) {
+
+    var list = mutableListOf<Document>()
+
+    mainViewModel.allDocsResponse.observe(context as ComponentActivity) {
+        list= it as MutableList<Document>
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
@@ -93,13 +101,11 @@ fun Main(context: Context, mainViewModel: MainViewModel) {
                     }
                 }
             }
-
-
         }
 
         Button(
             onClick = {
-                mainViewModel.addDocument{
+                mainViewModel.addDocument {
                     CO.log("addDocument: $it")
                 }
             },
