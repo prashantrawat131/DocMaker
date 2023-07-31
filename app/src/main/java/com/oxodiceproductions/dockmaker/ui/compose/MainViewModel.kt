@@ -1,5 +1,6 @@
 package com.oxodiceproductions.dockmaker.ui.compose
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +23,7 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
     fun getAllDocs(onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
-                allDocsResponse.postValue(database.documentDao().getAll())
+                allDocsResponse.value = database.documentDao().getAll()
             } catch (e: Exception) {
                 onException(e)
             }

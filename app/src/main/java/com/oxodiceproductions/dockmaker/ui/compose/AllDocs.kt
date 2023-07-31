@@ -9,11 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +21,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Document
@@ -70,10 +72,26 @@ class AllDocs : ComponentActivity() {
 @Composable
 fun Main(context: Context, mainViewModel: MainViewModel) {
 
-    var list = mutableListOf<Document>()
-
+      val (list,setList) = remember {
+          mutableStateOf<List<Document?>?>(null)
+      }
+   /* val list = remember {
+        MutableLiveData<List<Document?>>()
+    }
+*/
     mainViewModel.allDocsResponse.observe(context as ComponentActivity) {
-        list= it as MutableList<Document>
+        setList(it)
+        CO.log("Value Changed: ${list}")
+    }
+
+    fun getPreviewImage(document: Document?):ImageRequest{
+//        Extract the first image from the document and return it.
+        return ImageRequest.Builder(context)
+            .data(R.drawable.ic_baseline_add_24)
+            .target {
+                Log.d("AllDocs", "getPreviewImage: $it")
+            }
+            .build()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -88,16 +106,24 @@ fun Main(context: Context, mainViewModel: MainViewModel) {
             )
 
             LazyColumn() {
-                items(mainViewModel.allDocsResponse.value?.size ?: 0) { item ->
-                    Row() {
-                        Text(
-                            text = "${mainViewModel.allDocsResponse.value?.get(item)?.name}",
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
-                                .padding(16.dp),
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
-                            fontSize = 24.sp,
-                        )
+                items(list ?: listOf(Document(3232L,"fake data"))) { item ->
+                    Card() {
+                        Row() {
+                            Image(painter = painterResource(id = R.drawable.app_icon_orange_foreground), contentDescription = "Preview Image" ,modifier = Modifier
+                                .width(64.dp)
+                                .height(64.dp)
+                                .padding(16.dp)
+                                .align(Alignment.CenterVertically)
+                            )
+                            Text(
+                                text = item?.name?:"",
+                                modifier = Modifier
+                                    .fillMaxWidth(1f)
+                                    .padding(16.dp),
+                                fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
+                                fontSize = 16.sp,
+                            )
+                        }
                     }
                 }
             }
