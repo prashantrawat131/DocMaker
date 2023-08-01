@@ -91,6 +91,8 @@ dependencies {
     implementation "androidx.core:core:1.8.0"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
+
 
 //    room library
     def room_version = "2.5.0"

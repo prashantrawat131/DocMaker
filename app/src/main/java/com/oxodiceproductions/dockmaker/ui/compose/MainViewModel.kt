@@ -1,6 +1,5 @@
 package com.oxodiceproductions.dockmaker.ui.compose
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,7 +62,7 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
         }
     }
 
-    fun loadImagesForDoc(docId: Long, onException: (Exception) -> Unit){
+    fun loadImagesForDoc(docId: Long, onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
                 val imageDao = database.imageDao()
@@ -72,5 +71,25 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
                 onException(e)
             }
         }
+    }
+
+    fun getPreviewImage(
+        docId: Long,
+        handlePreviewResponse: (String?) -> Unit,
+        onException: (Exception) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val imageDao = database.imageDao()
+                val imagePath = imageDao.getImagesByDocId(docId)[0]?.imagePath
+                handlePreviewResponse(imagePath)
+            } catch (e: Exception) {
+                onException(e)
+            }
+        }
+    }
+
+    fun loadPreviewImages(){
+//        Todo: Load images for preview and send the list of the images.
     }
 }
