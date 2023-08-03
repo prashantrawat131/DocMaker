@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Document
 import com.oxodiceproductions.dockmaker.database.Image
+import com.oxodiceproductions.dockmaker.utils.CO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -18,11 +19,15 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
     val addDocResponse = MutableLiveData<Long>()
     val addImageResponse = MutableLiveData<Long>()
     val loadImagesResponse = MutableLiveData<List<Image?>>()
+    val previewImageResponse = MutableLiveData<HashMap<Long, String>>()
 
     fun getAllDocs(onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
                 allDocsResponse.value = database.documentDao().getAll()
+                getPreviewImage {
+                    CO.log("getPreviewImage: $it")
+                }
             } catch (e: Exception) {
                 onException(e)
             }
@@ -73,23 +78,24 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
         }
     }
 
-    fun getPreviewImage(
-        docId: Long,
-        handlePreviewResponse: (String?) -> Unit,
+    private fun getPreviewImage(
         onException: (Exception) -> Unit
     ) {
         viewModelScope.launch {
             try {
                 val imageDao = database.imageDao()
-                val imagePath = imageDao.getImagesByDocId(docId)[0]?.imagePath
-                handlePreviewResponse(imagePath)
+                val hashMap = HashMap<Long, String>()
+                allDocsResponse.value?.forEach { doc ->
+                    val imagesPath = imageDao.getImagesByDocId(doc!!.id)[0]?.imagePath
+                    CO.log("Image Path: $imagesPath")
+                    hashMap[doc.id] = imagesPath ?: ""
+                }
+                if (hashMap.isNotEmpty()) {
+                    previewImageResponse.value = hashMap
+                }
             } catch (e: Exception) {
                 onException(e)
             }
         }
-    }
-
-    fun loadPreviewImages(){
-//        Todo: Load images for preview and send the list of the images.
     }
 }
