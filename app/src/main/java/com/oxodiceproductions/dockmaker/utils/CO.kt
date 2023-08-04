@@ -6,11 +6,11 @@ import android.os.Environment
 import android.os.FileUtils
 import android.util.Log
 import android.widget.Toast
-import com.oxodiceproductions.dockmaker.database.AppDatabase
-import com.oxodiceproductions.dockmaker.database.Image
+import com.oxodiceproductions.dockmaker.model.DocumentPreviewModel
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.util.*
 
 class CO {
@@ -103,6 +103,15 @@ class CO {
 
         fun toast(msg: String, context: Context?) {
             Toast.makeText(context, "" + msg, Toast.LENGTH_SHORT).show()
+        }
+
+        fun getDocTime(time: Long): DocumentPreviewModel.DateTime {
+            val dateSDF = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val timeSDF = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            return DocumentPreviewModel.DateTime(
+                dateSDF.format(Date(time)),
+                timeSDF.format(Date(time))
+            )
         }
     }
 }

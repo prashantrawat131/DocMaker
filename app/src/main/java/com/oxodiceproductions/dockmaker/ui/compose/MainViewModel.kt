@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Document
 import com.oxodiceproductions.dockmaker.database.Image
+import com.oxodiceproductions.dockmaker.model.DocumentPreviewModel
 import com.oxodiceproductions.dockmaker.utils.CO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel() {
     val TAG = "MainViewModel"
+    val allDocsList = MutableLiveData<List<DocumentPreviewModel>>()
     val allDocsResponse = MutableLiveData<List<Document?>>()
     val addDocResponse = MutableLiveData<Long>()
     val addImageResponse = MutableLiveData<Long>()
@@ -24,10 +26,28 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
     fun getAllDocs(onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
-                allDocsResponse.value = database.documentDao().getAll()
-                getPreviewImage {
-                    CO.log("getPreviewImage: $it")
+                val documents = database.documentDao().getAll()
+                val imageDao = database.imageDao()
+                val previewDocuments= arrayListOf<DocumentPreviewModel>()
+//                allDocsResponse.value=documents
+                documents?.forEach { doc ->
+                    val images = imageDao.getImagesByDocId(doc!!.id)
+                    var imagePath: String? = null
+                    var imageCount = 0
+                    if((images?.size ?: 0) > 0){
+                        imagePath=images?.get(0)?.imagePath
+                        imageCount = images?.size?:0
+                    }
+                    val displayDocument = DocumentPreviewModel(
+                        doc?.id!!,
+                        doc?.name ?: "No Name",
+                        imagePath,
+                        CO.getDocTime(doc?.id!!),
+                        imageCount
+                    )
+                    previewDocuments.add(displayDocument)
                 }
+                allDocsList.value = previewDocuments
             } catch (e: Exception) {
                 onException(e)
             }
@@ -78,7 +98,7 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
         }
     }
 
-    private fun getPreviewImage(
+   /* private fun getPreviewImage(
         onException: (Exception) -> Unit
     ) {
         viewModelScope.launch {
@@ -97,5 +117,5 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
                 onException(e)
             }
         }
-    }
+    }*/
 }

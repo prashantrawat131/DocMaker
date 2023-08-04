@@ -19,7 +19,7 @@ interface ImageDao {
     suspend fun deleteAll()
 
     @Query("select * from Image where docId=:docId")
-    suspend fun getImagesByDocId(docId: Long): List<Image?>
+    suspend fun getImagesByDocId(docId: Long): List<Image?>?
 
     @Query("delete from Image where imagePath=:imagePath")
     suspend fun deleteImageByPath(imagePath: String)
