@@ -19,24 +19,37 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
     val allDocsList = MutableLiveData<List<DocumentPreviewModel>>()
     val allDocsResponse = MutableLiveData<List<Document?>>()
     val addDocResponse = MutableLiveData<Long>()
+    val loadDocumentResponse = MutableLiveData<Document?>()
     val addImageResponse = MutableLiveData<Long>()
     val loadImagesResponse = MutableLiveData<List<Image?>>()
     val previewImageResponse = MutableLiveData<HashMap<Long, String>>()
+
+    fun getDocById(docId: Long, onException: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val document = database.documentDao().getDocById(docId)?.get(0)
+                loadDocumentResponse.value = document
+            } catch (e: Exception) {
+                onException(e)
+            }
+        }
+    }
+
 
     fun getAllDocs(onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
                 val documents = database.documentDao().getAll()
                 val imageDao = database.imageDao()
-                val previewDocuments= arrayListOf<DocumentPreviewModel>()
+                val previewDocuments = arrayListOf<DocumentPreviewModel>()
 //                allDocsResponse.value=documents
                 documents?.forEach { doc ->
                     val images = imageDao.getImagesByDocId(doc!!.id)
                     var imagePath: String? = null
                     var imageCount = 0
-                    if((images?.size ?: 0) > 0){
-                        imagePath=images?.get(0)?.imagePath
-                        imageCount = images?.size?:0
+                    if ((images?.size ?: 0) > 0) {
+                        imagePath = images?.get(0)?.imagePath
+                        imageCount = images?.size ?: 0
                     }
                     val displayDocument = DocumentPreviewModel(
                         doc?.id!!,
@@ -98,24 +111,24 @@ class MainViewModel @Inject constructor(val database: AppDatabase) : ViewModel()
         }
     }
 
-   /* private fun getPreviewImage(
-        onException: (Exception) -> Unit
-    ) {
-        viewModelScope.launch {
-            try {
-                val imageDao = database.imageDao()
-                val hashMap = HashMap<Long, String>()
-                allDocsResponse.value?.forEach { doc ->
-                    val imagesPath = imageDao.getImagesByDocId(doc!!.id)[0]?.imagePath
-                    CO.log("Image Path: $imagesPath")
-                    hashMap[doc.id] = imagesPath ?: ""
-                }
-                if (hashMap.isNotEmpty()) {
-                    previewImageResponse.value = hashMap
-                }
-            } catch (e: Exception) {
-                onException(e)
-            }
-        }
-    }*/
+    /* private fun getPreviewImage(
+         onException: (Exception) -> Unit
+     ) {
+         viewModelScope.launch {
+             try {
+                 val imageDao = database.imageDao()
+                 val hashMap = HashMap<Long, String>()
+                 allDocsResponse.value?.forEach { doc ->
+                     val imagesPath = imageDao.getImagesByDocId(doc!!.id)[0]?.imagePath
+                     CO.log("Image Path: $imagesPath")
+                     hashMap[doc.id] = imagesPath ?: ""
+                 }
+                 if (hashMap.isNotEmpty()) {
+                     previewImageResponse.value = hashMap
+                 }
+             } catch (e: Exception) {
+                 onException(e)
+             }
+         }
+     }*/
 }

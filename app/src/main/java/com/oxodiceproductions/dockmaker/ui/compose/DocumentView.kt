@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,18 +14,21 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
-import coil.compose.AsyncImage
-import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
+import com.oxodiceproductions.dockmaker.ui.compose.components.ImagePreviewItem
+import com.oxodiceproductions.dockmaker.ui.compose.components.RenameDocDialog
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
 import com.oxodiceproductions.dockmaker.utils.Constants
@@ -68,7 +70,7 @@ class DocumentView : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    DocView(this, getImageFromGallery, mainViewModel)
+                    DocView(this, docId, getImageFromGallery, mainViewModel)
                 }
             }
         }
@@ -78,17 +80,40 @@ class DocumentView : ComponentActivity() {
 @Composable
 fun DocView(
     context: Context,
+    docId: Long,
     getImageFromGallery: ActivityResultLauncher<String>?,
     mainViewModel: MainViewModel
 ) {
+
+    LaunchedEffect(key1 = docId) {
+        mainViewModel.loadImagesForDoc(docId) {
+            CO.log("loadImagesForDoc: ${it.message}")
+        }
+    }
+
     val list = mainViewModel.loadImagesResponse.observeAsState()
+    val doc = mainViewModel.loadDocumentResponse.observeAsState()
+    val renameDialogVisible = remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
+        if (renameDialogVisible.value) {
+            RenameDocDialog(doc = doc.value!!)
+        }
         Column(modifier = Modifier.fillMaxSize()) {
+            TextButton(
+                content = {
+                    Text(
+                        text = doc.value?.name ?: "Document"
+                    )
+                },
+                modifier = Modifier.padding(16.dp),
+                onClick = {
+                    renameDialogVisible.value = true
+                }
+            )
             LazyColumn() {
                 items(list.value ?: listOf()) { item ->
-                    Row() {
-                        AsyncImage(model = item?.imagePath, contentDescription = "Image")
-                    }
+                    ImagePreviewItem(item!!)
                 }
             }
         }
@@ -117,6 +142,7 @@ fun DefaultPreview3() {
     DocMakerTheme {
         DocView(
             LocalContext.current,
+            1L,
             null,
             MainViewModel(AppDatabase.getInstance(LocalContext.current))
         )
