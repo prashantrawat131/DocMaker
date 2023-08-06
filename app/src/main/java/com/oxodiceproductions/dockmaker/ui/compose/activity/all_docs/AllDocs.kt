@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker.ui.compose
+package com.oxodiceproductions.dockmaker.ui.compose.activity.all_docs
 
 import android.content.Context
 import android.content.Intent
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.database.AppDatabase
+import com.oxodiceproductions.dockmaker.ui.compose.activity.document_view.DocumentView
 import com.oxodiceproductions.dockmaker.ui.compose.components.DocumentPreviewItem
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
@@ -33,12 +34,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AllDocs : ComponentActivity() {
 
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var mainViewModel: AllDocViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        mainViewModel = ViewModelProvider(this)[AllDocViewModel::class.java]
 
         setContent {
             DocMakerTheme {
@@ -59,11 +60,18 @@ class AllDocs : ComponentActivity() {
             startActivity(intent)
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        mainViewModel.getAllDocs {
+            CO.log(it.message?:"")
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Main(context: Context, mainViewModel: MainViewModel) {
+fun Main(context: Context, mainViewModel: AllDocViewModel) {
 
     LaunchedEffect(Unit) {
         mainViewModel.getAllDocs {
@@ -118,6 +126,6 @@ fun Main(context: Context, mainViewModel: MainViewModel) {
 @Composable
 fun DefaultPreview() {
     DocMakerTheme {
-        Main(LocalContext.current, MainViewModel(AppDatabase.getInstance(LocalContext.current)))
+        Main(LocalContext.current, AllDocViewModel(AppDatabase.getInstance(LocalContext.current)))
     }
 }

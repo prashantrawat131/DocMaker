@@ -17,7 +17,7 @@ interface DocumentDao {
     suspend fun delete(document: Document?)
 
     @Query("update Document set name=:name where id=:id")
-    suspend fun updateName(id: Long, name: String?)
+    suspend fun updateName(id: Long, name: String?):Int
 
     @Query("delete from Document")
     suspend fun deleteAll()

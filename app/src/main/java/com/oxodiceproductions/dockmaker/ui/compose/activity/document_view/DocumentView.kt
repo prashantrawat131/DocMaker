@@ -1,4 +1,4 @@
-package com.oxodiceproductions.dockmaker.ui.compose
+package com.oxodiceproductions.dockmaker.ui.compose.activity.document_view
 
 import android.content.Context
 import android.net.Uri
@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -37,16 +36,14 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class DocumentView : ComponentActivity() {
-
     private var docId = 0L
-
-    lateinit var mainViewModel: MainViewModel
+    lateinit var viewModel: DocViewViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this)[DocViewViewModel::class.java]
         docId = intent.getLongExtra(Constants.SP_DOC_ID, 0L)
-        mainViewModel.loadImagesForDoc(docId) {
+        viewModel.loadImagesForDoc(docId) {
             CO.log("loadImagesForDoc: ${it.message}")
         }
         val getImageFromGallery =
@@ -55,7 +52,7 @@ class DocumentView : ComponentActivity() {
                     CO.log("Uri Path: ${uri.path}")
                     val imageCompressor = ImageCompressor(this)
                     val filePath = imageCompressor.compress(uri)
-                    mainViewModel.addImageToDocument(docId, filePath) {
+                    viewModel.addImageToDocument(docId, filePath) {
                         CO.log("Image Added to Document: ${it.message}")
                     }
 //                    val intent = Intent(this, EditingActivity::class.java)
@@ -70,7 +67,7 @@ class DocumentView : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    DocView(this, docId, getImageFromGallery, mainViewModel)
+                    DocView(this, docId, getImageFromGallery, viewModel)
                 }
             }
         }
@@ -82,22 +79,33 @@ fun DocView(
     context: Context,
     docId: Long,
     getImageFromGallery: ActivityResultLauncher<String>?,
-    mainViewModel: MainViewModel
+    viewModel: DocViewViewModel
 ) {
 
     LaunchedEffect(key1 = docId) {
-        mainViewModel.loadImagesForDoc(docId) {
+        viewModel.loadImagesForDoc(docId) {
             CO.log("loadImagesForDoc: ${it.message}")
+        }
+        viewModel.getDocById(docId){
+            CO.log("Error while getting doc by id: ${it.message}")
         }
     }
 
-    val list = mainViewModel.loadImagesResponse.observeAsState()
-    val doc = mainViewModel.loadDocumentResponse.observeAsState()
+    val list = viewModel.loadImagesResponse.observeAsState()
+    val doc = viewModel.loadDocumentResponse.observeAsState()
     val renameDialogVisible = remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (renameDialogVisible.value) {
-            RenameDocDialog(doc = doc.value!!)
+            RenameDocDialog(doc.value?.name?:"Doc Name",{
+                viewModel.renameDoc(docId,it){
+                    e->
+                    CO.log("Error while updating name: ${e.message}")
+                }
+                renameDialogVisible.value=false
+            }){
+                renameDialogVisible.value=false
+            }
         }
         Column(modifier = Modifier.fillMaxSize()) {
             TextButton(
@@ -144,7 +152,7 @@ fun DefaultPreview3() {
             LocalContext.current,
             1L,
             null,
-            MainViewModel(AppDatabase.getInstance(LocalContext.current))
+            DocViewViewModel(AppDatabase.getInstance(LocalContext.current))
         )
     }
 }

@@ -2,7 +2,6 @@ package com.oxodiceproductions.dockmaker.ui.di
 
 import android.content.Context
 import com.oxodiceproductions.dockmaker.database.AppDatabase
-import com.oxodiceproductions.dockmaker.ui.compose.MainViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

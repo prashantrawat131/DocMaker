@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.compose.EditingActivity"
+            android:name=".ui.compose.activity.image_edit.EditingActivity"
             android:exported="false"
             android:label="@string/title_activity_editng"
             android:theme="@style/AppTheme">
@@ -26,7 +26,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.compose.CameraActivity"
+            android:name=".ui.compose.activity.camera.CameraActivity"
             android:exported="false"
             android:label="@string/title_activity_camera"
             android:theme="@style/AppTheme">
@@ -35,7 +35,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.compose.DocumentView"
+            android:name=".ui.compose.activity.document_view.DocumentView"
             android:exported="false"
             android:label="@string/title_activity_document_view"
             android:theme="@style/AppTheme">
@@ -44,25 +44,15 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.compose.SplashScreen"
+            android:name=".ui.compose.activity.all_docs.AllDocs"
             android:exported="true"
-            android:label="@string/title_activity_splash_screen"
+            android:label="@string/title_activity_main"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.compose.AllDocs"
-            android:exported="true"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
