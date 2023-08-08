@@ -1,12 +1,14 @@
 package com.oxodiceproductions.dockmaker.ui.compose.activity.document_view
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.database.AppDatabase
+import com.oxodiceproductions.dockmaker.ui.compose.activity.single_image.SingleImageActivity
 import com.oxodiceproductions.dockmaker.ui.compose.components.ImagePreviewItem
 import com.oxodiceproductions.dockmaker.ui.compose.components.RenameDocDialog
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
@@ -86,7 +89,7 @@ fun DocView(
         viewModel.loadImagesForDoc(docId) {
             CO.log("loadImagesForDoc: ${it.message}")
         }
-        viewModel.getDocById(docId){
+        viewModel.getDocById(docId) {
             CO.log("Error while getting doc by id: ${it.message}")
         }
     }
@@ -97,14 +100,13 @@ fun DocView(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (renameDialogVisible.value) {
-            RenameDocDialog(doc.value?.name?:"Doc Name",{
-                viewModel.renameDoc(docId,it){
-                    e->
+            RenameDocDialog(doc.value?.name ?: "Doc Name", {
+                viewModel.renameDoc(docId, it) { e ->
                     CO.log("Error while updating name: ${e.message}")
                 }
-                renameDialogVisible.value=false
-            }){
-                renameDialogVisible.value=false
+                renameDialogVisible.value = false
+            }) {
+                renameDialogVisible.value = false
             }
         }
         Column(modifier = Modifier.fillMaxSize()) {
@@ -121,7 +123,13 @@ fun DocView(
             )
             LazyColumn() {
                 items(list.value ?: listOf()) { item ->
-                    ImagePreviewItem(item!!)
+                    ImagePreviewItem(item!!) {
+                        val intent = Intent(context, SingleImageActivity::class.java)
+                        intent.putExtra("docId", docId)
+                        intent.putExtra("imagePath", item.imagePath)
+                        intent.putExtra("imageIndex", item.imageIndex)
+                        context.startActivity(intent)
+                    }
                 }
             }
         }

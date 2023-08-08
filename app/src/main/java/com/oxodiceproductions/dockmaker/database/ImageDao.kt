@@ -11,7 +11,7 @@ interface ImageDao {
     suspend fun insert(image: Image?): Long
 
     @Delete
-    suspend fun delete(image: Image?)
+    suspend fun delete(image: Image?):Int
 
     /* @Query("update Image set imageIndex=:newIndex where id=:id")
     void updateIndex(long id, int newIndex);*/
@@ -22,7 +22,7 @@ interface ImageDao {
     suspend fun getImagesByDocId(docId: Long): List<Image?>?
 
     @Query("delete from Image where imagePath=:imagePath")
-    suspend fun deleteImageByPath(imagePath: String)
+    suspend fun deleteImageByPath(imagePath: String):Int
 
     @Update
     suspend fun update(image: Image)

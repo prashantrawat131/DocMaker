@@ -6,23 +6,28 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.ui.compose.activity.document_view.DocumentView
 import com.oxodiceproductions.dockmaker.ui.compose.components.DocumentPreviewItem
@@ -34,12 +39,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AllDocs : ComponentActivity() {
 
-    private lateinit var mainViewModel: AllDocViewModel
+    private lateinit var viewModel: AllDocViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mainViewModel = ViewModelProvider(this)[AllDocViewModel::class.java]
+        viewModel = ViewModelProvider(this)[AllDocViewModel::class.java]
 
         setContent {
             DocMakerTheme {
@@ -47,12 +52,12 @@ class AllDocs : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
-                    Main(this, mainViewModel)
+                    Main(this, viewModel)
                 }
             }
         }
 
-        mainViewModel.addDocResponse.observe(this) {
+        viewModel.addDocResponse.observe(this) {
             Log.d("AllDocs", "addDocResponse: $it")
             val intent = Intent(this, DocumentView::class.java)
             intent.putExtra(Constants.SP_DOC_ID, it)
@@ -63,8 +68,8 @@ class AllDocs : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        mainViewModel.getAllDocs {
-            CO.log(it.message?:"")
+        viewModel.getAllDocs {
+            CO.log(it.message ?: "")
         }
     }
 }
@@ -102,8 +107,19 @@ fun Main(context: Context, mainViewModel: AllDocViewModel) {
                     }
                 }
             }
-        }
 
+            if (list.value == null) {
+                Box(modifier = Modifier.fillMaxWidth()
+                    .weight(1f,true)) {
+                    Icon(
+                        Icons.Filled.Face,
+                        contentDescription = "No Documents image"
+                    )
+
+                    Text(text = "No Documents Yet.")
+                }
+            }
+        }
         FloatingActionButton(
             onClick = {
                 mainViewModel.addDocument {
@@ -111,11 +127,12 @@ fun Main(context: Context, mainViewModel: AllDocViewModel) {
                 }
             },
             modifier = Modifier
-                .width(100.dp)
-                .height(100.dp)
                 .align(Alignment.BottomEnd)
+                .width(80.dp)
+                .height(80.dp)
                 .padding(16.dp),
-            shape = RectangleShape,
+            backgroundColor = Color(0xFFF3B96D),
+            shape = RoundedCornerShape(8.dp),
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Add Document")
         }
