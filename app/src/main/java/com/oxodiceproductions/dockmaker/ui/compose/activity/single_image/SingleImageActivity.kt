@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +37,7 @@ import com.oxodiceproductions.dockmaker.ui.compose.activity.document_view.Docume
 import com.oxodiceproductions.dockmaker.ui.compose.components.SimpleDialog
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
+import com.oxodiceproductions.dockmaker.utils.ShareUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -100,6 +102,11 @@ fun SingleImageView(
                     askToDelete.value = true
                 }) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete Image")
+                }
+                Button(onClick = {
+                    ShareUtil.shareImage(context, image.imagePath)
+                }) {
+                    Icon(Icons.Filled.Share, contentDescription = "Share Image")
                 }
             }
             AsyncImage(

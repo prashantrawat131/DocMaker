@@ -8,10 +8,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
+import androidx.camera.core.impl.utils.ContextUtil.getApplicationContext
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -22,11 +23,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
+import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.ui.compose.activity.single_image.SingleImageActivity
 import com.oxodiceproductions.dockmaker.ui.compose.components.ImagePreviewItem
@@ -36,6 +41,8 @@ import com.oxodiceproductions.dockmaker.utils.CO
 import com.oxodiceproductions.dockmaker.utils.Constants
 import com.oxodiceproductions.dockmaker.utils.ImageCompressor
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+
 
 @AndroidEntryPoint
 class DocumentView : ComponentActivity() {
@@ -63,6 +70,18 @@ class DocumentView : ComponentActivity() {
 //                    startActivity(intent)
                 }
             }
+        val clickImageFromCamera =
+            registerForActivityResult(ActivityResultContracts.TakePicture()) {
+                if (it) {
+                    CO.log("Image Captured")
+                    val imageCompressor = ImageCompressor(this)
+                    val filePath = imageCompressor.compress(File(filesDir,"picFromCamera"))
+                    viewModel.addImageToDocument(docId, filePath) {
+                        CO.log("Image Added to Document: ${it.message}")
+                    }
+                }
+            }
+
         setContent {
             DocMakerTheme {
                 // A surface container using the 'background' color from the theme
@@ -70,7 +89,7 @@ class DocumentView : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    DocView(this, docId, getImageFromGallery, viewModel)
+                    DocView(this, docId, getImageFromGallery, clickImageFromCamera, viewModel)
                 }
             }
         }
@@ -82,6 +101,7 @@ fun DocView(
     context: Context,
     docId: Long,
     getImageFromGallery: ActivityResultLauncher<String>?,
+    clickImageFromCamera: ActivityResultLauncher<Uri>?,
     viewModel: DocViewViewModel
 ) {
 
@@ -97,6 +117,7 @@ fun DocView(
     val list = viewModel.loadImagesResponse.observeAsState()
     val doc = viewModel.loadDocumentResponse.observeAsState()
     val renameDialogVisible = remember { mutableStateOf(false) }
+    val photoInputTypeDialogVisible = remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (renameDialogVisible.value) {
@@ -109,6 +130,45 @@ fun DocView(
                 renameDialogVisible.value = false
             }
         }
+
+        if (photoInputTypeDialogVisible.value) {
+            Dialog(onDismissRequest = { /*TODO*/ }) {
+                Column {
+                    Button(onClick = {
+                        getImageFromGallery?.launch("image/*")
+                        photoInputTypeDialogVisible.value = false
+                    }) {
+                        Row {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_photo_library_24),
+                                contentDescription = "Choose from gallery"
+                            )
+                            Text(text = "Choose from gallery")
+                        }
+                    }
+                    Button(onClick = {
+                        val file = File(context.filesDir, "picFromCamera")
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            context.packageName + ".provider",
+                            file
+                        )
+
+                        clickImageFromCamera?.launch(uri)
+                        photoInputTypeDialogVisible.value = false
+                    }) {
+                        Row {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_photo_camera_24),
+                                contentDescription = "Take a photo"
+                            )
+                            Text(text = "Take a photo")
+                        }
+                    }
+                }
+            }
+        }
+
         Column(modifier = Modifier.fillMaxSize()) {
             TextButton(
                 content = {
@@ -137,16 +197,20 @@ fun DocView(
 //        Add Button
         FloatingActionButton(
             onClick = {
-                getImageFromGallery?.launch("image/*")
+                photoInputTypeDialogVisible.value = true
             },
             modifier = Modifier
-                .width(100.dp)
-                .height(100.dp)
+                .width(80.dp)
+                .height(80.dp)
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            shape = RectangleShape,
+            backgroundColor = Color(0xFFF3B96D),
+            shape = RoundedCornerShape(8.dp),
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Add Document")
+            Icon(
+                Icons.Filled.Add, contentDescription = "Add Document",
+                tint = Color.White
+            )
         }
 
     }
@@ -159,6 +223,7 @@ fun DefaultPreview3() {
         DocView(
             LocalContext.current,
             1L,
+            null,
             null,
             DocViewViewModel(AppDatabase.getInstance(LocalContext.current))
         )
