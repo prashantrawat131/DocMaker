@@ -1,5 +1,7 @@
 package com.oxodiceproductions.dockmaker.ui.compose.activity.all_docs
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,11 +13,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @HiltViewModel
-class AllDocViewModel @Inject constructor(val database: AppDatabase):ViewModel() {
-    val allDocsList = MutableLiveData<List<DocumentPreviewModel>>()
+class AllDocViewModel @Inject constructor(val database: AppDatabase) : ViewModel() {
+    val allDocsList = mutableStateListOf<DocumentPreviewModel>()
     val addDocResponse = MutableLiveData<Long>()
+    val isSelectionModeOn = mutableStateOf(false)
 
     fun getAllDocs(onException: (Exception) -> Unit) {
         viewModelScope.launch {
@@ -23,7 +27,6 @@ class AllDocViewModel @Inject constructor(val database: AppDatabase):ViewModel()
                 val documents = database.documentDao().getAll()
                 val imageDao = database.imageDao()
                 val previewDocuments = arrayListOf<DocumentPreviewModel>()
-//                allDocsResponse.value=documents
                 documents?.forEach { doc ->
                     val images = imageDao.getImagesByDocId(doc!!.id)
                     var imagePath: String? = null
@@ -33,15 +36,17 @@ class AllDocViewModel @Inject constructor(val database: AppDatabase):ViewModel()
                         imageCount = images?.size ?: 0
                     }
                     val displayDocument = DocumentPreviewModel(
-                        doc?.id!!,
-                        doc?.name ?: "No Name",
+                        doc.id,
+                        doc.name ?: "No Name",
                         imagePath,
-                        CO.getDocTime(doc?.id!!),
+                        CO.getDocTime(doc.id),
                         imageCount
                     )
                     previewDocuments.add(displayDocument)
                 }
-                allDocsList.value = previewDocuments
+                isSelectionModeOn.value = false
+                allDocsList.clear()
+                allDocsList.addAll(previewDocuments)
             } catch (e: Exception) {
                 onException(e)
             }
@@ -60,6 +65,30 @@ class AllDocViewModel @Inject constructor(val database: AppDatabase):ViewModel()
                         Calendar.getInstance().timeInMillis, DocName
                     )
                 addDocResponse.value = documentDao.insert(newDocument)
+            } catch (e: Exception) {
+                onException(e)
+            }
+        }
+    }
+
+    fun selectDocument(docId: Long, onException: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val newList = allDocsList.map {
+                    if (it.id == docId) {
+                        it.isSelected = !it.isSelected
+                    }
+                    it
+                }
+                var flag = false
+                newList.forEach {
+                    if (it.isSelected) {
+                        flag = true
+                    }
+                }
+                isSelectionModeOn.value = flag
+                allDocsList.clear()
+                allDocsList.addAll(newList)
             } catch (e: Exception) {
                 onException(e)
             }
