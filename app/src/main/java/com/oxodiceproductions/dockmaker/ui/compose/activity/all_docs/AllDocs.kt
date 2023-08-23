@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,10 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.ui.compose.activity.document_view.DocumentView
 import com.oxodiceproductions.dockmaker.ui.compose.components.DocumentPreviewItem
@@ -91,19 +96,33 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            if (isSelectedModeOn.value) {
-                Row {
-                    Button(onClick = { /*TODO*/ }) {
+            if (!isSelectedModeOn.value) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .weight(1f, true)
+                    ) {
                         Icon(Icons.Filled.Delete, contentDescription = "Delete selected documents")
-                        Text(text = "Delete")
                     }
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .weight(1f, true)
+                    ) {
                         Icon(Icons.Filled.Share, contentDescription = "Share selected documents")
-                        Text(text = "Share")
                     }
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .weight(1f, true)
+                    ) {
                         Icon(Icons.Filled.Check, contentDescription = "Select all documents")
-                        Text(text = "Select All")
                     }
                 }
             } else {
@@ -117,7 +136,9 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                 )
             }
 
-            LazyColumn() {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+            ) {
                 items(list) { item ->
                     DocumentPreviewItem(item = item, isSelectedModeOn.value, {
                         val intent = Intent(context, DocumentView::class.java)
@@ -134,17 +155,27 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
             }
 
             if (list.size == 0) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, true)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(0.dp, 100.dp, 0.dp, 0.dp)
                 ) {
                     Icon(
-                        Icons.Filled.Face,
-                        contentDescription = "No Documents image"
+                        painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
+                        contentDescription = "No Documents image",
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .width(256.dp),
                     )
 
-                    Text(text = "No Documents Yet.")
+                    Text(
+                        text = "No Documents Yet.",
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(0.dp, 16.dp, 0.dp, 0.dp),
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
+                        fontSize = 24.sp
+                    )
                 }
             }
         }

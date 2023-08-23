@@ -5,10 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -34,57 +36,95 @@ fun DocumentPreviewItem(
     onItemClick: () -> Unit,
     onLongPress: (Long) -> Unit
 ) {
-    Card(
-        elevation = 2.dp,
-        modifier = Modifier.combinedClickable(
-            onClick = {
-                if (isSelectionModeOn) {
-                    onLongPress(item.id)
-                } else {
-                    onItemClick()
-                }
-            },
-            onLongClick = {
+    Row {
+        if (isSelectionModeOn) {
+            Checkbox(checked = item.isSelected, onCheckedChange = {
                 onLongPress(item.id)
-            }
-        )
-    ) {
-        Row {
-            if (isSelectionModeOn) {
-                Checkbox(checked = item.isSelected, onCheckedChange = {
-                    onLongPress(item.id)
-                }, modifier = Modifier.align(Alignment.CenterVertically))
-            }
-            if (item.image != null) {
-                AsyncImage(
-                    model = item.image,
-                    contentDescription = "Preview Image",
-                    modifier = Modifier
-                        .width(64.dp)
-                        .height(64.dp)
-                        .padding(16.dp)
-                        .align(Alignment.CenterVertically)
+            }, modifier = Modifier.align(Alignment.CenterVertically))
+        }
+        Card(
+            elevation = 2.dp,
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = {
+                        if (isSelectionModeOn) {
+                            onLongPress(item.id)
+                        } else {
+                            onItemClick()
+                        }
+                    },
+                    onLongClick = {
+                        onLongPress(item.id)
+                    }
                 )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
-                    contentDescription = "Preview Image",
-                    modifier = Modifier
-                        .width(64.dp)
-                        .height(64.dp)
-                        .padding(16.dp)
-                        .align(Alignment.CenterVertically),
-                    colorFilter = ColorFilter.tint(Color.Gray)
-                )
+                .padding(16.dp, 16.dp, 16.dp, 16.dp),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column {
+                Row {
+                    if (item.image != null) {
+                        AsyncImage(
+                            model = item.image,
+                            contentDescription = "Preview Image",
+                            modifier = Modifier
+                                .width(64.dp)
+                                .height(64.dp)
+                                .padding(16.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
+                            contentDescription = "Preview Image",
+                            modifier = Modifier
+                                .width(64.dp)
+                                .height(64.dp)
+                                .padding(16.dp)
+                                .align(Alignment.CenterVertically),
+                            colorFilter = ColorFilter.tint(Color.Gray)
+                        )
+                    }
+                    Text(
+                        text = item.name,
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(16.dp)
+                            .align(Alignment.CenterVertically),
+                        fontFamily = FontFamily.SansSerif,
+                        fontSize = 16.sp,
+                        maxLines = 1
+                    )
+                }
+                Row {
+                    Text(
+                        text = item.dateTime.date,
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                            .weight(1f),
+                        fontFamily = FontFamily.SansSerif,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        text = item.dateTime.time,
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                            .weight(1f),
+                        fontFamily = FontFamily.SansSerif,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        text = "${item.imageCount} Images",
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                            .weight(1f),
+                        fontFamily = FontFamily.SansSerif,
+                        fontSize = 12.sp,
+                    )
+                }
             }
-            Text(
-                text = item?.name ?: "",
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(16.dp),
-                fontFamily = FontFamily.SansSerif,
-                fontSize = 16.sp,
-            )
         }
     }
 }
@@ -103,7 +143,7 @@ fun DocumentPreviewItemPreview() {
                 time = "12:00"
             ),
             imageCount = 0
-        ), false, {
+        ), true, {
 
         }
     ) {

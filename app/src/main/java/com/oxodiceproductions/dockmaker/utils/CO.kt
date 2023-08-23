@@ -106,8 +106,8 @@ class CO {
         }
 
         fun getDocTime(time: Long): DocumentPreviewModel.DateTime {
-            val dateSDF = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val timeSDF = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            val dateSDF = SimpleDateFormat("dd MMM", Locale.getDefault())
+            val timeSDF = SimpleDateFormat("HH:mm a", Locale.getDefault())
             return DocumentPreviewModel.DateTime(
                 dateSDF.format(Date(time)),
                 timeSDF.format(Date(time))
