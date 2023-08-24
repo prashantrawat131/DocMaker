@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,72 +58,75 @@ fun DocumentPreviewItem(
                         onLongPress(item.id)
                     }
                 )
-                .padding(16.dp, 16.dp, 16.dp, 16.dp),
+                .padding(16.dp, 16.dp, 16.dp, 8.dp),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Column {
-                Row {
-                    if (item.image != null) {
-                        AsyncImage(
-                            model = item.image,
-                            contentDescription = "Preview Image",
-                            modifier = Modifier
-                                .width(64.dp)
-                                .height(64.dp)
-                                .padding(16.dp)
-                                .align(Alignment.CenterVertically)
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
-                            contentDescription = "Preview Image",
-                            modifier = Modifier
-                                .width(64.dp)
-                                .height(64.dp)
-                                .padding(16.dp)
-                                .align(Alignment.CenterVertically),
-                            colorFilter = ColorFilter.tint(Color.Gray)
-                        )
-                    }
+            Row {
+                if (item.image != null) {
+                    AsyncImage(
+                        model = item.image,
+                        contentDescription = "Preview Image",
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(100.dp)
+                            .padding(16.dp)
+                            .align(Alignment.CenterVertically),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
+                        contentDescription = "Preview Image",
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(100.dp)
+                            .padding(16.dp)
+                            .align(Alignment.CenterVertically),
+                        colorFilter = ColorFilter.tint(Color.Gray),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Column {
                     Text(
                         text = item.name,
                         modifier = Modifier
                             .fillMaxWidth(1f)
-                            .padding(16.dp)
-                            .align(Alignment.CenterVertically),
+                            .padding(16.dp),
                         fontFamily = FontFamily.SansSerif,
                         fontSize = 16.sp,
                         maxLines = 1
                     )
-                }
-                Row {
-                    Text(
-                        text = item.dateTime.date,
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .padding(16.dp, 0.dp, 16.dp, 16.dp)
-                            .weight(1f),
-                        fontFamily = FontFamily.SansSerif,
-                        fontSize = 12.sp,
-                    )
-                    Text(
-                        text = item.dateTime.time,
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .padding(16.dp, 0.dp, 16.dp, 16.dp)
-                            .weight(1f),
-                        fontFamily = FontFamily.SansSerif,
-                        fontSize = 12.sp,
-                    )
-                    Text(
-                        text = "${item.imageCount} Images",
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .padding(16.dp, 0.dp, 16.dp, 16.dp)
-                            .weight(1f),
-                        fontFamily = FontFamily.SansSerif,
-                        fontSize = 12.sp,
-                    )
+                    Row {
+                        Text(
+                            text = item.dateTime.date,
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+                                .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                                .weight(1f),
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 12.sp,
+                        )
+                        Text(
+                            text = item.dateTime.time,
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+                                .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                                .weight(1f),
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 12.sp,
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "${item.imageCount}",
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+                                .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                                .weight(1f),
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 12.sp,
+                        )
+                    }
                 }
             }
         }
@@ -139,8 +143,8 @@ fun DocumentPreviewItemPreview() {
             name = "Test",
             image = null,
             dateTime = DocumentPreviewModel.DateTime(
-                date = "01/01/2021",
-                time = "12:00"
+                date = "01 Jan",
+                time = "12:00 am"
             ),
             imageCount = 0
         ), true, {

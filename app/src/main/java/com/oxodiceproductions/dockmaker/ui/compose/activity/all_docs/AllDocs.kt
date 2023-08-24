@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
@@ -96,11 +97,20 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            if (!isSelectedModeOn.value) {
+            Text(
+                text = "Documents",
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .padding(16.dp,16.dp,16.dp,0.dp),
+                fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
+                fontSize = 24.sp,
+            )
+
+            AnimatedVisibility (isSelectedModeOn.value) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(1f)
-                        .padding(16.dp),
+                        .padding(16.dp,8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Button(
@@ -125,16 +135,8 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                         Icon(Icons.Filled.Check, contentDescription = "Select all documents")
                     }
                 }
-            } else {
-                Text(
-                    text = "Documents",
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .padding(16.dp),
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
-                    fontSize = 24.sp,
-                )
             }
+
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(0.dp),
@@ -165,7 +167,8 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                         contentDescription = "No Documents image",
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .width(256.dp),
+                            .size(128.dp),
+                        tint = Color.Gray
                     )
 
                     Text(
@@ -174,7 +177,8 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                             .align(Alignment.CenterHorizontally)
                             .padding(0.dp, 16.dp, 0.dp, 0.dp),
                         fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
-                        fontSize = 24.sp
+                        fontSize = 24.sp,
+                        color = Color.Gray
                     )
                 }
             }
@@ -190,7 +194,7 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                 .width(80.dp)
                 .height(80.dp)
                 .padding(16.dp),
-            backgroundColor = Color(0xFFF3B96D),
+            backgroundColor = MaterialTheme.colors.primary,
             shape = RoundedCornerShape(8.dp),
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Add Document")
