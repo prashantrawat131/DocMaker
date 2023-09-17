@@ -12,6 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SingleImageViewModel @Inject constructor(val database: AppDatabase) : ViewModel() {
     val deleteImageResponse = MutableLiveData<Int>()
+    val loadImageResponse = MutableLiveData<String>()
 
     fun deleteImage(
         image: Image,
@@ -21,6 +22,16 @@ class SingleImageViewModel @Inject constructor(val database: AppDatabase) : View
             try {
                 val imageDao = database.imageDao()
                 deleteImageResponse.value = imageDao.deleteImageByPath(image.imagePath)
+            } catch (e: Exception) {
+                onException(e)
+            }
+        }
+    }
+
+    fun loadImage(imagePath: String, onException: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                loadImageResponse.value = imagePath
             } catch (e: Exception) {
                 onException(e)
             }

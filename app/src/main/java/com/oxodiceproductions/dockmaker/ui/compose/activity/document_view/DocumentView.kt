@@ -33,6 +33,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
+import com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit.EditingActivity
 import com.oxodiceproductions.dockmaker.ui.compose.activity.single_image.SingleImageActivity
 import com.oxodiceproductions.dockmaker.ui.compose.components.ImagePreviewItem
 import com.oxodiceproductions.dockmaker.ui.compose.components.RenameDocDialog
@@ -47,7 +48,7 @@ import java.io.File
 @AndroidEntryPoint
 class DocumentView : ComponentActivity() {
     private var docId = 0L
-    lateinit var viewModel: DocViewViewModel
+    private lateinit var viewModel: DocViewViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,10 +65,11 @@ class DocumentView : ComponentActivity() {
                     val filePath = imageCompressor.compress(uri)
                     viewModel.addImageToDocument(docId, filePath) {
                         CO.log("Image Added to Document: ${it.message}")
+                        val intent = Intent(this, EditingActivity::class.java)
+                        intent.putExtra("docId", docId)
+                        intent.putExtra("imagePath", filePath)
+                        startActivity(intent)
                     }
-//                    val intent = Intent(this, EditingActivity::class.java)
-//                    intent.putExtra("ImagePath", uri.path)
-//                    startActivity(intent)
                 }
             }
         val clickImageFromCamera =
