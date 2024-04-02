@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.impl.utils.ContextUtil.getApplicationContext
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,8 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
+import com.google.common.util.concurrent.ListenableFuture
 import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
+import com.oxodiceproductions.dockmaker.ui.compose.activity.camera.CameraActivity
 import com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit.EditingActivity
 import com.oxodiceproductions.dockmaker.ui.compose.activity.single_image.SingleImageActivity
 import com.oxodiceproductions.dockmaker.ui.compose.components.ImagePreviewItem
@@ -72,7 +75,7 @@ class DocumentView : ComponentActivity() {
                     }
                 }
             }
-        val clickImageFromCamera =
+       /* val clickImageFromCamera =
             registerForActivityResult(ActivityResultContracts.TakePicture()) {
                 if (it) {
                     CO.log("Image Captured")
@@ -82,7 +85,13 @@ class DocumentView : ComponentActivity() {
                         CO.log("Image Added to Document: ${it.message}")
                     }
                 }
-            }
+            }*/
+
+        val clickImageFromCamera={
+            val intent=Intent(this, CameraActivity::class.java);
+            intent.putExtra(Constants.docId, docId);
+            startActivity(intent);
+        }
 
         setContent {
             DocMakerTheme {
@@ -103,7 +112,7 @@ fun DocView(
     context: Context,
     docId: Long,
     getImageFromGallery: ActivityResultLauncher<String>?,
-    clickImageFromCamera: ActivityResultLauncher<Uri>?,
+    clickImageFromCamera: ()->Unit,
     viewModel: DocViewViewModel
 ) {
 
@@ -148,17 +157,7 @@ fun DocView(
                             Text(text = "Choose from gallery")
                         }
                     }
-                    Button(onClick = {
-                        val file = File(context.filesDir, "picFromCamera")
-                        val uri = FileProvider.getUriForFile(
-                            context,
-                            context.packageName + ".provider",
-                            file
-                        )
-
-                        clickImageFromCamera?.launch(uri)
-                        photoInputTypeDialogVisible.value = false
-                    }) {
+                    Button(onClick = clickImageFromCamera) {
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_baseline_photo_camera_24),
@@ -226,7 +225,7 @@ fun DefaultPreview3() {
             LocalContext.current,
             1L,
             null,
-            null,
+            {  },
             DocViewViewModel(AppDatabase.getInstance(LocalContext.current))
         )
     }

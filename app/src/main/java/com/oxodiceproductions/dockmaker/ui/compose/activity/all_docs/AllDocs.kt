@@ -1,7 +1,10 @@
 package com.oxodiceproductions.dockmaker.ui.compose.activity.all_docs
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -34,6 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
@@ -53,6 +58,8 @@ class AllDocs : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(this)[AllDocViewModel::class.java]
+
+        takePermissions(this,this);
 
         setContent {
             DocMakerTheme {
@@ -79,6 +86,25 @@ class AllDocs : ComponentActivity() {
         viewModel.getAllDocs {
             CO.log(it.message ?: "")
         }
+    }
+}
+
+fun takePermissions(context: Context,activity: Activity){
+//    Take camera and write to storage permissions
+    val permissions = arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+        // Request the permissions
+        ActivityCompat.requestPermissions(activity, permissions, 100)
+    } else {
+        // You already have the permissions
     }
 }
 
