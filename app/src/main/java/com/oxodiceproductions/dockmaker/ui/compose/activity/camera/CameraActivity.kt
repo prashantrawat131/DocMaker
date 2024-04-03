@@ -20,6 +20,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -47,7 +48,7 @@ class CameraActivity : ComponentActivity() {
             DocMakerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(1f),
                     color = MaterialTheme.colors.background
                 ) {
                     AppContent(cameraProviderFuture, goToEditImageActivity = {
@@ -89,7 +90,7 @@ fun AppContent(
             imageCapture
         )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize(1f)) {
         AndroidView({ previewView }) { view ->
             preview.setSurfaceProvider(view.surfaceProvider)
         }
@@ -107,7 +108,7 @@ fun AppContent(
                         CO.log(exception.message.toString())
                     }
                 })
-        }) {
+        }, modifier = Modifier.align(Alignment.Center)) {
             Image(
                 painter = painterResource(id = R.drawable.ic_baseline_photo_camera_24),
                 contentDescription = "Click to capture image"

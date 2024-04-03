@@ -1,5 +1,6 @@
 package com.oxodiceproductions.dockmaker.ui.compose.activity.document_view
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -61,13 +62,14 @@ class DocumentView : ComponentActivity() {
             CO.log("loadImagesForDoc: ${it.message}")
         }
         val getImageFromGallery =
-            registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-                if (uri != null) {
-                    CO.log("Uri Path: ${uri.path}")
-                    val imageCompressor = ImageCompressor(this)
-                    val filePath = imageCompressor.compress(uri)
-                    viewModel.addImageToDocument(docId, filePath) {
-                        CO.log("Image Added to Document: ${it.message}")
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val uri = result.data?.data
+                    if (uri != null) {
+                        CO.log("Uri Path: ${uri.path}")
+                        val imageCompressor = ImageCompressor(this)
+                        val filePath = imageCompressor.compress(uri)
+
                         val intent = Intent(this, EditingActivity::class.java)
                         intent.putExtra("docId", docId)
                         intent.putExtra("imagePath", filePath)
@@ -75,20 +77,20 @@ class DocumentView : ComponentActivity() {
                     }
                 }
             }
-       /* val clickImageFromCamera =
-            registerForActivityResult(ActivityResultContracts.TakePicture()) {
-                if (it) {
-                    CO.log("Image Captured")
-                    val imageCompressor = ImageCompressor(this)
-                    val filePath = imageCompressor.compress(File(filesDir,"picFromCamera"))
-                    viewModel.addImageToDocument(docId, filePath) {
-                        CO.log("Image Added to Document: ${it.message}")
-                    }
-                }
-            }*/
+        /* val clickImageFromCamera =
+             registerForActivityResult(ActivityResultContracts.TakePicture()) {
+                 if (it) {
+                     CO.log("Image Captured")
+                     val imageCompressor = ImageCompressor(this)
+                     val filePath = imageCompressor.compress(File(filesDir,"picFromCamera"))
+                     viewModel.addImageToDocument(docId, filePath) {
+                         CO.log("Image Added to Document: ${it.message}")
+                     }
+                 }
+             }*/
 
-        val clickImageFromCamera={
-            val intent=Intent(this, CameraActivity::class.java);
+        val clickImageFromCamera = {
+            val intent = Intent(this, CameraActivity::class.java);
             intent.putExtra(Constants.docId, docId);
             startActivity(intent);
         }
@@ -111,8 +113,8 @@ class DocumentView : ComponentActivity() {
 fun DocView(
     context: Context,
     docId: Long,
-    getImageFromGallery: ActivityResultLauncher<String>?,
-    clickImageFromCamera: ()->Unit,
+    getImageFromGallery: ActivityResultLauncher<Intent>?,
+    clickImageFromCamera: () -> Unit,
     viewModel: DocViewViewModel
 ) {
 
@@ -146,7 +148,9 @@ fun DocView(
             Dialog(onDismissRequest = { /*TODO*/ }) {
                 Column {
                     Button(onClick = {
-                        getImageFromGallery?.launch("image/*")
+                        val intent = Intent(Intent.ACTION_PICK)
+                        intent.type = "image/*"
+                        getImageFromGallery?.launch(intent)
                         photoInputTypeDialogVisible.value = false
                     }) {
                         Row {
@@ -225,7 +229,7 @@ fun DefaultPreview3() {
             LocalContext.current,
             1L,
             null,
-            {  },
+            { },
             DocViewViewModel(AppDatabase.getInstance(LocalContext.current))
         )
     }

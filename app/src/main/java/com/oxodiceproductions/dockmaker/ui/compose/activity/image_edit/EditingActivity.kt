@@ -2,6 +2,7 @@ package com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
@@ -55,6 +57,7 @@ class EditingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val docId = intent.extras?.getLong("docId")
         val imagePath = intent.extras?.getString("imagePath")
+        CO.log("docId: $docId, imagePath: $imagePath")
         setContent {
             DocMakerTheme {
                 // A surface container using the 'background' color from the theme
@@ -94,8 +97,12 @@ fun EditingView(
         mutableStateOf(0f)
     }
 
-    var imageBitmap by remember {
-        mutableStateOf(BitmapFactory.decodeFile(imagePath).asImageBitmap())
+    var imageBitmap = remember(imagePath) {
+        val options = BitmapFactory.Options().apply {
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+        }
+        val bitmap = BitmapFactory.decodeFile(imagePath, options)
+        bitmap.asImageBitmap()
     }
 
     var editingState by remember {
@@ -164,10 +171,10 @@ fun EditingView(
             contentDescription = "Image for editing",
             modifier = Modifier
                 .weight(1f)
-                .rotate(rotation)
-                .drawBehind {
-                    drawRect(Color.Red, Offset(0f, 0f), size)
-                }
+//                .rotate(rotation)
+//                .drawBehind {
+//                    drawRect(Color.Red, Offset(0f, 0f), size)
+//                }
         )
         if (editingState == Constants.EditingState.ROTATE) {
             Row {
@@ -182,7 +189,7 @@ fun EditingView(
             }
         }
         if (editingState == Constants.EditingState.NONE) {
-            Row(modifier = Modifier.fillMaxSize()) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Button(onClick = {
                     lastRotation = rotation
                     editingState = Constants.EditingState.ROTATE
