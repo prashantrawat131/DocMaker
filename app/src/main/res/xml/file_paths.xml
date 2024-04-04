@@ -6,7 +6,7 @@
     <cache-path
         name="name2"
         path="."/>
-    <!--<external-cache-path
+    <external-cache-path
         name="name3"
         path="."/>
     <external-files-path
@@ -17,6 +17,6 @@
         path="."/>
     <external-path
         name="name6"
-        path="."/>-->
+        path="."/>
 
 </paths>

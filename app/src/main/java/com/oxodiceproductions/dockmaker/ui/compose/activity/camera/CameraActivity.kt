@@ -43,7 +43,7 @@ class CameraActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         CO.log("CameraActivity");
-        val docId = intent.extras?.getLong(Constants.docId)
+//        val docId = intent.extras?.getLong(Constants.docId)
         setContent {
             DocMakerTheme {
                 // A surface container using the 'background' color from the theme
@@ -51,11 +51,13 @@ class CameraActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(1f),
                     color = MaterialTheme.colors.background
                 ) {
-                    AppContent(cameraProviderFuture, goToEditImageActivity = {
-                        val intent = Intent(this, EditingActivity::class.java)
-                        intent.putExtra(Constants.docId, docId);
-                        intent.putExtra(Constants.imagePath, it)
-                        startActivity(intent)
+                    AppContent(cameraProviderFuture, returnActivity = {
+                        fileName->
+                        val resultIntent= Intent().apply {
+                            putExtra(Constants.imagePath, fileName)
+                        }
+                        setResult(RESULT_OK, resultIntent)
+                        finish()
                     })
                 }
             }
@@ -66,7 +68,7 @@ class CameraActivity : ComponentActivity() {
 @Composable
 fun AppContent(
     cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
-    goToEditImageActivity: (String) -> Unit
+    returnActivity: (String) -> Unit
 ) {
     val context = LocalContext.current
     val previewView = PreviewView(LocalContext.current)
@@ -100,7 +102,7 @@ fun AppContent(
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                         CO.log("Image saved")
-                        goToEditImageActivity(fileName)
+                        returnActivity(capturedImage.path)
                     }
 
                     override fun onError(exception: ImageCaptureException) {

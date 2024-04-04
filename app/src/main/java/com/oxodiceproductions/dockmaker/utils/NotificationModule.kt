@@ -1,9 +1,12 @@
 package com.oxodiceproductions.dockmaker.utils
 
+import android.Manifest
 import android.app.DownloadManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.oxodiceproductions.dockmaker.R
@@ -27,6 +30,13 @@ class NotificationModule {
         val notificationManager = NotificationManagerCompat.from(context)
 
         // notificationId is a unique int for each notification that you must define
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
         notificationManager.notify(notificationId++, builder.build())
     }
 

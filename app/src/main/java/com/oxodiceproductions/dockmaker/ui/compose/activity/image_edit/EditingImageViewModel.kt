@@ -3,9 +3,13 @@ package com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.oxodiceproductions.dockmaker.utils.CO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -14,6 +18,11 @@ import java.io.FileOutputStream
 
 class EditingImageViewModel : ViewModel() {
     val saveImageResponse = MutableLiveData<Boolean>()
+    val imageCropResponse = MutableLiveData<Bitmap?>()
+
+     fun cropImage(bitmap: ImageBitmap) {
+
+    }
 
     fun rotateImage(imagePath: String, degrees: Float, onException: (Exception) -> Unit) {
         viewModelScope.launch {
