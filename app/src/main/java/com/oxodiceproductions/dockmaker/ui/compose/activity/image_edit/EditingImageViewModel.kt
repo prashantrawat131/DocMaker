@@ -1,5 +1,6 @@
 package com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -16,15 +17,20 @@ import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.ImageCropper
 import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImagePicker
+import com.oxodiceproductions.dockmaker.database.AppDatabase
+import com.oxodiceproductions.dockmaker.database.Image
 import com.oxodiceproductions.dockmaker.utils.CO
 import com.oxodiceproductions.dockmaker.utils.Constants
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import javax.inject.Inject
 
-class EditingImageViewModel : ViewModel() {
+@HiltViewModel
+class EditingImageViewModel @Inject constructor(val database: AppDatabase) : ViewModel() {
     val saveImageResponse = MutableLiveData<Boolean>()
     val imageCropResponse = MutableLiveData<ImageBitmap?>()
     val imageCropper = ImageCropper()
@@ -52,12 +58,27 @@ class EditingImageViewModel : ViewModel() {
 
     fun saveImage(docId: Long, imageBitmap: ImageBitmap, oldImagePath: String) {
         viewModelScope.launch {
-            val file = File(oldImagePath)
-            file.delete()
-            withContext(Dispatchers.IO) {
+            try {
+                val file = File(oldImagePath)
+                try {
+                    file.delete()
+                } catch (e: Exception) {
+                    CO.log("Error deleting file: ${e.message}")
+                }
                 imageBitmap.asAndroidBitmap()
                     .compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
-                saveImageResponse.value = true
+
+                val imageDao = database.imageDao()
+                val index = imageDao.all()?.size ?: 0
+                val newImage = Image(
+                    oldImagePath, index, docId
+                )
+                val res:Long = imageDao.insert(newImage)
+                saveImageResponse.value = (res > 0)
+                CO.log("Image saved successfully")
+            } catch (e: Exception) {
+                saveImageResponse.value = false
+                CO.log("Error saving image: ${e.message}")
             }
         }
     }

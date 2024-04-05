@@ -1,6 +1,8 @@
 package com.oxodiceproductions.dockmaker.utils
 
 object Constants {
+    const val appName="DockMaker"
+
     const val TAG = "tagJi"
     const val PROPER_DATE_FORMAT = "EEE MMM dd HH:mm:ss z yyyy"
     const val SP_DOC_ID = "DocId"

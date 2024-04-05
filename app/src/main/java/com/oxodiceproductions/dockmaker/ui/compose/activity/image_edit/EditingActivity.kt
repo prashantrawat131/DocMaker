@@ -51,10 +51,12 @@ import com.oxodiceproductions.dockmaker.ui.compose.activity.document_view.Docume
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
 import com.oxodiceproductions.dockmaker.utils.Constants
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
+@AndroidEntryPoint
 class EditingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

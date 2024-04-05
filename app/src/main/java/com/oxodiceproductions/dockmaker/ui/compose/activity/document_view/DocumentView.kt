@@ -11,6 +11,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,18 +30,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.R
+import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Image
 import com.oxodiceproductions.dockmaker.ui.compose.activity.camera.CameraActivity
+import com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit.EditingActivity
 import com.oxodiceproductions.dockmaker.ui.compose.activity.single_image.SingleImageActivity
 import com.oxodiceproductions.dockmaker.ui.compose.components.ImagePreviewItem
 import com.oxodiceproductions.dockmaker.ui.compose.components.RenameDocDialog
+import com.oxodiceproductions.dockmaker.ui.compose.components.SimpleDialog
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
 import com.oxodiceproductions.dockmaker.utils.Constants
@@ -55,7 +68,6 @@ class DocumentView : ComponentActivity() {
     private var docId = 0L
     private lateinit var viewModel: DocViewViewModel
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[DocViewViewModel::class.java]
@@ -71,9 +83,10 @@ class DocumentView : ComponentActivity() {
                         CO.log("Uri Path: ${uri.path}")
                         val imageCompressor = ImageCompressor(this)
                         val filePath = imageCompressor.compress(uri)
-                        viewModel.addImageToDocument(docId, filePath) {
+                        /*viewModel.addImageToDocument(docId, filePath) {
                             CO.log("Error while adding image to document: ${it.message}")
-                        }
+                        }*/
+                        goToEditingActivity(filePath)
 
                         /*val intent = Intent(this, EditingActivity::class.java)
                         intent.putExtra("docId", docId)
@@ -99,9 +112,10 @@ class DocumentView : ComponentActivity() {
                     val imageCompressor = ImageCompressor(this)
                     val filePath = imageCompressor.compress(File(it))
                     CO.log("File Path from camera activity: $filePath")
-                    viewModel.addImageToDocument(docId, filePath) {
+                    /*viewModel.addImageToDocument(docId, filePath) {
                         CO.log("Error while adding image to document: ${it.message}")
-                    }
+                    }*/
+                    goToEditingActivity(filePath)
                 }
             }
 
@@ -127,12 +141,16 @@ class DocumentView : ComponentActivity() {
         }
 
         viewModel.downloadPdfResponse.observeForever {
-            val notificationModule=NotificationModule()
+            val notificationModule = NotificationModule()
             if (it) {
                 notificationModule.generateNotification(this, "PDF downloaded", "Go to downloads.");
                 CO.toast("PDF downloaded successfully", this)
             } else {
-                notificationModule.generateNotification(this, "Error", "Error while downloading PDF.");
+                notificationModule.generateNotification(
+                    this,
+                    "Error",
+                    "Error while downloading PDF."
+                );
                 CO.toast("Error while downloading PDF", this)
             }
         }
@@ -160,6 +178,13 @@ class DocumentView : ComponentActivity() {
         }
     }
 
+    private fun goToEditingActivity(imagePath: String) {
+        val intent = Intent(this, EditingActivity::class.java)
+        intent.putExtra(Constants.docId, docId)
+        intent.putExtra(Constants.imagePath, imagePath)
+        startActivity(intent)
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.getDocById(docId) {
@@ -183,7 +208,7 @@ fun DocView(
 ) {
 
     LaunchedEffect(key1 = docId) {
-        viewModel.loadImagesForDoc(docId) {
+        viewModel!!.loadImagesForDoc(docId) {
             CO.log("loadImagesForDoc: ${it.message}")
         }
         viewModel.getDocById(docId) {
@@ -196,16 +221,32 @@ fun DocView(
         }
     }
 
-    val images by viewModel.images.observeAsState(initial = emptyList())
-    val doc = viewModel.loadDocumentResponse.observeAsState()
+    val images by viewModel!!.images.observeAsState(initial = emptyList())
+    val doc = viewModel!!.loadDocumentResponse.observeAsState()
     val renameDialogVisible = remember { mutableStateOf(false) }
     val photoInputTypeDialogVisible = remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
+        val deleteDocumentDialogVisible = remember {
+            mutableStateOf(false)
+        }
+
+        if (deleteDocumentDialogVisible.value) {
+            SimpleDialog(
+                heading = "Delete Document",
+                description = "The following document\n ${doc.value?.name} \nwill be deleted. Are you sure you want to delete this document?",
+                positiveText = "Delete",
+                negativeText = "Cancel",
+                modifier = Modifier.align(Alignment.Center),
+                positive = { viewModel.deleteDoc(docId) }) {
+                deleteDocumentDialogVisible.value = false
+            }
+        }
+
         if (renameDialogVisible.value) {
             RenameDocDialog(doc.value?.name ?: "Doc Name", {
-                viewModel.renameDoc(docId, it) { e ->
+                viewModel!!.renameDoc(docId, it) { e ->
                     CO.log("Error while updating name: ${e.message}")
                 }
                 renameDialogVisible.value = false
@@ -218,11 +259,10 @@ fun DocView(
             Dialog(onDismissRequest = { /*TODO*/ }) {
                 Column {
                     Button(onClick = {
+                        photoInputTypeDialogVisible.value = false
                         val intent = Intent(Intent.ACTION_PICK)
                         intent.type = "image/*"
                         getImageFromGallery?.launch(intent)
-                        photoInputTypeDialogVisible.value = false
-
                     }) {
                         Row {
                             Icon(
@@ -233,6 +273,7 @@ fun DocView(
                         }
                     }
                     Button(onClick = {
+                        photoInputTypeDialogVisible.value = false
                         captureImage?.launch(Unit)
                     }) {
                         Row {
@@ -247,26 +288,40 @@ fun DocView(
             }
         }
 
-
-
         Column(modifier = Modifier.fillMaxSize()) {
-            Row {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xfF3F51B5),
+                                Color(0xFF303F9F),
+                            )
+                        ),
+                        shape = RectangleShape
+                    )
+                    .padding(0.dp, 8.dp, 0.dp, 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 IconButton(onClick = {
                     goToAllDocsActivity()
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
                         modifier = Modifier.rotate(-90f),
-                        contentDescription = "Back"
+                        contentDescription = "Back",
+                        tint = Color.White
                     )
                 }
 
                 IconButton(onClick = {
-                    viewModel.deleteDoc(docId)
+                    deleteDocumentDialogVisible.value = true
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_delete_24),
-                        contentDescription = "Delete"
+                        contentDescription = "Delete",
+                        tint = Color.White
                     )
                 }
 
@@ -277,7 +332,8 @@ fun DocView(
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_picture_as_pdf_24),
-                        contentDescription = "Delete"
+                        contentDescription = "PDF Preview",
+                        tint = Color.White
                     )
                 }
 
@@ -288,7 +344,8 @@ fun DocView(
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_share_24),
-                        contentDescription = "Share"
+                        contentDescription = "Share",
+                        tint = Color.White
                     )
                 }
 
@@ -299,7 +356,8 @@ fun DocView(
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_get_app_24),
-                        contentDescription = "Download PDF"
+                        contentDescription = "Download PDF",
+                        tint = Color.White
                     )
                 }
             }
@@ -308,7 +366,13 @@ fun DocView(
                 TextButton(
                     content = {
                         Text(
-                            text = doc.value?.name ?: "Document"
+                            text = doc.value?.name ?: "Document",
+                            Modifier.border(
+                                width = 1.dp,
+                                color = Color(0xFFFA842A),
+                                shape = RoundedCornerShape(8.dp)
+                            ).padding(8.dp)
+                                .fillMaxWidth(1f)
                         )
                     },
                     modifier = Modifier.padding(16.dp),
@@ -336,22 +400,22 @@ fun DocView(
                 photoInputTypeDialogVisible.value = true
             },
             modifier = Modifier
-                .width(80.dp)
-                .height(80.dp)
                 .align(Alignment.BottomEnd)
+                .width(90.dp)
+                .height(90.dp)
                 .padding(16.dp),
-            backgroundColor = Color(0xFFF3B96D),
-            shape = RoundedCornerShape(8.dp),
+            backgroundColor = Color(0xFF3F51B5),
+            shape = RoundedCornerShape(50),
         ) {
-            Icon(
-                Icons.Filled.Add, contentDescription = "Add Document",
-                tint = Color.White
+            Image(
+                painter = painterResource(id = R.drawable.ic_baseline_add_24),
+                contentDescription = "Add Document",
+                colorFilter = ColorFilter.tint(Color.White)
             )
         }
 
     }
 }
-/*
 
 @Preview(showBackground = true, widthDp = 320, heightDp = 640)
 @Composable
@@ -361,9 +425,9 @@ fun DefaultPreview3() {
             LocalContext.current,
             1L,
             null,
-            { },
-            DocViewViewModel(AppDatabase.getInstance(LocalContext.current)),
-            null
+            null,
+            {},
+            DocViewViewModel(AppDatabase.getInstance(LocalContext.current), null)
         )
     }
-}*/
+}

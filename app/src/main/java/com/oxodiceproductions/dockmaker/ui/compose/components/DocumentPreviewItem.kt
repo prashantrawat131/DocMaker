@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -75,14 +76,13 @@ fun DocumentPreviewItem(
                     )
                 } else {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
+                        painter = painterResource(id = R.drawable.folder_icon),
                         contentDescription = "Preview Image",
                         modifier = Modifier
                             .width(100.dp)
                             .height(100.dp)
                             .padding(16.dp)
                             .align(Alignment.CenterVertically),
-                        colorFilter = ColorFilter.tint(Color.Gray),
                         contentScale = ContentScale.Crop
                     )
                 }
@@ -111,14 +111,13 @@ fun DocumentPreviewItem(
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .padding(16.dp, 0.dp, 16.dp, 16.dp)
-                                .weight(1f),
+                                .weight(1f)
+                                .alpha(0f),
                             fontFamily = FontFamily.SansSerif,
                             fontSize = 12.sp,
                         )
-                    }
-                    Row {
                         Text(
-                            text = "${item.imageCount}",
+                            text = "${item.imageCount} img",
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .padding(16.dp, 0.dp, 16.dp, 16.dp)

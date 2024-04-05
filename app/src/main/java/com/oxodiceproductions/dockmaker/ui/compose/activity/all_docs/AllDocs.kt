@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -12,10 +13,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -31,10 +34,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -59,7 +67,7 @@ class AllDocs : ComponentActivity() {
 
         viewModel = ViewModelProvider(this)[AllDocViewModel::class.java]
 
-        takePermissions(this,this);
+        takePermissions(this, this);
 
         setContent {
             DocMakerTheme {
@@ -89,7 +97,7 @@ class AllDocs : ComponentActivity() {
     }
 }
 
-fun takePermissions(context: Context,activity: Activity){
+fun takePermissions(context: Context, activity: Activity) {
 //    Take camera and write to storage permissions
     val permissions = arrayOf(
         Manifest.permission.CAMERA,
@@ -98,9 +106,19 @@ fun takePermissions(context: Context,activity: Activity){
         Manifest.permission.POST_NOTIFICATIONS
     )
 
-    if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-        ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
 
         // Request the permissions
         ActivityCompat.requestPermissions(activity, permissions, 100)
@@ -124,24 +142,59 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = "Documents",
+            Row(
                 modifier = Modifier
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFF3F51B5),
+                                Color(0xFF303F9F),
+                            )
+                        ),
+                        shape = RoundedCornerShape(0.dp)
+                    )
                     .fillMaxWidth(1f)
-                    .padding(16.dp,16.dp,16.dp,0.dp),
-                fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
-                fontSize = 24.sp,
-            )
+            ) {
+                Image(painter = painterResource(id = R.drawable.app_icon_for_buttons), contentDescription = "App Icon",
+                    modifier = Modifier
+                        .size(52.dp)
+                        .align(Alignment.CenterVertically),
+                    colorFilter = ColorFilter.tint(Color.White)
+                )
+                Column() {
+                    Text(
+                        text = Constants.appName,
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(8.dp, 8.dp, 16.dp, 0.dp),
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Normal,
+                        fontSize = 24.sp,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Easy \u2022 Fast \u2022 Secure",
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(9.dp, 0.dp, 16.dp, 8.dp),
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
+                        fontSize = 12.sp,
+                        color = Color.White
+                    )
+                }
+            }
 
-            AnimatedVisibility (isSelectedModeOn.value) {
+            AnimatedVisibility(isSelectedModeOn.value) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(1f)
-                        .padding(16.dp,8.dp),
+                        .padding(16.dp, 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+
+                        },
                         modifier = Modifier
                             .weight(1f, true)
                     ) {
@@ -176,9 +229,9 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                         context.startActivity(intent)
                     }, { docId ->
                         CO.log("Long press")
-                        viewModel.selectDocument(docId) {
+                        /*viewModel.selectDocument(docId) {
                             CO.log("selectDocument: $it")
-                        }
+                        }*/
                     })
                 }
             }
@@ -190,7 +243,7 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
                         .padding(0.dp, 100.dp, 0.dp, 0.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_broken_image_24),
+                        painter = painterResource(id = R.drawable.app_icon_for_buttons),
                         contentDescription = "No Documents image",
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
@@ -218,13 +271,17 @@ fun Main(context: Context, viewModel: AllDocViewModel) {
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .width(80.dp)
-                .height(80.dp)
+                .width(90.dp)
+                .height(90.dp)
                 .padding(16.dp),
-            backgroundColor = MaterialTheme.colors.primary,
-            shape = RoundedCornerShape(8.dp),
+            backgroundColor = Color(0xFF3F51B5),
+            shape = RoundedCornerShape(50),
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Add Document")
+            Image(
+                painter = painterResource(id = R.drawable.ic_baseline_add_24),
+                contentDescription = "Add Document",
+                colorFilter = ColorFilter.tint(Color.White)
+            )
         }
     }
 }

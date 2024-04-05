@@ -19,9 +19,9 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class DocViewViewModel @Inject constructor(val database: AppDatabase, val appContext: Application) :
+class DocViewViewModel @Inject constructor(val database: AppDatabase, val appContext: Application?) :
     ViewModel() {
-    val addImageResponse = MutableLiveData<Long>()
+//    val addImageResponse = MutableLiveData<Long>()
     val loadDocumentResponse = MutableLiveData<Document?>()
 
     private val loadImagesResponse = MutableLiveData<List<Image?>>()
@@ -40,7 +40,7 @@ class DocViewViewModel @Inject constructor(val database: AppDatabase, val appCon
                 CO.log("Adding Image to temp list: ${it?.imagePath}")
                 arrayList.add(it!!)
             }
-            return PDFMaker(appContext).MakeTempPDF(
+            return PDFMaker(appContext!!).MakeTempPDF(
                 arrayList,
                 loadDocumentResponse.value?.name ?: "Document"
             )
@@ -93,7 +93,7 @@ class DocViewViewModel @Inject constructor(val database: AppDatabase, val appCon
         }
     }
 
-    fun addImageToDocument(docId: Long, imagePath: String, onException: (Exception) -> Unit) {
+   /* fun addImageToDocument(docId: Long, imagePath: String, onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
                 val imageDao = database.imageDao()
@@ -107,7 +107,7 @@ class DocViewViewModel @Inject constructor(val database: AppDatabase, val appCon
                 onException(e)
             }
         }
-    }
+    }*/
 
     fun loadImagesForDoc(docId: Long, onException: (Exception) -> Unit) {
         viewModelScope.launch {

@@ -39,7 +39,7 @@ class AllDocViewModel @Inject constructor(val database: AppDatabase) : ViewModel
                         doc.id,
                         doc.name ?: "No Name",
                         imagePath,
-                        CO.getDocTime(doc.id),
+                        CO.getDocTime(doc.time),
                         imageCount
                     )
                     previewDocuments.add(displayDocument)
@@ -56,13 +56,10 @@ class AllDocViewModel @Inject constructor(val database: AppDatabase) : ViewModel
     fun addDocument(onException: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
-                val c = Calendar.getInstance()
-                val DocName =
-                    "DocMaker" + "_" + c[Calendar.DATE] + "_" + c[Calendar.MONTH] + "_" + c[Calendar.YEAR] + "_" + c[Calendar.HOUR_OF_DAY] + "_" + c[Calendar.MINUTE] + "_" + c[Calendar.SECOND] //date.getSeconds()+"_"+date.getDate()+"_"+(date.getMonth()+1)+"_"+date.getHours()+"_"+date.getMinutes();da
                 val documentDao = database.documentDao()
                 val newDocument =
                     Document(
-                        Calendar.getInstance().timeInMillis, DocName
+                        Calendar.getInstance().timeInMillis, "New Document"
                     )
                 addDocResponse.value = documentDao.insert(newDocument)
             } catch (e: Exception) {

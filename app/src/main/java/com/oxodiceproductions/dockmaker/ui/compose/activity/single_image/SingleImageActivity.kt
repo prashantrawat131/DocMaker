@@ -158,6 +158,7 @@ fun SingleImageView(
                 description = "",
                 positiveText = "Delete",
                 negativeText = "Cancel",
+                modifier = Modifier.fillMaxWidth(),
                 positive = {
                     viewModel.deleteImage(image) {
                         CO.log("Image deleted")
