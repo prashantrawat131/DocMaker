@@ -91,9 +91,10 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     //image cropper library
-    implementation 'com.edmodo:cropper:1.0.1'
+//    implementation 'com.edmodo:cropper:1.0.1'
 //        implementation "com.theartofdev.edmodo:android-image-cropper:2.8.+"
 //    implementation("com.vanniktech:android-image-cropper:4.5.0")
+    implementation("io.github.mr0xf00:easycrop:0.1.1")
 
     //notification lib
     implementation "androidx.core:core:1.8.0"

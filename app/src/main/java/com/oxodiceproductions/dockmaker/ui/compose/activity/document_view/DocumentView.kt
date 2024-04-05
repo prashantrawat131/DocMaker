@@ -159,6 +159,17 @@ class DocumentView : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getDocById(docId) {
+            CO.log("Error while getting doc by id: ${it.message}")
+        }
+
+        viewModel.loadImagesForDoc(docId) {
+            CO.log("Error while loading images for doc: ${it.message}")
+        }
+    }
 }
 
 @Composable

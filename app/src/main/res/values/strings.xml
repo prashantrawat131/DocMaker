@@ -83,4 +83,6 @@
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_editng">EditngActivity</string>
     <string name="title_activity_single_image">SingleImageActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -69,19 +69,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <!--
- <activity
-            android:name=".ui.activity.editing.EditingImageActivity"
-            android:exported="false" />
-        <activity android:name=".ui.activity.settings.SettingsActivity" />
-        <activity android:name=".ui.activity.camera.CameraActivity" />
-        <activity android:name=".ui.activity.all_docs.AllDocsActivity" />
-        <activity android:name=".ui.activity.single_image.SingleImageActivity" />
-        <activity android:name=".ui.activity.document_view.DocumentViewActivity" />
-        <activity
-            android:name=".ui.activity.main.MainPage"
-            android:exported="true" />
-        -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.oxodiceproductions.dockmaker"

@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -30,9 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
+import com.oxodiceproductions.dockmaker.R
 import com.oxodiceproductions.dockmaker.database.AppDatabase
 import com.oxodiceproductions.dockmaker.database.Image
 import com.oxodiceproductions.dockmaker.ui.compose.activity.document_view.DocumentView
@@ -40,6 +44,7 @@ import com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit.EditingAc
 import com.oxodiceproductions.dockmaker.ui.compose.components.SimpleDialog
 import com.oxodiceproductions.dockmaker.ui.compose.ui.theme.DocMakerTheme
 import com.oxodiceproductions.dockmaker.utils.CO
+import com.oxodiceproductions.dockmaker.utils.NotificationModule
 import com.oxodiceproductions.dockmaker.utils.ShareUtil
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,12 +55,24 @@ class SingleImageActivity : ComponentActivity() {
     private lateinit var image: Image
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         val docId = intent.getLongExtra("docId", 0)
         val imagePath = intent.getStringExtra("imagePath")
         val imageIndex = intent.getIntExtra("imageIndex", 0)
         image = Image(imagePath ?: "", imageIndex, docId)
-        super.onCreate(savedInstanceState)
+
         viewModel = ViewModelProvider(this)[SingleImageViewModel::class.java]
+
+        viewModel.downloadImageResponse.observeForever {
+            CO.log("downloadImageResponse: $it")
+            NotificationModule().generateNotification(
+                this,
+                "Image Downloaded",
+                "Image has been downloaded successfully"
+            )
+        }
+
         setContent {
             DocMakerTheme {
                 // A surface container using the 'background' color from the theme
@@ -67,7 +84,8 @@ class SingleImageActivity : ComponentActivity() {
                         viewModel,
                         this,
                         image,
-                        this::goToDocumentView
+                        this::goToDocumentView,
+                        this::goToEditingActivity
                     )
                 }
             }
@@ -75,10 +93,14 @@ class SingleImageActivity : ComponentActivity() {
     }
 
     private fun goToDocumentView() {
-        val intent = Intent(this, DocumentView::class.java)
-        intent.putExtra("docId", intent.getLongExtra("docId", 0))
-        startActivity(intent)
         finish()
+    }
+
+    fun goToEditingActivity() {
+        val intent = Intent(this, EditingActivity::class.java)
+        intent.putExtra("docId", image.docId)
+        intent.putExtra("imagePath", image.imagePath)
+        startActivity(intent)
     }
 
     override fun onResume() {
@@ -94,7 +116,8 @@ fun SingleImageView(
     viewModel: SingleImageViewModel,
     context: Context,
     image: Image,
-    goToDocumentView: () -> Unit
+    goToDocumentView: () -> Unit,
+    goToEditingActivity: () -> Unit
 ) {
     var imagePath by remember {
         mutableStateOf(image.imagePath)
@@ -146,24 +169,34 @@ fun SingleImageView(
         Column {
             if (scale == 1f) {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = {
+
+                    IconButton(onClick = goToDocumentView) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
+                    }
+                    IconButton(onClick = {
                         askToDelete.value = true
                     }) {
                         Icon(Icons.Filled.Delete, contentDescription = "Delete Image")
                     }
-                    Button(onClick = {
+                    IconButton(onClick = {
+                        viewModel.downloadImage(context) {
+                            CO.log("Image downloaded")
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_get_app_24),
+                            contentDescription = "Download image"
+                        )
+                    }
+                    IconButton(onClick = {
                         ShareUtil.shareImage(context, image.imagePath)
                     }) {
                         Icon(Icons.Filled.Share, contentDescription = "Share Image")
                     }
-                    Button(onClick = {
-                        val intent = Intent(context, EditingActivity::class.java)
-                        intent.putExtra("docId", image.docId)
-                        intent.putExtra("imagePath", image.imagePath)
-                        context.startActivity(intent)
-                    }) {
+                    IconButton(onClick = goToEditingActivity) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit Image")
                     }
+
                 }
             }
             AsyncImage(
@@ -189,7 +222,7 @@ fun SingleImageActivityPreview() {
         SingleImageView(
             SingleImageViewModel(
                 AppDatabase.getInstance(LocalContext.current)
-            ), LocalContext.current, Image("https://picsum.photos/200/300", 1, 1L)
+            ), LocalContext.current, Image("https://picsum.photos/200/300", 1, 1L), {}
         ) {
 
         }

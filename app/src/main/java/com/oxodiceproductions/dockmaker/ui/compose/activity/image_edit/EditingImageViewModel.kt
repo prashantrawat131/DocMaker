@@ -1,15 +1,23 @@
 package com.oxodiceproductions.dockmaker.ui.compose.activity.image_edit
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.net.Uri
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mr0xf00.easycrop.CropError
+import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.ImageCropper
+import com.mr0xf00.easycrop.crop
+import com.mr0xf00.easycrop.rememberImagePicker
 import com.oxodiceproductions.dockmaker.utils.CO
+import com.oxodiceproductions.dockmaker.utils.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,37 +26,67 @@ import java.io.FileOutputStream
 
 class EditingImageViewModel : ViewModel() {
     val saveImageResponse = MutableLiveData<Boolean>()
-    val imageCropResponse = MutableLiveData<Bitmap?>()
+    val imageCropResponse = MutableLiveData<ImageBitmap?>()
+    val imageCropper = ImageCropper()
 
-     fun cropImage(bitmap: ImageBitmap) {
-
-    }
-
-    fun rotateImage(imagePath: String, degrees: Float, onException: (Exception) -> Unit) {
+    fun cropImage(imagePath: String, context: Context) {
         viewModelScope.launch {
-            try {
-                val bitmap = BitmapFactory.decodeFile(imagePath)
-                val rotatedBitmap = Bitmap.createBitmap(
-                    bitmap,
-                    0,
-                    0,
-                    bitmap.width,
-                    bitmap.height,
-                    Matrix().apply {
-                        postRotate(degrees)
-                    },
-                    false
-                )
-                val file = File(imagePath)
-                file.delete()
-                withContext(Dispatchers.IO) {
-                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
-                    saveImageResponse.value = true
+            when (val result = imageCropper.crop(Uri.fromFile(File(imagePath)), context)) {
+                is CropResult.Cancelled -> {
+                    CO.log("Crop cancelled")
+                    imageCropResponse.value = null
                 }
-            } catch (e: Exception) {
-                onException(e)
-                saveImageResponse.value = false
+
+                is CropError -> {
+                    CO.log("Crop error: ${result.name}")
+                    imageCropResponse.value = null
+                }
+
+                is CropResult.Success -> {
+                    CO.log("Crop success")
+                    imageCropResponse.value = result.bitmap
+                }
             }
         }
     }
+
+    fun saveImage(docId: Long, imageBitmap: ImageBitmap, oldImagePath: String) {
+        viewModelScope.launch {
+            val file = File(oldImagePath)
+            file.delete()
+            withContext(Dispatchers.IO) {
+                imageBitmap.asAndroidBitmap()
+                    .compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
+                saveImageResponse.value = true
+            }
+        }
+    }
+    /*
+        fun rotateImage(imagePath: String, degrees: Float, onException: (Exception) -> Unit) {
+            viewModelScope.launch {
+                try {
+                    val bitmap = BitmapFactory.decodeFile(imagePath)
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        bitmap,
+                        0,
+                        0,
+                        bitmap.width,
+                        bitmap.height,
+                        Matrix().apply {
+                            postRotate(degrees)
+                        },
+                        false
+                    )
+                    val file = File(imagePath)
+                    file.delete()
+                    withContext(Dispatchers.IO) {
+                        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
+                        saveImageResponse.value = true
+                    }
+                } catch (e: Exception) {
+                    onException(e)
+                    saveImageResponse.value = false
+                }
+            }
+        }*/
 }
