@@ -60,12 +60,15 @@ import java.io.File
 class EditingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val docId = intent.extras?.getLong(Constants.docId)
         val imagePath = intent.extras?.getString(Constants.imagePath)
+        val newImage = intent.extras?.getBoolean(Constants.newImage)
+
         val viewModel = ViewModelProvider(this)[EditingImageViewModel::class.java]
         CO.log("docId: $docId, imagePath: $imagePath")
 
-        viewModel.saveImageResponse.observeForever{
+        viewModel.saveImageResponse.observeForever {
             goToDocView(docId ?: 1L)
         }
 
@@ -78,6 +81,7 @@ class EditingActivity : ComponentActivity() {
                     EditingView(
                         this, imagePath ?: "",
                         docId ?: 1L,
+                        newImage,
                         viewModel,
                         this::goToDocView
                     )
@@ -97,6 +101,7 @@ fun EditingView(
     context: Context,
     imagePath: String,
     docId: Long,
+    newImage: Boolean?,
     viewModel: EditingImageViewModel?,
     goToDocView: (Long) -> Unit
 ) {
@@ -105,7 +110,7 @@ fun EditingView(
         viewModel?.cropImage(imagePath, context)
         viewModel?.imageCropResponse?.observeForever { bitmap ->
             if (bitmap != null) {
-                viewModel.saveImage(docId, bitmap, imagePath)
+                viewModel.saveImage(context, docId, bitmap, imagePath, newImage)
             } else {
                 goToDocView(docId)
             }
@@ -246,6 +251,6 @@ fun EditingView(
 @Composable
 fun EditingActivityPreview() {
     DocMakerTheme {
-        EditingView(LocalContext.current, "", 1L, null, {})
+        EditingView(LocalContext.current, "", 1L, false, null, {})
     }
 }

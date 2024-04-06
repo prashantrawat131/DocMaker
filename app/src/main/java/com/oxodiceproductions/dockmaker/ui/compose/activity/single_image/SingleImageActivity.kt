@@ -5,13 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -28,12 +31,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
 import com.oxodiceproductions.dockmaker.R
@@ -53,12 +61,13 @@ class SingleImageActivity : ComponentActivity() {
 
     private lateinit var viewModel: SingleImageViewModel
     private lateinit var image: Image
+    private lateinit var imagePath: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val docId = intent.getLongExtra("docId", 0)
-        val imagePath = intent.getStringExtra("imagePath")
+        imagePath = intent.getStringExtra("imagePath") ?: ""
         val imageIndex = intent.getIntExtra("imageIndex", 0)
         image = Image(imagePath ?: "", imageIndex, docId)
 
@@ -101,12 +110,14 @@ class SingleImageActivity : ComponentActivity() {
         intent.putExtra("docId", image.docId)
         intent.putExtra("imagePath", image.imagePath)
         startActivity(intent)
+        finish()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadImage(intent.getStringExtra("imagePath") ?: "") {
-            CO.log("loadImage: ${it.message}")
+        CO.log("onResume")
+        viewModel.loadImage(imagePath){
+            CO.log("Image loaded")
         }
     }
 }
@@ -158,7 +169,7 @@ fun SingleImageView(
                 description = "",
                 positiveText = "Delete",
                 negativeText = "Cancel",
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.align(Alignment.Center),
                 positive = {
                     viewModel.deleteImage(image) {
                         CO.log("Image deleted")
@@ -169,33 +180,63 @@ fun SingleImageView(
         }
         Column {
             if (scale == 1f) {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color(0xfF3F51B5),
+                                    Color(0xFF303F9F),
+                                )
+                            ),
+                            shape = RectangleShape
+                        )
+                        .padding(8.dp, 8.dp, 8.dp, 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
                     IconButton(onClick = goToDocumentView) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            contentDescription = "Go Back",
+                            tint = Color.White
+                        )
                     }
                     IconButton(onClick = {
                         askToDelete.value = true
                     }) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Delete Image")
-                    }
-                    IconButton(onClick = {
-                        viewModel.downloadImage(context) {
-                            CO.log("Image downloaded")
-                        }
-                    }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_get_app_24),
-                            contentDescription = "Download image"
+                            Icons.Filled.Delete,
+                            contentDescription = "Delete Image",
+                            tint = Color.White
                         )
                     }
+                    /*   IconButton(onClick = {
+                           viewModel.downloadImage(context) {
+                               CO.log("Image downloaded")
+                           }
+                       }) {
+                           Icon(
+                               painter = painterResource(id = R.drawable.ic_baseline_get_app_24),
+                               contentDescription = "Download image", tint = Color.White
+                           )
+                       }*/
                     IconButton(onClick = {
                         ShareUtil.shareImage(context, image.imagePath)
                     }) {
-                        Icon(Icons.Filled.Share, contentDescription = "Share Image")
+                        Icon(
+                            Icons.Filled.Share,
+                            contentDescription = "Share Image",
+                            tint = Color.White
+                        )
                     }
                     IconButton(onClick = goToEditingActivity) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Edit Image")
+                        Icon(
+                            Icons.Filled.Edit,
+                            contentDescription = "Edit Image",
+                            tint = Color.White
+                        )
                     }
 
                 }
@@ -213,6 +254,7 @@ fun SingleImageView(
                     .transformable(state = state),
             )
         }
+
     }
 }
 

@@ -14,6 +14,8 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.google.common.util.concurrent.ListenableFuture
@@ -93,7 +96,7 @@ fun AppContent(
         )
 
     Box(modifier = Modifier.fillMaxSize(1f)) {
-        AndroidView({ previewView }) { view ->
+        AndroidView({ previewView }, modifier = Modifier.fillMaxSize(1f)) { view ->
             preview.setSurfaceProvider(view.surfaceProvider)
         }
         Button(onClick = {
@@ -110,7 +113,7 @@ fun AppContent(
                         CO.log(exception.message.toString())
                     }
                 })
-        }, modifier = Modifier.align(Alignment.Center)) {
+        }, modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp), shape = androidx.compose.foundation.shape.CircleShape) {
             Image(
                 painter = painterResource(id = R.drawable.ic_baseline_photo_camera_24),
                 contentDescription = "Click to capture image"

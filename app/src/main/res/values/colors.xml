@@ -13,6 +13,7 @@
 
     <!--light zone-->
     <color name="app_bg">#ffffff</color>
+    <color name="app_icon_color">#FF3F51B5</color>
 
     <!--    extra light zone-->
 

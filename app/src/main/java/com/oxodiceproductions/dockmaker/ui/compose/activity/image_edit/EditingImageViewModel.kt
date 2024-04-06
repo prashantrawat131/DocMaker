@@ -56,25 +56,40 @@ class EditingImageViewModel @Inject constructor(val database: AppDatabase) : Vie
         }
     }
 
-    fun saveImage(docId: Long, imageBitmap: ImageBitmap, oldImagePath: String) {
+    fun saveImage(
+        context: Context,
+        docId: Long,
+        imageBitmap: ImageBitmap,
+        oldImagePath: String,
+        newImage: Boolean?
+    ) {
         viewModelScope.launch {
             try {
                 val file = File(oldImagePath)
-                try {
-                    file.delete()
-                } catch (e: Exception) {
-                    CO.log("Error deleting file: ${e.message}")
-                }
-                imageBitmap.asAndroidBitmap()
-                    .compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
+                file.delete()
 
                 val imageDao = database.imageDao()
-                val index = imageDao.all()?.size ?: 0
-                val newImage = Image(
-                    oldImagePath, index, docId
-                )
-                val res:Long = imageDao.insert(newImage)
-                saveImageResponse.value = (res > 0)
+                if (newImage == true) {
+                    imageBitmap.asAndroidBitmap()
+                        .compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
+
+                    val index = imageDao.all()?.size ?: 0
+                    val imgObj = Image(
+                        oldImagePath, index, docId
+                    )
+                    val res: Long = imageDao.insert(imgObj)
+                    saveImageResponse.value = (res > 0)
+                } else {
+                    val newFile =
+                        File(context.filesDir, CO.getUniqueName(Constants.imageExtension, 0))
+                    imageBitmap.asAndroidBitmap()
+                        .compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(newFile))
+                    val imgObj = imageDao.getImageByImagePath(docId, oldImagePath)
+                    imgObj.imagePath = newFile.absolutePath
+                    imageDao.update(imgObj)
+                    saveImageResponse.value = true
+                }
+
                 CO.log("Image saved successfully")
             } catch (e: Exception) {
                 saveImageResponse.value = false
@@ -82,6 +97,7 @@ class EditingImageViewModel @Inject constructor(val database: AppDatabase) : Vie
             }
         }
     }
+
     /*
         fun rotateImage(imagePath: String, degrees: Float, onException: (Exception) -> Unit) {
             viewModelScope.launch {

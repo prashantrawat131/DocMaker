@@ -17,6 +17,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -41,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.oxodiceproductions.dockmaker.R
@@ -182,6 +184,7 @@ class DocumentView : ComponentActivity() {
         val intent = Intent(this, EditingActivity::class.java)
         intent.putExtra(Constants.docId, docId)
         intent.putExtra(Constants.imagePath, imagePath)
+        intent.putExtra(Constants.newImage, true)
         startActivity(intent)
     }
 
@@ -256,32 +259,36 @@ fun DocView(
         }
 
         if (photoInputTypeDialogVisible.value) {
-            Dialog(onDismissRequest = { /*TODO*/ }) {
+            Dialog(onDismissRequest = { photoInputTypeDialogVisible.value = false }) {
                 Column {
-                    Button(onClick = {
-                        photoInputTypeDialogVisible.value = false
-                        val intent = Intent(Intent.ACTION_PICK)
-                        intent.type = "image/*"
-                        getImageFromGallery?.launch(intent)
-                    }) {
+                    Button(
+                        onClick = {
+                            photoInputTypeDialogVisible.value = false
+                            val intent = Intent(Intent.ACTION_PICK)
+                            intent.type = "image/*"
+                            getImageFromGallery?.launch(intent)
+                        }
+                    ) {
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_baseline_photo_library_24),
                                 contentDescription = "Choose from gallery"
                             )
-                            Text(text = "Choose from gallery")
+                            Text(text = "Gallery")
                         }
                     }
-                    Button(onClick = {
-                        photoInputTypeDialogVisible.value = false
-                        captureImage?.launch(Unit)
-                    }) {
+                    Button(
+                        onClick = {
+                            photoInputTypeDialogVisible.value = false
+                            captureImage?.launch(Unit)
+                        }
+                    ) {
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_baseline_photo_camera_24),
                                 contentDescription = "Take a photo"
                             )
-                            Text(text = "Take a photo")
+                            Text(text = "Camera")
                         }
                     }
                 }
@@ -301,7 +308,7 @@ fun DocView(
                         ),
                         shape = RectangleShape
                     )
-                    .padding(0.dp, 8.dp, 0.dp, 8.dp),
+                    .padding(8.dp, 8.dp, 8.dp, 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
@@ -348,7 +355,7 @@ fun DocView(
                         tint = Color.White
                     )
                 }
-
+/*
                 IconButton(onClick = {
                     viewModel.downloadPdf {
                         CO.log("Error while downloading pdf: ${it.message}")
@@ -359,7 +366,7 @@ fun DocView(
                         contentDescription = "Download PDF",
                         tint = Color.White
                     )
-                }
+                }*/
             }
 
             Column(modifier = Modifier.fillMaxSize()) {
@@ -367,11 +374,13 @@ fun DocView(
                     content = {
                         Text(
                             text = doc.value?.name ?: "Document",
-                            Modifier.border(
-                                width = 1.dp,
-                                color = Color(0xFFFA842A),
-                                shape = RoundedCornerShape(8.dp)
-                            ).padding(8.dp)
+                            Modifier
+                                .border(
+                                    width = 1.dp,
+                                    color = Color(0xFFFA842A),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(8.dp)
                                 .fillMaxWidth(1f)
                         )
                     },
@@ -381,8 +390,8 @@ fun DocView(
                     }
                 )
                 LazyColumn() {
-                    items(images) { item ->
-                        ImagePreviewItem(item!!) {
+                    itemsIndexed(images) {index, item ->
+                        ImagePreviewItem(item!!,index+1) {
                             val intent = Intent(context, SingleImageActivity::class.java)
                             intent.putExtra("docId", docId)
                             intent.putExtra("imagePath", item.imagePath)

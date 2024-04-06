@@ -53,12 +53,14 @@ fun SimpleDialog(
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
-            Text(
-                text = description,
-                modifier = Modifier.padding(bottom = 16.dp),
-                color = Color.White,
-                fontSize = 12.sp,
-            )
+            if(description!=""){
+                Text(
+                    text = description,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = Color.White,
+                    fontSize = 12.sp,
+                )
+            }
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
                 Button(onClick = negative) {
                     Text(text = negativeText)

@@ -19,19 +19,22 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class DocViewViewModel @Inject constructor(val database: AppDatabase, val appContext: Application?) :
+class DocViewViewModel @Inject constructor(
+    val database: AppDatabase,
+    val appContext: Application?
+) :
     ViewModel() {
-//    val addImageResponse = MutableLiveData<Long>()
+    //    val addImageResponse = MutableLiveData<Long>()
     val loadDocumentResponse = MutableLiveData<Document?>()
 
     private val loadImagesResponse = MutableLiveData<List<Image?>>()
-    val images:LiveData<List<Image?>> get() = loadImagesResponse
+    val images: LiveData<List<Image?>> get() = loadImagesResponse
 
     val renameDocResponse = MutableLiveData<Int>()
     val deleteDocResponse = MutableLiveData<Boolean>()
     val tempPdfResponse = MutableLiveData<String>()
     val sharePdfResponse = MutableLiveData<String>()
-    val downloadPdfResponse=MutableLiveData<Boolean>()
+    val downloadPdfResponse = MutableLiveData<Boolean>()
 
     private fun makePdf(): String {
         try {
@@ -53,12 +56,19 @@ class DocViewViewModel @Inject constructor(val database: AppDatabase, val appCon
         viewModelScope.launch {
             try {
                 val tempFilePath = makePdf()
+//                Downlads folder for my app
+
                 val downloadsFolder =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
-                val docName=loadDocumentResponse.value?.name?:"Document"
+                val appExternalDir = appContext?.getExternalFilesDir(null)
+                if (appExternalDir != null && !appExternalDir.exists()) {
+                    appExternalDir.mkdirs()
+                }
 
-                val fileOutputStream = FileOutputStream("$downloadsFolder/$docName.pdf")
+                val docName = loadDocumentResponse.value?.name ?: "Document"
+
+                val fileOutputStream = FileOutputStream("$appExternalDir/$docName.pdf")
                 val fileInputStream = FileInputStream(tempFilePath)
                 fileOutputStream.write(fileInputStream.readBytes())
 
@@ -93,21 +103,21 @@ class DocViewViewModel @Inject constructor(val database: AppDatabase, val appCon
         }
     }
 
-   /* fun addImageToDocument(docId: Long, imagePath: String, onException: (Exception) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val imageDao = database.imageDao()
-                val index = imageDao.all()?.size ?: 0
-                val newImage = Image(
-                    imagePath, index, docId
-                )
-                addImageResponse.value = imageDao.insert(newImage)
-                loadImagesResponse.value = imageDao.getImagesByDocId(docId)
-            } catch (e: Exception) {
-                onException(e)
-            }
-        }
-    }*/
+    /* fun addImageToDocument(docId: Long, imagePath: String, onException: (Exception) -> Unit) {
+         viewModelScope.launch {
+             try {
+                 val imageDao = database.imageDao()
+                 val index = imageDao.all()?.size ?: 0
+                 val newImage = Image(
+                     imagePath, index, docId
+                 )
+                 addImageResponse.value = imageDao.insert(newImage)
+                 loadImagesResponse.value = imageDao.getImagesByDocId(docId)
+             } catch (e: Exception) {
+                 onException(e)
+             }
+         }
+     }*/
 
     fun loadImagesForDoc(docId: Long, onException: (Exception) -> Unit) {
         viewModelScope.launch {

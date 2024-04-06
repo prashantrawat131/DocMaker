@@ -94,11 +94,11 @@ class CO {
         }*/
 
         fun log(msg: String) {
-            Log.d(Constants.TAG, msg + "")
+//            Log.d(Constants.TAG, msg + "")
         }
 
         fun logError(msg: String) {
-            Log.e(Constants.TAG, msg + "")
+//            Log.e(Constants.TAG, msg + "")
         }
 
         fun toast(msg: String, context: Context?) {
